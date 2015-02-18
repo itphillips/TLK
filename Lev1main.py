@@ -17,7 +17,7 @@ def sent_cleanup(whole_sent):
 
 #This loop goes through all of these characters and if that character is in the main file, 
 #it replaces it with a space (for easier splitting)
-    for punct in ["!", "'", '"', ":", "\n", ";", ".", ",", "?", "$", "(", ")", "-"]:
+    for punct in ["!", '"', ":", "\n", ";", ".", ",", "?", "$", "(", ")", "-"]:
         words = string.replace(words, punct, " ")
     	b = string.split(words, " ")
     return b
