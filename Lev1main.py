@@ -1,6 +1,23 @@
 #this contains the functions needed to collect and store TLK level 1 metadata
 
 import string
+import psycopg2
+import urlparse
+from psycopg2 import extras
+
+#connect to psql database
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse("")
+conn = psycopg2.connect(
+database=url.path[1:],
+user=url.username,
+password=url.password,
+host=url.hostname,
+port=url.port
+)
+conn.set_session(autocommit=True)
+dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
 
 #This function asks the user to input a sentence
 def get_sent():
@@ -36,27 +53,32 @@ def tag_pos(input_sent):
 
 #this function checks the info that the user has entered; it re-runs tag_pos() if the info
 #is incorrect; it asks for a new sentence if the info is correct
-def pos_confirm():
-	confirmation = raw_input("Is this information correct?")
-	if confirmation == "0":
-		tag_pos()
-	else:
-		print "Great! Let's continue."
-		levonemain()
+def pos_confirm(pos_tags):
+    print pos_tags
+    confirmation = raw_input("Is this information correct?")
+    if confirmation == "0":
+        tag_pos()
+    else:
+        for word in pos_tags:
+            dict_cur.execute("INSERT INTO words(word, pos, language) VALUES (%s,%s, %s)",(word, pos_tags[word],"english"))
+        print "Great! Let's continue."
+        print pos_tags
+        levonemain()
 
 #this function runs all of the small functions (above) that are needed to gather TLK
 #Level 1 (part-of-speech) data
 def levonemain():
 #this variable is the whole sentence that the user inputs
-	whole_sent = get_sent()
+    whole_sent = get_sent()
 #this variable is the output of sent_cleanup when performed on whole_sent
-	split_sent = sent_cleanup(whole_sent)
+    split_sent = sent_cleanup(whole_sent)
 #this variable is the output of tag_pos when performed on split_sent
-	pos_tags = tag_pos(split_sent)
+    pos_tags = tag_pos(split_sent)
 	
+    pos_confirm(pos_tags)
 #this prints the dictionary that contains each word in the sentence input by the user
 #and the POS tag that the user has applied to each word 
-	print pos_tags
+
 	
 
 
