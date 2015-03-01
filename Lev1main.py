@@ -18,10 +18,10 @@ port=url.port
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-
+input_sent = raw_input("Please enter one sentence with all punctuation: ")
 #This function asks the user to input a sentence
 def get_sent():
-    a = raw_input("Please enter one sentence with all punctuation: ") 
+    a = input_sent 
     return a
 
 #This function splits the sentence into individual words; replaces punctuation with a space
@@ -40,12 +40,12 @@ def sent_cleanup(whole_sent):
     return b
 
 #this function creates a dictionary called "sentence_dict"
-def tag_pos(input_sent):
+def tag_pos(word_lists):
     sentence_dict = {}
     
 #This loop goes through all of the words in the input and asks what the part-of-speech tag
 #should be, then adds this value-key pair to the dictionary "sentence_dict"
-    for word in input_sent:
+    for word in word_lists:
         print "What part of speech does '" + word + "' belong to?"
         b = raw_input(" ")
         sentence_dict.update({word:b})
@@ -55,15 +55,16 @@ def tag_pos(input_sent):
 #is incorrect; it asks for a new sentence if the info is correct
 def pos_confirm(pos_tags):
     print pos_tags
+    
     confirmation = raw_input("Is this information correct?")
+    
     if confirmation == "0":
-        tag_pos()
+        levonemain()
     else:
         for word in pos_tags:
             dict_cur.execute("INSERT INTO words(word, pos, language) VALUES (%s,%s, %s)",(word, pos_tags[word],"english"))
         print "Great! Let's continue."
-        print pos_tags
-        levonemain()
+
 
 #this function runs all of the small functions (above) that are needed to gather TLK
 #Level 1 (part-of-speech) data
@@ -76,12 +77,17 @@ def levonemain():
     pos_tags = tag_pos(split_sent)
 	
     pos_confirm(pos_tags)
-#this prints the dictionary that contains each word in the sentence input by the user
-#and the POS tag that the user has applied to each word 
-
-	
 
 
 #this calls the main Level 1 function: starts with a whole sentence input by the user
 #and ends by adding each word and its part-of-speech tag to the dictionary sentence_dict
 levonemain()
+
+#***************************************************************************
+
+#this contains the functions needed to collect and store TLK level 2 data
+
+print "Now we're going to identify the syntactic categories in the sentence."
+print "Here is the sentence you entered: \n%s" % (input_sent)
+
+
