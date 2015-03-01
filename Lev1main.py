@@ -89,7 +89,7 @@ levonemain()
 
 #this contains the functions needed to collect and store TLK level 2 data
 
-print "Now we're going to identify the syntactic categories in the sentence."
+print "Now you're going to identify the syntactic categories in the sentence."
 print "Here is the sentence you entered: \n%s" % (input_sent)
 
 #this creates the phrase dictionary as a global variable
@@ -125,4 +125,9 @@ def levtwomain():
 
 #this calls the main lev 2 function	
 levtwomain()
+
+#****************** LEVEL 3 *********************************************************
+
+#working on this in Lev3main.py
+#will add lev 3 functions here once they are up and running in Lev3main.py
 
