@@ -12,7 +12,7 @@ cur.execute("CREATE TABLE words (id serial PRIMARY KEY, word varchar, pos varcha
 cur.execute("CREATE TABLE words_sentences (id serial PRIMARY KEY, sentenceID int, wordID int);")
 cur.execute("CREATE TABLE phrases (id serial PRIMARY KEY, phrase varchar, phrase_type varchar, wordtype1 varchar, wordtype2 varchar);") #there should be 15 of these!!
 cur.execute("CREATE TABLE phrases_sentences (id serial PRIMARY KEY, sentenceID int, phraseID int);")
-
+cur.execute("CREATE TABLE users (id serial PRIMARY KEY, username varchar, password varchar")
 
 conn.commit()
 
