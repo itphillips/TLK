@@ -64,7 +64,15 @@ def pos_confirm(pos_tags):
         levonemain()
     else:
         for word in pos_tags:
-            dict_cur.execute("INSERT INTO words(word, pos, language) VALUES (%s,%s, %s)",(word, pos_tags[word],"english"))
+            # check to see if word, pos, language are in the database. If they are don't put them in again. Can I do this without repetition? 
+            # ALSO! Make all the caps lower.
+            dict_cur.execute("SELECT id FROM words WHERE word='{0}' AND pos= '{1}' AND language='{2}');".format(word, pos_tags[word], "english"))
+            wordID = int(dict_cur.fetchone())
+            if not wordID:
+                dict_cur.execute("INSERT INTO words(word, pos, language) VALUES (%s,%s, %s)",(word, pos_tags[word],"english"))
+                dict_cur.execute("SELECT id FROM words WHERE word='{0}' AND pos= '{1}' AND language='{2}');".format(word, pos_tags[word], "english"))
+                wordID = int(dict_cur.fetchone())
+            #dict_cur.execute("INSERT INTO words_sentences(sentenceID, wordID) VALUES (%i, %i)", (sentenceID, wordID)
         print "Great! Let's continue."
 
 
@@ -128,6 +136,14 @@ def levtwocheck():
 	else:
 #HERE WE NEED TO ADD THE FUNCTION THAT SENDS THE constituent_token:constituent_type 
 #TUPLES IN THE DICTIONARY TO THE SYNTACTIC CONSTITUENT TABLE IN THE DATABASE
+        for phrase in p_dict.keys():
+            dict_cur.execute("SELECT id FROM phrases WHERE phrase='{0}');".format(phrase))
+            phraseID = int(dict_cur.fetchone())
+            if not phraseID:
+                dict_cur.execute("INSERT INTO phrases(phrase, phrase_type) VALUES (%s,%s)",(phrase, p_dict[phrase]))
+                dict_cur.execute("SELECT id FROM phrases WHERE phrase='{0}');".format(phrase))
+                phraseID = int(dict_cur.fetchone())
+            #dict_cur.execute("INSERT INTO phrases_sentences(sentenceID, phraseID) VALUES (%i, %i)", (sentenceID, phraseID)
 		print "Great! Now let's identify some grammatical functions in the sentence."
 
 def levtwomain():
@@ -224,6 +240,12 @@ def confirm_gramfunc():
 #HERE WE NEED TO SEND THE "grammatical function:phrase" TUPLES IN gramfunc_dict TO THE
 #GRAMMATICAL FUNCTION TABLE FOR THIS SESSION	
 	else:
+        for word in gramfunc_dict.keys():
+            # this is not going to work as a dictionary since we are losing the ordering, which is important for our databasing.
+            # we should change it to a list of tuples, or something...or, probably, an ordered dictionary!
+            #this is a placeholder
+            colname ="wordtype1"
+            dict_cur.execute(""" UPDATE words SET '{0}' = '{1}' WHERE word='{2}';""".format(colname,gramfunc_dict[word],word ))
 #WE NEED TO FIGURE OUT WHAT TO SHOW THE USER AT THIS POINT and how to show them
 #e.g., show the phrase structure rules and the syntactic tree for the sentence
 		print """Great! Now let's take a look at all the information you've entered for the following sentence: """
