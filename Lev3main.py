@@ -2,6 +2,8 @@
 #levtwomain is called here because it creates phrase_dict, which is needed to run 
 #levthreemain
 import string
+import collections
+
 
 input_sent = raw_input("Please enter one sentence with all punctuation: ")
 
@@ -69,20 +71,20 @@ print "Here are the syntactic constituents you labeled in the last step: "
 print p_dict
 
 #this creates a dictionary for grammatical functions
-gramfunc_dict = {}
+gramfunc_dict = collections.OrderedDict()
 
 #this asks the user to identify the grammatical subject, labels it "subject" and adds
 #this key:value pair to the gramfunc_dict
 def label_gramsub():
 	gram_sub = raw_input ("Which constituent is the grammatical subject of the sentence? ")
-	gramfunc_dict.update({gram_sub:"subject"})
+	gramfunc_dict.update({"subject":gram_sub})
 	dirobj_loop()
 
 #this asks the user to identify the grammatical direct object, labels it "direct object" 
 #and adds this key:value pair to the gramfunc_dict	
 def label_gramdirobj():
 	gram_dirobj = raw_input ("""Which constituent is the grammatical direct object of the sentence? """)
-	gramfunc_dict.update({gram_dirobj:"direct object"})
+	gramfunc_dict.update({"direct object":gram_dirobj})
 	indobj_loop()
 
 #this asks the user to identify the grammatical indirect object, labels it "indirect object" 
@@ -90,7 +92,7 @@ def label_gramdirobj():
 def label_gramindobj():
 	z = gramfunc_dict
 	gram_indobj = raw_input ("""Which constituent is the grammatical indirect object of the sentence? """)
-	gramfunc_dict.update({gram_indobj:"indirect object"})
+	gramfunc_dict.update({"indirect object":gram_indobj})
 	print """Here are the grammatical functions you've assigned to the constituents in your sentence: """
 	print z
 	confirm_gramfunc()

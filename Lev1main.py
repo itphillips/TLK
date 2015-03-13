@@ -5,6 +5,7 @@
 import string
 import psycopg2
 import urlparse
+import collections
 from psycopg2 import extras
 
 #connect to psql database
@@ -37,13 +38,13 @@ def sent_cleanup(whole_sent):
 #This loop goes through all of these characters and if that character is in the main file, 
 #it replaces it with a space (for easier splitting)
     for punct in ["!", '"', ":", "\n", ";", ".", ",", "?", "$", "(", ")", "-"]:
-        words = string.replace(words, punct, " ")
+        words = string.replace(words, punct, "")
     	b = string.split(words, " ")
     return b
 
-#this function creates a dictionary called "sentence_dict"
+#this function creates an ordered dictionary called "sentence_dict"
 def tag_pos(word_lists):
-    sentence_dict = {}
+    sentence_dict = collections.OrderedDict()
     
 #This loop goes through all of the words in the input and asks what the part-of-speech tag
 #should be, then adds this value-key pair to the dictionary "sentence_dict"
@@ -166,7 +167,7 @@ print "Here are the syntactic constituents you labeled in the last step: "
 print p_dict
 
 #this creates a dictionary for grammatical functions
-gramfunc_dict = {}
+gramfunc_dict = collections.OrderedDict()
 
 #this asks the user to identify the grammatical subject, labels it "subject" and adds
 #this key:value pair to the gramfunc_dict
@@ -244,6 +245,13 @@ def confirm_gramfunc():
             # this is not going to work as a dictionary since we are losing the ordering, which is important for our databasing.
             # we should change it to a list of tuples, or something...or, probably, an ordered dictionary!
             #this is a placeholder
+            # made gramfunc_dict an ordered dictionary, but I think it still won't do what we need
+            # this will remember the order in which the user added subject, direct object, and indirect object tuples
+            # to the dictionary (it will always be S, DO, IO, because of the way we ask for this info); what
+            # we want is the order from the original sentence input, so I turned the dictionary created in level 1
+            # from the user-input sentence (sentence_dict) into an ordered dictionary; now the question is: how do we
+            # couple the order information from the level 1 ordered dictionary to the grammatical function info
+            # from level 3 in order to determine basic word order for the sentence (SVO, SOV, VSO, etc.)?
             colname ="wordtype1"
             dict_cur.execute(""" UPDATE words SET '{0}' = '{1}' WHERE word='{2}';""".format(colname,gramfunc_dict[word],word ))
 #WE NEED TO FIGURE OUT WHAT TO SHOW THE USER AT THIS POINT and how to show them
