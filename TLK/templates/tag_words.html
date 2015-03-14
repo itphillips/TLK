@@ -27,21 +27,35 @@
             
 <!--This is the workspace box-->
     <div id="content" style="background-color:#FFF; height:600px;width:650px;float:left;">
-        <h2>Step 1</h2>
-        <h3>Please begin by entering one sentence and paraphrasing its meaning below.</h3>
+        <h2>Step 2</h2>
+        <h3>Please identify the part of speech for each word in your sentence:</h3>
+        <p>show the sentence entered in enter_sent.html</p>
     	<div> 
-        	<form> 
-            	<p>Enter your sentence here: </p>
-                	<p><input type="text" name="sentence" style="width:600px;"><br></p> 
-            	<p>Paraphrase the meaning of your sentence here: </p>
-                	<p><input type="text" name = "paraphrase" style="width:600px;"><br></p> 
-            	<p>Sentence type: 
-                	<input type="radio" name = "sentencetype" value="declarative">declarative
-                	<input type="radio" name = "sentencetype" value="interrogative">interrogative
-                	<input type="radio" name = "sentencetype" value="imperative">imperative                            
-            	</p>
- 			<input type="submit" value="Continue to Step 2"> 
-        	</form> 
+        	<form name="pos" action="{{url_for('pos_confirm', words=words)}}">
+			{% for word in words %}
+			{{word}}
+				<select name="{{word}}" form="pos">
+  					<option value="adjective">Adjective</option>
+  					<option value="adverb">Adverb</option>
+  					<option value="conjunction">Conjunction</option>
+  					<option value="complementizer">Complementizer</option>
+  					<option value="determiner-demonstrative">Determiner-demonstrative</option>
+  					<option value="determiner-numeral">Determiner-numeral</option>
+  					<option value="determiner-possessive">Determiner-possessive</option>
+  					<option value="determiner-quantificational">Determiner-quantificational</option>
+  					<option value="noun">Noun</option>
+  					<option value="preposition">Preposition</option>
+  					<option value="pronoun">Pronoun</option>
+  					<option value="verb-ditransitive">Verb-ditransitive</option>
+  					<option value="verb-intransitive">Verb-intransitive</option>
+  					<option value="verb-transitive">Verb-transitive</option>
+  					<option value="verb-sentential complement">Verb-sentential complement</option>
+  					
+				</select>
+				<br>
+				{% endfor %}
+					<input type="submit" value="Continue to Step 3">
+			</form> 
     	</div>
     </div>
             
@@ -55,23 +69,3 @@
 </html>
 
 <html>
-
-<head>
-	Please select the part of speech for each word in the sentence.
-</head>
-<body>
-<form name="pos" action="{{url_for('pos_confirm', words=words)}}">
-{% for word in words %}
-{{word}}
-<select name="{{word}}" form="pos">
-  <option value="noun">Noun</option>
-  <option value="verb">Verb</option>
-  <option value="article">Article</option>
-  <option value="adjective">Adjective</option>
-</select>
-<br>
-{% endfor %}
-<input type="submit" value="submit">
-</form>
-</body>
-</html>
