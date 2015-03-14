@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
-		<title>tag words</title>
+		<title>input sentence</title>
 		<meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
@@ -51,27 +51,5 @@
     </div>
 </div>
 
-</body>
-</html>
-
-<html>
-
-<head>
-	Please select the part of speech for each word in the sentence.
-</head>
-<body>
-<form name="pos" action="{{url_for('pos_confirm', words=words)}}">
-{% for word in words %}
-{{word}}
-<select name="{{word}}" form="pos">
-  <option value="noun">Noun</option>
-  <option value="verb">Verb</option>
-  <option value="article">Article</option>
-  <option value="adjective">Adjective</option>
-</select>
-<br>
-{% endfor %}
-<input type="submit" value="submit">
-</form>
 </body>
 </html>
