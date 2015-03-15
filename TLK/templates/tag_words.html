@@ -31,7 +31,7 @@
         <h3>Please identify the part of speech for each word in your sentence:</h3>
         <p>show the sentence entered in enter_sent.html</p>
     	<div> 
-        	<form name="pos" action="{{url_for('pos_confirm', words=words)}}">
+        	<form name="pos" action="{{url_for('lev1main.py', words=words)}}">
 			{% for word in words %}
 			{{word}}
 				<select name="{{word}}" form="pos">
