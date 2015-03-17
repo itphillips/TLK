@@ -1,9 +1,23 @@
-<html>
-<!-- Ian, I added this action so that when you hit the button it goes to the function called show_sentences. You can list variables here -->
-<form name="nameinput" action="{{url_for('show_sentences', username=username, password=password)}}">
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>TLK login</title>
+</head>
+
+<body>
+<!--This is the container and title image header-->
+    <div id="container" style="width:1100px">
+        <div id="header" style="background-color:#FFF;">
+            <img src="LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210">    
+        </div>
+    </div> 
+<form>
+	Please enter your user name: <input type="text" name="username"><br>
+	<form name="nameinput" action="{{url_for('show_sentences', username=username, password=password)}}">
 	Please enter your user name and password: 
 	<input type="text" name="username"> <input type="text" name="password">
 	<br>
 	<button type="submit">OK
 </form>
+</body>
 </html>

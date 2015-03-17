@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
-		<title>tag words</title>
+		<title>tag phrases</title>
 		<meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
 
 <body>
-
 <!--This is the container and title image header-->
 <div id="container" style="width:1100px">
         <div id="header" style="background-color:#FFF;">
@@ -28,30 +27,21 @@
             
 <!--This is the workspace box-->
     <div id="content" style="background-color:#FFF; height:600px;width:650px;float:left;">
-        <h2>Step 2</h2>
-        <h3>Please identify the part of speech for each word in your sentence:</h3>
+        <h2>Step 3</h2>
+        <h3>Please identify each syntactic category (phrase) in your sentence:</h3>
         <p>show the sentence entered in enter_sent.html</p>
     	<div> 
-		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
-
-		{% for word in sentence.split() %}
-		{{word}}
-				<select name="{{word}}" form="pos">
-  					<option value="adjective">Adjective</option>
-  					<option value="adverb">Adverb</option>
-  					<option value="conjunction">Conjunction</option>
-  					<option value="complementizer">Complementizer</option>
-  					<option value="determiner-demonstrative">Determiner-demonstrative</option>
-  					<option value="determiner-numeral">Determiner-numeral</option>
-  					<option value="determiner-possessive">Determiner-possessive</option>
-  					<option value="determiner-quantificational">Determiner-quantificational</option>
-  					<option value="noun">Noun</option>
-  					<option value="preposition">Preposition</option>
-  					<option value="pronoun">Pronoun</option>
-  					<option value="verb-ditransitive">Verb-ditransitive</option>
-  					<option value="verb-intransitive">Verb-intransitive</option>
-  					<option value="verb-transitive">Verb-transitive</option>
-  					<option value="verb-sentential complement">Verb-sentential complement</option>
+        	<form name="phrase_tag" action="{{url_for('phrase_confirm', phrases=phrases)}}">
+			{% for phrase in phrases %}
+			{{phrase}}
+				<select name="{{phrase}}" form="phrase_tag">
+  					<option value="AP">AP</option>
+  					<option value="CP">CP</option>
+  					<option value="NP">NP</option>
+  					<option value="PP">PP</option>
+  					<option value="S">S</option>
+  					<option value="VP">VP</option>
+  					<option value="WhP">WhP</option>
   					
 				</select>
 				<br>
@@ -67,7 +57,7 @@
     </div>
 </div>
 
-
 </body>
 </html>
 
+<html>

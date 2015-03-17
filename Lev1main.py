@@ -21,13 +21,13 @@ port=url.port
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-input_sent = raw_input("Please enter one sentence with all punctuation: ")
-#This function asks the user to input a sentence
+#this function prompts the user to input a sentence and returns it
 def get_sent():
-    a = input_sent 
-    return a
+    input_sent = raw_input("Please enter one sentence with all punctuation: ")
+    return input_sent
 
-#This function splits the sentence into individual words; replaces punctuation with a space
+
+#This function deletes punctuation and splits the sentence into individual words
 #This function needs to be revised so that contractions get split in the right place
 #before "n't", not at "'"
 
@@ -98,11 +98,10 @@ levonemain()
 
 #this contains the functions needed to collect and store TLK level 2 data
 
-print "Now we're going to identify the syntactic constituents in the sentence."
-print "Here is the sentence you entered: \n%s" % (input_sent)
-
-#this creates the phrase dictionary as a global variable--takes phrase:phrase type tuples
-p_dict = {}
+#this creates the phrase dictionary as a local variable--takes phrase:phrase type tuples
+def make_pdict():
+    p_dict = {}
+    return p_dict
 
 #updates p_dict with tuples entered by the user in levtwomain()
 def p_dict_addition(a,b):
@@ -148,6 +147,13 @@ def levtwocheck():
 		print "Great! Now let's identify some grammatical functions in the sentence."
 
 def levtwomain():
+#assigns the sentence input by the user to the variable "show_sent"
+	show_sent = get_sent()
+#assigns the p_dict created by make_pdict() to the variable p_dict
+	p_dict = make_pdict()
+#Lev2 intro	
+	print "Now we're going to identify the syntactic constituents in the sentence."
+	print "Here is the sentence you entered: \n%s" % (show_sent)
 #gets a constituent from the user and assigns it to variable "p"
 	p = raw_input ("Please enter a syntactic constituent in this sentence: ")
 #gets a constituent type from the user and assigns it to variable "p_tag"
@@ -156,18 +162,19 @@ def levtwomain():
 	p_dict_addition(p, p_tag)
 #calls the function that allows the user to update p_dict{}
 	add_ptag()
-	
+
+
+
 #calls the main function
 levtwomain()
 
 #****************** LEVEL 3 *********************************************************
 
-print """Now you're going to identify the grammatical functions for the constituents in your sentence."""
-print "Here are the syntactic constituents you labeled in the last step: "
-print p_dict
 
 #this creates a dictionary for grammatical functions
-gramfunc_dict = collections.OrderedDict()
+def make_gramfunc_dict():
+	gramfunc_dict = collections.OrderedDict()
+	return gramfunc_dict
 
 #this asks the user to identify the grammatical subject, labels it "subject" and adds
 #this key:value pair to the gramfunc_dict
@@ -256,14 +263,27 @@ def confirm_gramfunc():
             dict_cur.execute(""" UPDATE words SET '{0}' = '{1}' WHERE word='{2}';""".format(colname,gramfunc_dict[word],word ))
 #WE NEED TO FIGURE OUT WHAT TO SHOW THE USER AT THIS POINT and how to show them
 #e.g., show the phrase structure rules and the syntactic tree for the sentence
-		print """Great! Now let's take a look at all the information you've entered for the following sentence: """
-		print input_sent
-		print "syntactic constituents: %r" % p_dict
-		print "grammatical functions: %r" % gramfunc_dict
-	
+		
 #this defines the function order for levthreemain()
 def levthreemain():
+#this variable is the whole sentence that the user inputs
+    whole_sent = get_sent()
+#assigns the gramfunc_dict created by make_gramfunc_dict() to the variable gramfunc_dict
+	gramfunc_dict = make_gramfunc_dict()
+#assigns the p_dict created in level 2 make_pdict to the variable show_pdict
+	show_pdict = make_pdict()
+#Lev3 intro	
+	print """Now you're going to identify the grammatical functions for the constituents in your sentence."""
+	print "Here are the syntactic constituents you labeled in the last step: "
+	print show_pdict
+	
 	sub_loop()
+	
+	print """Great! Now let's take a look at all the information you've entered for the following sentence: """
+	print whole_sent
+	print "syntactic constituents: %r" % show_pdict
+	print "grammatical functions: %r" % gramfunc_dict
+	
 
 #this calls the main function for collecting level three (grammatical function) data	
 levthreemain()
