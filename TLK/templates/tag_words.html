@@ -5,6 +5,7 @@
 </head>
 <body>
 <form name="pos" action="{{url_for('pos_confirm', words=words)}}">
+	<fieldset>
 {% for word in words %}
 {{word}}
 <select name="{{word}}" form="pos">
@@ -15,7 +16,7 @@
 </select>
 <br>
 {% endfor %}
-<input type="submit" value="submit">
+<input type="submit" value="submit"></fieldset>
 </form>
 </body>
 </html>
