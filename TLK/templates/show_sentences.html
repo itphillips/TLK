@@ -1,0 +1,18 @@
+<html>
+Click the sentence you want to work on!
+
+{% for sentence in sentences %}
+<form name="{{sentence}}" action="{{url_for('tag', sentence=sentence)}}" method="GET">
+        <button type="submit">{{sentence}}
+        </button>
+        <input type="hidden" name="username" value="{{username}}">
+        <input type="hidden" name="password" value="{{password}}">
+        </form> 
+ {% endfor %}
+ <form name="NewSentence" action="{{url_for('input_sentence')}}">
+ 	<button type="submit">I want to input a new sentence
+ 		 <input type="hidden" name="username" value="{{username}}">
+        <input type="hidden" name="password" value="{{password}}">
+    </form>
+
+</html>

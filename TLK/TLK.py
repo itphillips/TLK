@@ -15,8 +15,8 @@ conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec
 
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-
 @app.route("/")
+@app.route("/login")
 def login():
 	return render_template("login.html")
 
@@ -25,26 +25,65 @@ def show_sentences():
 	#this pulls any users from the database that match the credentials given. If there is one, it displays the sentences from this user.
 	#if not, it 
 	username=request.args.get("username")
-	print username, "username"
-	dict_cur.execute("SELECT * FROM sentences WHERE username = '{0}';".format( username ))
+	password=request.args.get("password")
+	dict_cur.execute("SELECT * FROM sentences WHERE username = '{0}' AND password= '{1}';".format( username, password ))
 	sentences=dict_cur.fetchall()
 	if sentences == []:
 		return redirect (url_for('input_sentence'))
+	else:
+		return render_template("show_sentences.html", sentences=sentences, username=username, password=password)
 
+@app.route("/input")
 def input_sentence():
-	pass
+	username=request.args.get("username")
+	password=request.args.get("password")
+	return render_template("input_sentence.html", username=username, password=password)
 
+@app.route("/sentence")
+def confirm_setence():
+	
+	username=request.args.get("username")
+	password=request.args.get("password")
+	sentence=request.args.get("sentence")
+	language=request.args.get("language")
+	date=request.args.get("date")
+	#continued_session=request.args.get("continued_session")
 
-@app.route("/tag")
+	sessionID=date+language
+	dict_cur.execute("SELECT sessionnumber FROM sentences WHERE username = '{0}' AND password = '{1}' AND sessionID='{2}';").format(username, password, sessionID)
+	if dict_cur.fetchall != []:
+		#may want to check if the sentence is identical or not...
+		sessionnumber=sessionnumber+1
+	else:
+		sessionnumber=1	
+	
+	dict_cur.execute(dict_cur.execute("INSERT INTO sentences (username,password,sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s, %s, %s)",(username,password,sentence, language, date, sessionnumber, sessionID))
+
+		
+
+@app.route("/tagPOS")
 def tag_pos(sentence="Susan and Ian are making an app"):
-	words=sentence.split()
-	return render_template("tag_words.html", words=words)
+	return render_template("tag_words.html", sentence=sentence)
 
 @app.route("/confirmPOS")
 def pos_confirm():
-	words=request.args.get("words")
-	print words
-	return render_template("tag_words.html", words=words)
+
+	print "hi"
+	try:
+		sentence=request.args.get("sentence")
+		print "got args"
+		print sentence
+	except Exception as e:
+		print e
+	return render_template("POS_confirm.html", sentence=sentence)
+
+@app.route("/")
+def pos_confirm_redirect():
+	if request.args.get("YES!"):
+		return render_template ("")
+	else:
+		return redirect(url_for("tag_pos")) 
+
 
 if __name__ == '__main__':
     app.run()

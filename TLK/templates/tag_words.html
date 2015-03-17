@@ -4,9 +4,9 @@
 	Please select the part of speech for each word in the sentence.
 </head>
 <body>
-<form name="pos" action="{{url_for('pos_confirm', words=words)}}">
+<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
 	<fieldset>
-{% for word in words %}
+{% for word in sentence.split() %}
 {{word}}
 <select name="{{word}}" form="pos">
   <option value="noun">Noun</option>
