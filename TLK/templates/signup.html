@@ -1,8 +1,9 @@
 <html>
 Looks like you haven't used The Linguist's Kitchen before!
 Do you want to sign up?
+<!--!   best case send them an email if they forgot their password -->
 <form action="{{url_for('signup', username=username, password=password) }}" method="POST">
-<input type="text" name="username" value="{{username}}">username <br>
+<input type="text" name="username" value="{{username}}">email <br>
 <input type="text" name="password" value="{{password}}">password <br>
 <input type="submit" name="submit" value="Sign me up!">
 </html>
