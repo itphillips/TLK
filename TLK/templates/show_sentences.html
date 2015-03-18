@@ -9,14 +9,12 @@ Looks like you don't have any sentences input yet!
 <form name="{{sentence}}" action="{{url_for('tag', sentence=sentence)}}" method="GET">
         <button type="submit">{{sentence}}
         </button>
-        <input type="hidden" name="username" value="{{username}}">
-        <input type="hidden" name="password" value="{{password}}">
+        <input type="hidden" name="userID" value="{{userID}}">
         </form> 
  {% endfor %}
  <form name="NewSentence" action="{{url_for('input_sentence')}}">
  	<button type="submit">I want to input a new sentence
- 		 <input type="hidden" name="username" value="{{username}}">
-        <input type="hidden" name="password" value="{{password}}">
+ 		 <input type="hidden" name="userID" value="{{userID}}">
     </form>
 
 </html>

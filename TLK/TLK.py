@@ -27,19 +27,18 @@ def show_sentences():
 	username=request.args.get("username")
 	password=request.args.get("password")
 
-	query="SELECT id FROM users WHERE username = '{}' AND password= '{}';".format( username, password )
-	dict_cur.execute(query)
+	dict_cur.execute("SELECT id FROM users WHERE username = '{}' AND password= '{}';".format( username, password ))
+	
 	userID=dict_cur.fetchone()
 	if userID == None:
 		return redirect (url_for('signup', username=username, password=password))
-		#return redirect (url_for('input_sentence'), username=username, password=password)
 	else:
 		try:
 			dict_cur.execute("SELECT * FROM sentences s INNER JOIN users_sentences us ON us.sentenceID=s.id WHERE us.userID='{0}'".format(userID[0]))
 			sentences=dict_cur.fetchall()
 		except Exception as e:
 			print e
-		return render_template("show_sentences.html", sentences=sentences, username=username, password=password)
+		return render_template("show_sentences.html", sentences=sentences, userID= userID[0])
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -49,62 +48,65 @@ def signup():
 	if request.method=="GET":
 		return render_template("signup.html", username=username, password=password)
 	else:
-		try:
-			dict_cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
-		except Exception as e:
-			print e
+		#this says it's working but secretly isn't (!)
+		dict_cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
 		return redirect(url_for('show_sentences', username=username, password=password))
 
 
 @app.route("/input")
 def input_sentence():
-	username=request.args.get("username")
-	password=request.args.get("password")
-	print "hi"
-	print username, password
-	return render_template("input_sentence.html", username=username, password=password)
+	userID=request.args.get("userID")
+	return render_template("input_sentence.html", userID=userID)
 
 @app.route("/sentence")
-def confirm_setence():
-
-	username=request.args.get("username")
-	password=request.args.get("password")
+def confirm_sentence():
+	userID=request.args.get("userID")
 	sentence=request.args.get("sentence")
 	language=request.args.get("language")
 	date=request.args.get("date")
+
 	#continued_session=request.args.get("continued_session")
 
 	sessionID=date+language
-	dict_cur.execute("SELECT sessionnumber FROM sentences WHERE username = '{0}' AND password = '{1}' AND sessionID='{2}';").format(username, password, sessionID)
-	if dict_cur.fetchall != []:
+	try:
+		dict_cur.execute("SELECT sessionnumber FROM sentences s INNER JOIN users_sentences us ON us.userID=s.ID WHERE us.userID = '{}'  AND sessionID='{}';".format(userID, sessionID))
+	except Exception as e:
+		print e
+	if dict_cur.fetchall() != []:
 		#may want to check if the sentence is identical or not...
 		sessionnumber=sessionnumber+1
 	else:
 		sessionnumber=1	
 	
-	dict_cur.execute(dict_cur.execute("INSERT INTO sentences (username,password,sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s, %s, %s)",(username,password,sentence, language, date, sessionnumber, sessionID)))
+	try:
+		dict_cur.execute("INSERT INTO sentences (sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s)",(sentence, language, date, sessionnumber, sessionID))
+		dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
+		sentenceID= dict_cur.fetchone()[0]
+		dict_cur.execute("INSERT INTO users_sentences (userID, sentenceID) VALUES (%s, %s)", (userID, sentenceID))
+	except Exception as e:
+		print e	
 
-		
+	return render_template("confirm_sentence.html", sentence=sentence, sentenceID=sentenceID, userID=userID)
+	#this template lets the user see if they like the sentence. If they don't, it redirects to input sentence. If they do, it directs to tag_pos
 
 @app.route("/tagPOS")
-def tag_pos(sentence="Susan and Ian are making an app"):
-	return render_template("tag_words.html", sentence=sentence)
+def tag_pos():
+	sentence = request.args.get(sentence)
+	userID = request.args.get(userID)
+	sentenceID = request.args.get(sentenceID)
+	return render_template("tag_words.html", sentence=sentence, userID=userID, sentenceID=sentenceID)
 
 @app.route("/confirmPOS")
 def pos_confirm():
-
-	print "hi"
-	try:
-		sentence=request.args.get("sentence")
-		print "got args"
-		print sentence
-	except Exception as e:
-		print e
-	return render_template("POS_confirm.html", sentence=sentence)
+	sentence=request.args.get("sentence")
+	userID = request.args.get(userID)
+	sentenceID = request.args.get(sentenceID)
+	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID)
 
 @app.route("/")
 def pos_confirm_redirect():
 	if request.args.get("YES!"):
+		#THIS IS WHERE THIS STOPS WORKING!
 		return render_template ("")
 	else:
 		return redirect(url_for("tag_pos")) 
