@@ -25,8 +25,8 @@ import collections
 
 #this function prompts the user to input a sentence and returns it
 def get_sent():
-    input_sent = raw_input("Please enter one sentence with all punctuation: ")
-    return input_sent
+    a = raw_input("Please enter one sentence with all punctuation: ")
+    return a
 
 
 #This function deletes punctuation and splits the sentence into individual words
@@ -58,8 +58,8 @@ def tag_pos(word_lists):
 
 #this function checks the info that the user has entered; it re-runs tag_pos() if the info
 #is incorrect; it asks for a new sentence if the info is correct
-def pos_confirm(pos_tags):
-    print pos_tags
+def pos_confirm(x):
+    print x
     
     confirmation = raw_input("Is this information correct?")
     
@@ -90,6 +90,7 @@ def levonemain():
     pos_tags = tag_pos(split_sent)
 	
     pos_confirm(pos_tags)
+    return whole_sent
 
 
 #this calls the main Level 1 function: starts with a whole sentence input by the user
@@ -99,11 +100,6 @@ levonemain()
 #****************** LEVEL 2 *********************************************************
 
 #this contains the functions needed to collect and store TLK level 2 data
-
-#this function shows the user the sentence they entered at the beginning of lev1
-def show_sent():
-    input_sent = raw_input("Please enter one sentence with all punctuation: ")
-    return input_sent
 
 #this creates the phrase dictionary as a local variable--takes phrase:phrase type tuples
 def make_pdict():
@@ -158,7 +154,7 @@ def levtwocheck():
 
 def levtwomain():
 #assigns the sentence input by the user to the variable "show_sent"
-	levonesent = show_sent()
+	levonesent = levonemain()
 #assigns the p_dict created by make_pdict() to the variable p_dict
 	p_dict = make_pdict()
 #Lev2 intro	
