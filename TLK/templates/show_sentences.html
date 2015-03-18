@@ -1,6 +1,10 @@
 <html>
+{% if sentences!=[] %}
 Click the sentence you want to work on!
 
+{% else %}
+Looks like you don't have any sentences input yet!
+{% endif %}
 {% for sentence in sentences %}
 <form name="{{sentence}}" action="{{url_for('tag', sentence=sentence)}}" method="GET">
         <button type="submit">{{sentence}}

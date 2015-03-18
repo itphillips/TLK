@@ -1,6 +1,6 @@
 <html>
-
-	<form name="sentenceInput" action="{{url_for('confirm_sentence', username=username, password=password, sentence=sentence, language=language, date=date, continued_session=continued_session)}}">
+hey.
+	<form name="sentenceInput" action="{{url_for('confirm_sentence', username=username, password=password, sentence=sentence, language=language, date=date)}}">
 	Please enter the sentence:<br> 
 	<input type="text" name="sentence"> <br>
 	What language is this sentence? <br>
@@ -9,11 +9,10 @@
 	When was this sample collected? Please enter the date in MMDDYY format <br>
 	<input type="text" name="date"> 
 	<br>
-	Have you previously input other sentences from this same recording session?
+<!-- 	Have you previously input other sentences from this same recording session?
 <input type="radio" name="continued_session" value="yes">Yes<br>
-<input type="radio" name="continued_session" value="no">No
+<input type="radio" name="continued_session" value="no">No -->
 
-	<button type="submit">OK
+	<button type="submit"> OK
 </form>
-</html>
 </html>

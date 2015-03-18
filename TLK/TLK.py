@@ -26,22 +26,47 @@ def show_sentences():
 	#if not, it 
 	username=request.args.get("username")
 	password=request.args.get("password")
-	dict_cur.execute("SELECT * FROM sentences WHERE username = '{0}' AND password= '{1}';".format( username, password ))
-	sentences=dict_cur.fetchall()
-	if sentences == []:
-		return redirect (url_for('input_sentence'))
+
+	query="SELECT id FROM users WHERE username = '{}' AND password= '{}';".format( username, password )
+	dict_cur.execute(query)
+	userID=dict_cur.fetchone()
+	if userID == None:
+		return redirect (url_for('signup', username=username, password=password))
+		#return redirect (url_for('input_sentence'), username=username, password=password)
 	else:
+		try:
+			dict_cur.execute("SELECT * FROM sentences s INNER JOIN users_sentences us ON us.sentenceID=s.id WHERE us.userID='{0}'".format(userID[0]))
+			sentences=dict_cur.fetchall()
+		except Exception as e:
+			print e
 		return render_template("show_sentences.html", sentences=sentences, username=username, password=password)
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+	username=request.args.get("username")
+	password=request.args.get("password")
+
+	if request.method=="GET":
+		return render_template("signup.html", username=username, password=password)
+	else:
+		try:
+			dict_cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
+		except Exception as e:
+			print e
+		return redirect(url_for('show_sentences', username=username, password=password))
+
 
 @app.route("/input")
 def input_sentence():
 	username=request.args.get("username")
 	password=request.args.get("password")
+	print "hi"
+	print username, password
 	return render_template("input_sentence.html", username=username, password=password)
 
 @app.route("/sentence")
 def confirm_setence():
-	
+
 	username=request.args.get("username")
 	password=request.args.get("password")
 	sentence=request.args.get("sentence")
@@ -57,7 +82,7 @@ def confirm_setence():
 	else:
 		sessionnumber=1	
 	
-	dict_cur.execute(dict_cur.execute("INSERT INTO sentences (username,password,sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s, %s, %s)",(username,password,sentence, language, date, sessionnumber, sessionID))
+	dict_cur.execute(dict_cur.execute("INSERT INTO sentences (username,password,sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s, %s, %s)",(username,password,sentence, language, date, sessionnumber, sessionID)))
 
 		
 
