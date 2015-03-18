@@ -1,0 +1,14 @@
+<html>
+{% for word in sentence.split() %}
+<form name="{{word}}" action="{{url_for('group.html')}}" method="POST">
+<button type >
+        </button>
+
+{% endfor %}
+<button type="submit" > Submit
+        </button>
+        <input type="hidden" name="userID" value="{{userID}}">
+        <input type="hidden" name="sentenceID" value="{{sentenceID}}">
+        </form> 
+
+</html>
