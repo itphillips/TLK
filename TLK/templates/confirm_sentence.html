@@ -1,20 +1,26 @@
 <html>
 Is this correct? <br>
  {{sentence}}
+
+ <div>
 <form action="{{url_for('tag_pos')}}">
 
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="language" value="{{language}}">
 	<input type="hidden" name="date" value="{{date}}">
-	<button type="submit">Yes, this sentence is correct
+	<button type="submit">Yes, this sentence is correct </button>
 </form>
+</div>
 
-<form action "{{url_for('input_sentence')}}">
+<div>
+<form action ="{{url_for('input_sentence')}}">
+
 	<input type="hidden" name="userID" value="{{userID}}">
-<button type="submit"> No, I want to input a different sentence
+	<button type="submit" name="2"> No, I want to input a different sentence
+	</button>
 </form>
-
+</div>
 still working on this!
 </html>
 

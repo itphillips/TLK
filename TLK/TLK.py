@@ -57,6 +57,7 @@ def signup():
 
 @app.route("/input")
 def input_sentence():
+	print "HEYYY INOOYRRT SENTENCE"
 	userID=request.args.get("userID")
 	print userID
 	return render_template("input_sentence.html", userID=userID)
@@ -77,8 +78,6 @@ def confirm_sentence():
 	print date
 		#return redirect to same page with error message==make sure you fill in all fields.
 	#continued_session=request.args.get("continued_session")
-
-
 
 	return render_template("confirm_sentence.html", userID=userID, sentence=sentence, language=language, date=date)
 
