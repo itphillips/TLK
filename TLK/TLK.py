@@ -57,9 +57,7 @@ def signup():
 
 @app.route("/input")
 def input_sentence():
-	print "HEYYY INOOYRRT SENTENCE"
 	userID=request.args.get("userID")
-	print userID
 	return render_template("input_sentence.html", userID=userID)
 
 @app.route("/sentence")
@@ -83,25 +81,21 @@ def confirm_sentence():
 
 @app.route("/tagPOS")
 def tag_pos():
-	print "yo"
+	error= request.args.get("error")
+	sentence = request.args.get("sentence")
+	userID = request.args.get("userID")
+
+	if error:
+		sentenceID= request.args.get("sentenceID")
+		return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error)
+
 	try:
-		sentence = request.args.get("sentence")
-		userID = request.args.get("userID")
 		language=request.args.get("language")
 		date=request.args.get("date")
 		sessionID=date+language
 	except Exception as e:
 		print e
 
-	try:
-		print sentence
-	except Exception as e:
-		print e
-	print userID
-	print language
-	print date
-	print sessionID
-	
 	try:
 		dict_cur.execute("SELECT sessionnumber FROM sentences s INNER JOIN users_sentences us ON us.userID=s.ID WHERE us.userID = '{}'  AND sessionID='{}';".format(userID, sessionID))
 	except Exception as e:
@@ -120,14 +114,27 @@ def tag_pos():
 	except Exception as e:
 		print e	
 
-	return render_template("tag_words.html", sentence=sentence, userID=userID, sentenceID=sentenceID)
+	return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error)
 
 @app.route("/confirmPOS")
 def pos_confirm():
 	sentence=request.args.get("sentence")
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
-	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID)
+	sentencepos = {}
+	for word in sentence.split():
+		print word
+		print request.args.get(word.lower())
+		if request.args.get(word.lower()):
+			print "hello"
+			try:
+				sentencepos[word.lower()] = request.args.get(word.lower())
+			except Exception as e:
+				print e
+		else:
+			return redirect(url_for('tag_pos', sentence=sentence, userID=userID, sentenceID=sentenceID, error= 1))
+
+	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, sentencepos=sentencepos)
 
 @app.route("/")
 def pos_confirm_redirect():

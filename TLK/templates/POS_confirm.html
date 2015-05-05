@@ -1,7 +1,11 @@
 <html>
-{% for i in range(len(sentence.split())) %}
-{{sentence.split()[i]}}  <br>
+{% for word in sentencepos%}
+{{word}}: {{sentencepos[word]}} 
+<br>
 {% endfor %}
 <br>
+<br>
 Is this correct?
+<input type ="submit" value= "Yes">
+<input type ="submit" value="No">
 </html>
