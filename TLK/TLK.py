@@ -143,9 +143,9 @@ def group():
 	sentence = request.args.get("sentence")
 	pos = request.args.get("pos")
 	words = sentence.split()
-	print pos
 	for i in range(len(words)):
 		print words[i]
+		print pos[i]
 		try:
 			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos[i], language))
 
@@ -153,9 +153,9 @@ def group():
 				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (words[i], pos[i], language))
 				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos[i], language))
 
-			wordID = dict_cur.fetchone()
+			wordID = dict_cur.fetchone()[0]
 
-			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s, %s)", (wordID, sentenceID))
+			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s)", (wordID, sentenceID))
 		except Exception as e:
 			print e
 
