@@ -1,8 +1,6 @@
 <html>
-{% for word in sentencepos%}
-{{word}}: {{sentencepos[word]}} 
-<br>
-{% endfor %}
+{% words = sentence.split() %}
+
 <br>
 <br>
 Is this correct?
@@ -10,7 +8,7 @@ Is this correct?
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<input type="hidden" name="sentencepos" value="{{sentencepos}}">
+	<input type="hidden" name="pos" value="{{pos}}">
 	<input type="hidden" name="language" value="{{language}}">
 	<button type ="submit" name= "Yes">Yes
 	</button>

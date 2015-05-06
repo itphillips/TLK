@@ -1,20 +1,31 @@
 <html>
-{% for word in sentence.split() %}
-<form name="{{word}}" action="{{url_for('group.html')}}" method="POST">
-<button type >
-        </button>
+<body>
+	<script type="text/javascript">
+	function onClick(e){
+		var target = e.target
+		status = e.target.classList.contains("active");
+		e.target.classList.add(status ? 'inactive' : 'active');
+   		e.target.classList.remove(status ? 'active' : 'inactive'); 
+	}
 
-{% endfor %}
+.active {
+  background-color: #7FFF00;  
+	}
+	</script>
+
+<form name="phrase" action="{{url_for('record_phrase')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+{% count = 0 %}
+{% for word in sentence.split() %}
+	{% count = count + 1 %}
+	<button type = "button" id = "{{count}}" onClick="onClick(e)" >{{word}}</button>
+	{% endfor %}
 <!--- dropdown for type -->
-<button type="submit" > Submit
-        </button>
-        <input type="hidden" name="userID" value="{{userID}}">
-        <input type="hidden" name="sentenceID" value="{{sentenceID}}">
-        </form> 
+		<button type="submit" > Submit</button>
+ </form> 
 
 <!--- above redirects to check work-->
 <!--- below redirects to next page-->
-<form name = "All done" action="{{url_for('')}}" method ="GET">
-<button type "submit" action>
-</form>
+</body>
 </html>

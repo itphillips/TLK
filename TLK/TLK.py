@@ -87,7 +87,7 @@ def tag_pos():
 	language=request.args.get("language")
 
 	if error:
-		sentenceID= request.args.get("sentenceID")
+		sentenceID = request.args.get("sentenceID")
 		return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error, language=language)
 
 	try:
@@ -123,15 +123,17 @@ def pos_confirm():
 	sentenceID = request.args.get("sentenceID")
 	pos = []
 	for word in sentence.split():
+		print word
 		if request.args.get(word.lower()):
+			print request.args.get(word.lower())
 			try:
 				pos.append(request.args.get(word.lower()))
 			except Exception as e:
 				print e
 		else:
 			return redirect(url_for('tag_pos', sentence=sentence, userID=userID, sentenceID=sentenceID, error= 1))
-	sentencepos = collections.OrderedDict(zip(sentence.split(), pos))
-	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, sentencepos=sentencepos)
+	print  "all done"
+	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, pos=pos)
 
 @app.route("/group")
 def group():
@@ -139,15 +141,17 @@ def group():
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
 	sentence = request.args.get("sentence")
-	for word in sentencepos.keys():
+	pos = request.args.get("pos")
+	words = sentence.split()
+	print pos
+	for i in range(len(words)):
+		print words[i]
 		try:
-			pos = sentencepos[word]
-
-			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(word, pos, language))
+			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos[i], language))
 
 			if dict_cur.fetchall() == []:
-				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (word, pos, language))
-				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(word, pos, language))
+				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (words[i], pos[i], language))
+				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos[i], language))
 
 			wordID = dict_cur.fetchone()
 
@@ -155,8 +159,13 @@ def group():
 		except Exception as e:
 			print e
 
-	return render_template("group.html")
+	return render_template("group.html", sentence=sentence, userID=userID)
 
+@app.route("/record")
+def record_phrase():
+	sentence= request.args.get("sentence")
+	userID = request.args.get("userID")
+	return redirect(url_for("group"), sentence=sentence, userID= userID)
 
 if __name__ == '__main__':
     app.run()
