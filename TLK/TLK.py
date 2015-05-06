@@ -1,10 +1,10 @@
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+from flask import Flask, request, redirect, url_for, render_template
 
 import string
 import psycopg2
 import collections
 import urlparse
+import collections
 from psycopg2 import extras
 
 
@@ -84,13 +84,13 @@ def tag_pos():
 	error= request.args.get("error")
 	sentence = request.args.get("sentence")
 	userID = request.args.get("userID")
+	language=request.args.get("language")
 
 	if error:
 		sentenceID= request.args.get("sentenceID")
-		return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error)
+		return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error, language=language)
 
 	try:
-		language=request.args.get("language")
 		date=request.args.get("date")
 		sessionID=date+language
 	except Exception as e:
@@ -114,35 +114,48 @@ def tag_pos():
 	except Exception as e:
 		print e	
 
-	return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error)
+	return render_template("tag_words2.html", sentence=sentence, userID=userID, sentenceID=sentenceID, error=error, language=language)
 
 @app.route("/confirmPOS")
 def pos_confirm():
 	sentence=request.args.get("sentence")
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
-	sentencepos = {}
+	pos = []
 	for word in sentence.split():
-		print word
-		print request.args.get(word.lower())
 		if request.args.get(word.lower()):
-			print "hello"
 			try:
-				sentencepos[word.lower()] = request.args.get(word.lower())
+				pos.append(request.args.get(word.lower()))
 			except Exception as e:
 				print e
 		else:
 			return redirect(url_for('tag_pos', sentence=sentence, userID=userID, sentenceID=sentenceID, error= 1))
-
+	sentencepos = collections.OrderedDict(zip(sentence.split(), pos))
 	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, sentencepos=sentencepos)
 
-@app.route("/")
-def pos_confirm_redirect():
-	if request.args.get("YES!"):
-		#THIS IS WHERE THIS STOPS WORKING!
-		return render_template ("group.html")
-	else:
-		return redirect(url_for("tag_pos")) 
+@app.route("/group")
+def group():
+	language=request.args.get("language")
+	userID = request.args.get("userID")
+	sentenceID = request.args.get("sentenceID")
+	sentence = request.args.get("sentence")
+	for word in sentencepos.keys():
+		try:
+			pos = sentencepos[word]
+
+			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(word, pos, language))
+
+			if dict_cur.fetchall() == []:
+				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (word, pos, language))
+				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(word, pos, language))
+
+			wordID = dict_cur.fetchone()
+
+			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s, %s)", (wordID, sentenceID))
+		except Exception as e:
+			print e
+
+	return render_template("group.html")
 
 
 if __name__ == '__main__':
