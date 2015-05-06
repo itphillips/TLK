@@ -36,7 +36,7 @@ h4 {color:red;}
         <h4> Please make sure you select a part of speech for each word! </h4>
         {% endif %}
         <h3>Please identify the part of speech for each word in your sentence:</h3>
-        <p>show the sentence entered in enter_sent.html</p>
+        <p>{{sentence}}</p>
     	<div> 
 		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
       {% set count = 0 %}
@@ -66,6 +66,7 @@ h4 {color:red;}
 				<input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
 				<input type="hidden" name= "userID" value ="{{userID}}">
         <input type="hidden" name= "sentence" value= "{{sentence}}">
+        <input type= "hidden" name="language" value= "{{language}}">
 					<input type="submit" value="Check my work">
 			</form> 
     	</div>

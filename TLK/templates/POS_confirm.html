@@ -1,6 +1,10 @@
 <html>
-{% words = sentence.split() %}
+{% set words = sentence.split() %}
+{% for i in range(words|length) %}
 
+{{words[i]}} : {{pos[i]}}
+<br>
+{% endfor %}
 <br>
 <br>
 Is this correct?

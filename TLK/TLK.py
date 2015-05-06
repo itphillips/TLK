@@ -121,19 +121,19 @@ def pos_confirm():
 	sentence=request.args.get("sentence")
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
+	language = request.args.get("language")
 	pos = []
-	for word in sentence.split():
-		print word
-		if request.args.get(word.lower()):
-			print request.args.get(word.lower())
+	for i in range(len(sentence.split())):
+		if request.args.get(str(i)):
+			print request.args.get(str(i))
 			try:
-				pos.append(request.args.get(word.lower()))
+				pos.append(request.args.get(str(i)))
 			except Exception as e:
 				print e
 		else:
-			return redirect(url_for('tag_pos', sentence=sentence, userID=userID, sentenceID=sentenceID, error= 1))
-	print  "all done"
-	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, pos=pos)
+			return redirect(url_for('tag_pos', sentence=sentence, userID=userID, sentenceID=sentenceID, error= 1, language=language))
+	print pos
+	return render_template("POS_confirm.html", sentence=sentence, userID=userID, sentenceID=sentenceID, pos=pos, language=language)
 
 @app.route("/group")
 def group():
