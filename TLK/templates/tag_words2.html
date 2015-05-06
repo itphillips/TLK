@@ -39,26 +39,29 @@ h4 {color:red;}
         <p>show the sentence entered in enter_sent.html</p>
     	<div> 
 		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
-
+      {% set count = 0 %}
 		{% for word in sentence.split() %}
 		{{word}}
-      <input type="radio" name="{{word}}" value="adjective">Adjective 
-				<input type="radio" name="{{word}}" value="adverb">Adverb 
-  					<input type="radio" name="{{word}}"  value="conjunction">Conjunction
-  					<input type="radio" name="{{word}}"  value="complementizer">Complementizer 
-  					<input type="radio" name="{{word}}"  value="determiner-demonstrative">Determiner-demonstrative
-  					<input type="radio" name="{{word}}"  value="determiner-numeral">Determiner-numeral
-  					<input type="radio" name="{{word}}"  value="determiner-possessive">Determiner-possessive
-  					<input type="radio" name="{{word}}"  value="determiner-quantificational">Determiner-quantificational
-  					<input type="radio" name="{{word}}"  value="noun">Noun
-  					<input type="radio" name="{{word}}"  value="preposition">Preposition
-  					<input type="radio" name="{{word}}"  value="pronoun">Pronoun
-  					<input type="radio" name="{{word}}"  value="verb-ditransitive">Verb-ditransitive
-  					<input type="radio" name="{{word}}"  value="verb-intransitive">Verb-intransitive
-  					<input type="radio" name="{{word}}"  value="verb-transitive">Verb-transitive
-  					<input type="radio" name="{{word}}"  value="verb-sentential complement">Verb-sentential complement
+
+
+      <input type="radio" name="{{count}}" value="adjective">Adjective 
+				<input type="radio" name="{{count}}" value="adverb">Adverb 
+  					<input type="radio" name="{{count}}"  value="conjunction">Conjunction
+  					<input type="radio" name="{{count}}"  value="complementizer">Complementizer 
+  					<input type="radio" name="{{count}}"  value="determiner-demonstrative">Determiner-demonstrative
+  					<input type="radio" name="{{count}}"  value="determiner-numeral">Determiner-numeral
+  					<input type="radio" name="{{count}}"  value="determiner-possessive">Determiner-possessive
+  					<input type="radio" name="{{count}}"  value="determiner-quantificational">Determiner-quantificational
+  					<input type="radio" name="{{count}}"  value="noun">Noun
+  					<input type="radio" name="{{count}}"  value="preposition">Preposition
+  					<input type="radio" name="{{count}}"  value="pronoun">Pronoun
+  					<input type="radio" name="{{count}}"  value="verb-ditransitive">Verb-ditransitive
+  					<input type="radio" name="{{count}}"  value="verb-intransitive">Verb-intransitive
+  					<input type="radio" name="{{count}}"  value="verb-transitive">Verb-transitive
+  					<input type="radio" name="{{count}}"  value="verb-sentential complement">Verb-sentential complement
 
 				<br>
+        {% set count = count+1 %}
 				{% endfor %}
 				<input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
 				<input type="hidden" name= "userID" value ="{{userID}}">
