@@ -110,12 +110,10 @@ def tag_pos():
 		dict_cur.execute("SELECT sessionnumber FROM sentences s INNER JOIN users_sentences us ON us.userID=s.ID WHERE us.userID = '{}'  AND sessionID='{}';".format(userID, sessionID))
 	except Exception as e:
 		print e
-	print dict_cur.fetchall()
 	if dict_cur.fetchall() != []:
 		sessionnumber=sessionnumber+1
 	else:
 		sessionnumber=1	
-	print sessionnumber
 	try:
 		dict_cur.execute("INSERT INTO sentences (sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s)",(sentence, language, date, sessionnumber, sessionID))
 		dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
@@ -152,23 +150,17 @@ def group():
 	sentenceID = request.args.get("sentenceID")
 	sentence = request.args.get("sentence")
 	pos_array = str(request.args.get("pos")).split()
-	print pos_array
 	for pos in pos_array:
-		print pos
 	words = sentence.split()
 	for i in range(len(words)):
 		try:
 			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
 			found = dict_cur.fetchall()
-			print found
 			if found == []:
-				print "found none"
 				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (words[i], pos_array[i], language))
 				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
 				found = dict_cur.fetchall()
 			wordID = found[0]["id"]
-			print wordID
-			print type(wordID)
 			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s)", (wordID, sentenceID))
 		except Exception as e:
 			print e
