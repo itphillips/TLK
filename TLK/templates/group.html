@@ -1,9 +1,7 @@
 <html>
 <body>
 	<script type="text/javascript">
-	var count = 0;
 	function wordClick(e){
-		count = count + 1;
 		var target = e.target;
 		console.log(target);
 		if (target.value === "active"){
@@ -28,7 +26,7 @@
 
 	</script>
 
-<form name="phrase" action="{{url_for('record_phrase')}}">
+<form name="group" action="{{url_for('type_phrase')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 {% set count = 0 %}
@@ -37,7 +35,17 @@
 	<button type = "button" id = "{{count}}" onClick="wordClick(event)">{{word}}</button>
 	{% endfor %}
 <!--- dropdown for type -->
-		<button type="submit" name = "words" onClick = "submitClick(event)" value = " "> Submit</button>
+	<br>
+	<br>
+	What kind of phrase is this?
+	<input type="radio" name = "phrase_type" value="S">Sentence
+	<input type="radio" name = "phrase_type" value="NP">Noun Phrase 
+	<input type="radio" name = "phrase_type" value="VP">Verb Phrase
+	<input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
+	<input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
+<br>
+		<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit</button>
  </form> 
 
 <!--- above redirects to check work-->

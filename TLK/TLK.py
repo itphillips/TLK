@@ -19,6 +19,16 @@ dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 @app.route("/")
 @app.route("/login")
 def login():
+	dict_cur.execute("SELECT * FROM users;")
+	print dict_cur.fetchall()
+	dict_cur.execute("SELECT * FROM sentences;")
+	print dict_cur.fetchall()
+	dict_cur.execute("SELECT * FROM phrases;")
+	print dict_cur.fetchall()
+	dict_cur.execute("SELECT * FROM words;")
+	print dict_cur.fetchall()
+	dict_cur.execute("SELECT * FROM words_sentences;")
+	print dict_cur.fetchall()
 	return render_template("login.html")
 
 @app.route("/show_sentences")
@@ -28,7 +38,7 @@ def show_sentences():
 	username=request.args.get("username")
 	password=request.args.get("password")
 	dict_cur.execute("SELECT id FROM users WHERE username = '{}' AND password= '{}';".format( username, password ))
-	
+
 	userID=dict_cur.fetchone()
 	if userID == None:
 		print "done show sentences"
@@ -149,13 +159,16 @@ def group():
 	for i in range(len(words)):
 		try:
 			dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
-
-			if dict_cur.fetchall() == []:
+			found = dict_cur.fetchall()
+			print found
+			if found == []:
+				print "found none"
 				dict_cur.execute("INSERT INTO words (word, pos, language) VALUES (%s, %s, %s)", (words[i], pos_array[i], language))
 				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
-
-			wordID = dict_cur.fetchone()[0]
-
+				found = dict_cur.fetchall()
+			wordID = found[0]["id"]
+			print wordID
+			print type(wordID)
 			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s)", (wordID, sentenceID))
 		except Exception as e:
 			print e
@@ -163,10 +176,17 @@ def group():
 	return render_template("group.html", sentence=sentence, userID=userID)
 
 @app.route("/record")
-def record_phrase():
+def type_phrase():
 	sentence= request.args.get("sentence")
 	userID = request.args.get("userID")
-	return redirect(url_for("group"), sentence=sentence, userID= userID)
+	phrase = request.args.get("phrase")
+	phrase_type = request.args.get("phrase_type")
+	phrase_type_dict = {"S":["NP", "VP"], "NP": ["det", "AP", "N", "PP"], "VP":["V", "PP", "NP", ["NP", "S", "CP"], "AP", "PP"], "PP":["P" ["NP" "PP"]], "AP":["deg" "A"], "CP": ["C" "S"] }
+	more_clarification = ["NP", "VP", "PP", "AP"]
+	if phrase_type in more_clarification:
+		return render_template("complex")
+	return render_template("type_phrase.html", phrase=phrase, sentence=sentence, userID=userID)
+	#return redirect(url_for("group"), sentence=sentence, userID= userID)
 
 if __name__ == '__main__':
     app.run()
