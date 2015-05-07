@@ -13,7 +13,7 @@ app.config.from_object(__name__)
 
 #conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
 conn = psycopg2.connect("user=SusanSteinman")
-
+conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 @app.route("/")
@@ -150,7 +150,6 @@ def group():
 	sentenceID = request.args.get("sentenceID")
 	sentence = request.args.get("sentence")
 	pos_array = str(request.args.get("pos")).split()
-	for pos in pos_array:
 	words = sentence.split()
 	for i in range(len(words)):
 		try:
