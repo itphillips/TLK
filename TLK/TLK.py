@@ -176,7 +176,7 @@ def type_phrase():
 	phrase_type_dict = {"S":["NP", "VP"], "NP": ["det", "AP", "N", "PP"], "VP":["V", "PP", "NP", ["NP", "S", "CP"], "AP", "PP"], "PP":["P" ["NP" "PP"]], "AP":["deg" "A"], "CP": ["C" "S"] }
 	more_clarification = ["NP", "VP", "PP", "AP"]
 	if phrase_type in more_clarification:
-		return render_template("complex")
+		return render_template("complex.html")
 	return render_template("type_phrase.html", phrase=phrase, sentence=sentence, userID=userID)
 	#return redirect(url_for("group"), sentence=sentence, userID= userID)
 

@@ -1,6 +1,7 @@
 <html>
 <body>
 	<script type="text/javascript">
+	var prev= null;
 	function wordClick(e){
 		var target = e.target;
 		console.log(target);
@@ -23,7 +24,24 @@
 		}
 		}
 	}
+	function radioClick(e){
+		var target = e.target;
 
+        (prev)? console.log(prev.value):null;
+        if(this !== prev) {
+            prev = this;
+        }
+        console.log(this.value)
+
+		var complex_types = {NP: {"det", "AP", "N", "PP"}, 
+						VP:{"V", "PP", "NP", {"NP", "S", "CP"}, "AP", "PP"},
+						 PP:{"P" ["NP" "PP"]}, 
+						 AP:{"deg" "A"}
+						};
+
+	}
+//I  am in the middle of creating a function that shows and hides complex tagging options based on which radio button is tagged. The results are NOT saved to the database correctly. ALSO! the entire database overwrites itself each time I run the program. hm.
+}
 	</script>
 
 <form name="group" action="{{url_for('type_phrase')}}">
@@ -39,12 +57,15 @@
 	<br>
 	What kind of phrase is this?
 	<input type="radio" name = "phrase_type" value="S">Sentence
-	<input type="radio" name = "phrase_type" value="NP">Noun Phrase 
-	<input type="radio" name = "phrase_type" value="VP">Verb Phrase
-	<input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
-	<input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<input type="radio" name = "phrase_type" onClick="radioClick(event)" value="NP">Noun Phrase 
+	<input type="radio" name = "phrase_type" onClick="radioClick(event)" value="VP">Verb Phrase
+	<input type="radio" name = "phrase_type" onClick="radioClick(event)" value="PP">Prepositional Phrase
+	<input type="radio" name = "phrase_type" onClick="radioClick(event)" value="AP">Adjective Phrase
 	<input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
 <br>
+<div>
+
+	</div>
 		<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit</button>
  </form> 
 
