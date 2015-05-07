@@ -11,7 +11,7 @@ try:
 	cur.execute("CREATE TABLE sentences (id serial PRIMARY KEY, sessionID varchar, language varchar, collection_date date, sessionnumber int, notes varchar, collection_location varchar, sentence_type varchar, sentence varchar, eng_gloss varchar, correctness varchar );")
 	cur.execute("CREATE TABLE words (id serial PRIMARY KEY, word varchar, pos varchar, language varchar, gram_case varchar);")
 	cur.execute("CREATE TABLE words_sentences (id serial PRIMARY KEY, sentenceID int, wordID int);")
-	cur.execute("CREATE TABLE phrases (id serial PRIMARY KEY, phrase varchar, phrase_type varchar, wordtype1 varchar, wordtype2 varchar);") #there should be 15 of these!!
+	cur.execute("CREATE TABLE phrases (id serial PRIMARY KEY, phrase varchar, phrase_type varchar, phrase_subtype varchar);")
 	cur.execute("CREATE TABLE phrases_sentences (id serial PRIMARY KEY, sentenceID int, phraseID int);")
 	cur.execute("CREATE TABLE users (id serial PRIMARY KEY, username varchar, password varchar);")
 	cur.execute("CREATE TABLE users_sentences (id serial PRIMARY KEY, userID int, sentenceID int);")
@@ -19,4 +19,5 @@ try:
 
 except Exception as e:
 	print e
+
 conn.close()
