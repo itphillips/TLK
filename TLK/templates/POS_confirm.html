@@ -1,8 +1,9 @@
 <html>
 {% set words = sentence.split() %}
+{% set pos_array = pos.split() %}
 {% for i in range(words|length) %}
 
-{{words[i]}} : {{pos[i]}}
+{{words[i]}} : {{pos_array[i]}}
 <br>
 {% endfor %}
 <br>
