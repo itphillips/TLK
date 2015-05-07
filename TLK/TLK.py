@@ -141,8 +141,10 @@ def group():
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
 	sentence = request.args.get("sentence")
-	pos_array = request.args.get("pos").split()
+	pos_array = str(request.args.get("pos")).split()
 	print pos_array
+	for pos in pos_array:
+		print pos
 	words = sentence.split()
 	for i in range(len(words)):
 		try:
