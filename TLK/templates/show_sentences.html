@@ -4,13 +4,12 @@
 	<title>show_sentences</title>
 </head>
 
+{% extends "base.html" %}
+
 <body>
 
-	<div id="container" style="width:1100px">
-        <div id="header" style="background-color:#FFF;">
-            <img src="LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210">    
-        </div>
-	</div>
+{% block content %}
+	
 {% if sentences!=[] %}
 Click the sentence you want to work on!
 
@@ -28,5 +27,6 @@ Looks like you don't have any sentences input yet!
  		<button type="submit">I want to input a new sentence
  		 	<input type="hidden" name="userID" value="{{userID}}">
 	</form>
+{% endblock %}
 </body>
 </html>
