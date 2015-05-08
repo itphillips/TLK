@@ -1,7 +1,18 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>input_sentence</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+
 	<form action="{{url_for ('confirm_sentence')}}">
 
-Please enter the sentence:<br> 
+	Please enter the sentence:<br> 
 	<input type="text" name="sentence"> <br>
 	What language is this sentence? <br>
 	<input type="radio" name="language" value="E">English <br>
@@ -15,4 +26,8 @@ Please enter the sentence:<br>
 <input type="radio" name="continued_session" value="no">No -->
 
 	<button type="submit"> OK
+	
+{% endblock %}
+
+</body>
 </html>

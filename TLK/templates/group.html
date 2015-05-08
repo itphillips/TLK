@@ -1,5 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>group</title>
+</head>
+
+{% extends "base.html" %}
+
 <body>
+
+{% block content %}
+
 	<script type="text/javascript">
 	var prev= null;
 	function wordClick(e){
@@ -40,17 +50,18 @@
 	<br>
 	<br>
 	What kind of phrase is this?
-	<input type="radio" name = "phrase_type" value="S">Sentence
-	<input type="radio" name = "phrase_type" value="NP">Noun Phrase 
-	<input type="radio" name = "phrase_type" value="VP">Verb Phrase
-	<input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
-	<input type="radio" name = "phrase_type" value="AP">Adjective Phrase
-	<input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
+	<br> <input type="radio" name = "phrase_type" value="S">Sentence
+	<br> <input type="radio" name = "phrase_type" value="NP">Noun Phrase 
+	<br> <input type="radio" name = "phrase_type" value="VP">Verb Phrase
+	<br> <input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
+	<br> <input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<br> <input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
 <br>
 		<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit</button>
  </form> 
 
 <!--- above redirects to check work-->
 <!--- below redirects to next page-->
+{% endblock %}
 </body>
 </html>
