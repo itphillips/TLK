@@ -17,10 +17,15 @@ Click the sentence you want to work on!
 Looks like you don't have any sentences input yet!
 {% endif %}
 {% for sentence in sentences %}
-	<form name="{{sentence}}" action="{{url_for('tag', sentence=sentence)}}" method="GET">
-        <button type="submit">{{sentence}}
+
+	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
+        <button type="submit">{{sentence['sentence']}}
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
+        <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
+        <input type="hidden" name="language" value="{{sentence['language']}}">
+        <input type="hidden" name="date" value="{{sentence['collection_date']}}">
+
 	</form> 
 {% endfor %}
 	<form name="NewSentence" action="{{url_for('input_sentence')}}">

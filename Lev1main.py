@@ -58,6 +58,7 @@ def tag_pos(word_lists):
 #is incorrect; it asks for a new sentence if the info is correct
 def pos_confirm(pos_tags):
     print pos_tags
+<<<<<<< HEAD
     
     confirmation = raw_input("Is this information correct?")
     
@@ -86,6 +87,10 @@ def levonemain():
     split_sent = sent_cleanup(whole_sent)
 #this variable is the output of tag_pos when performed on split_sent
     pos_tags = tag_pos(split_sent)
+
+#this prints the dictionary that contains each word in the sentence input by the user
+#and the POS tag that the user has applied to each word 
+
 	
     pos_confirm(pos_tags)
 

@@ -4,6 +4,9 @@
 		<title>tag words</title>
 		<meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+h4 {color:red;}
+</style>
 	</head>
 
 <body>
@@ -29,36 +32,41 @@
 <!--This is the workspace box-->
     <div id="content" style="background-color:#FFF; height:600px;width:650px;float:left;">
         <h2>Step 2</h2>
+        {% if error != None %}
+        <h4> Please make sure you select a part of speech for each word! </h4>
+        {% endif %}
         <h3>Please identify the part of speech for each word in your sentence:</h3>
-        <p>show the sentence entered in enter_sent.html</p>
+        <p>{{sentence}}</p>
     	<div> 
 		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
-
+      {% set count = 0 %}
 		{% for word in sentence.split() %}
 		{{word}}
-				<select name="{{word}}" form="pos">
-  					<option value="adjective">Adjective</option>
-  					<option value="adverb">Adverb</option>
-  					<option value="conjunction">Conjunction</option>
-  					<option value="complementizer">Complementizer</option>
-  					<option value="determiner-demonstrative">Determiner-demonstrative</option>
-  					<option value="determiner-numeral">Determiner-numeral</option>
-  					<option value="determiner-possessive">Determiner-possessive</option>
-  					<option value="determiner-quantificational">Determiner-quantificational</option>
-  					<option value="noun">Noun</option>
-  					<option value="preposition">Preposition</option>
-  					<option value="pronoun">Pronoun</option>
-  					<option value="verb-ditransitive">Verb-ditransitive</option>
-  					<option value="verb-intransitive">Verb-intransitive</option>
-  					<option value="verb-transitive">Verb-transitive</option>
-  					<option value="verb-sentential complement">Verb-sentential complement</option>
-  					
-				</select>
+
+
+      <input type="radio" name="{{count}}" value="adjective">Adjective 
+				<input type="radio" name="{{count}}" value="adverb">Adverb 
+  					<input type="radio" name="{{count}}"  value="conjunction">Conjunction
+  					<input type="radio" name="{{count}}"  value="complementizer">Complementizer 
+  					<input type="radio" name="{{count}}"  value="determiner-demonstrative">Determiner-demonstrative
+  					<input type="radio" name="{{count}}"  value="determiner-numeral">Determiner-numeral
+  					<input type="radio" name="{{count}}"  value="determiner-possessive">Determiner-possessive
+  					<input type="radio" name="{{count}}"  value="determiner-quantificational">Determiner-quantificational
+  					<input type="radio" name="{{count}}"  value="noun">Noun
+  					<input type="radio" name="{{count}}"  value="preposition">Preposition
+  					<input type="radio" name="{{count}}"  value="pronoun">Pronoun
+  					<input type="radio" name="{{count}}"  value="verb-ditransitive">Verb-ditransitive
+  					<input type="radio" name="{{count}}"  value="verb-intransitive">Verb-intransitive
+  					<input type="radio" name="{{count}}"  value="verb-transitive">Verb-transitive
+  					<input type="radio" name="{{count}}"  value="verb-sentential_complement">Verb-sentential complement
+
 				<br>
+        {% set count = count+1 %}
 				{% endfor %}
 				<input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
 				<input type="hidden" name= "userID" value ="{{userID}}">
         <input type="hidden" name= "sentence" value= "{{sentence}}">
+        <input type= "hidden" name="language" value= "{{language}}">
 					<input type="submit" value="Check my work">
 			</form> 
     	</div>

@@ -1,20 +1,56 @@
 <html>
-{% for word in sentence.split() %}
-<form name="{{word}}" action="{{url_for('group.html')}}" method="POST">
-<button type >
-        </button>
+<body>
+	<script type="text/javascript">
+	var prev= null;
+	function wordClick(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="red";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
 
-{% endfor %}
+	</script>
+
+<form name="group" action="{{url_for('tag_phrase_structure')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+{% set count = 0 %}
+{% for word in sentence.split() %}
+	<button type = "button" id = "{{count}}" onClick="wordClick(event)">{{word}}</button>
+		{% set count = count + 1 %}
+	{% endfor %}
 <!--- dropdown for type -->
-<button type="submit" > Submit
-        </button>
-        <input type="hidden" name="userID" value="{{userID}}">
-        <input type="hidden" name="sentenceID" value="{{sentenceID}}">
-        </form> 
+	<br>
+	<br>
+	What kind of phrase is this?
+	<input type="radio" name = "phrase_type" value="S">Sentence
+	<input type="radio" name = "phrase_type" value="NP">Noun Phrase 
+	<input type="radio" name = "phrase_type" value="VP">Verb Phrase
+	<input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
+	<input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
+<br>
+		<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit</button>
+ </form> 
 
 <!--- above redirects to check work-->
 <!--- below redirects to next page-->
-<form name = "All done" action="{{url_for('')}}" method ="GET">
-<button type "submit" action>
-</form>
+</body>
 </html>

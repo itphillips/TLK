@@ -1,0 +1,8 @@
+<html>
+<form action="tag_obj">
+Which one of these is the subject?
+{% for i in range(words.count()) %}
+<input type="submit" value="{{wordIDs[i]}}" onClick="changeColor(e)">{{words[i]}}
+{% endfor %}
+
+</html>

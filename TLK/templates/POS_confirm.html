@@ -1,7 +1,33 @@
 <html>
-{% for i in range(len(sentence.split())) %}
-{{sentence.split()[i]}}  <br>
+{% set words = sentence.split() %}
+{% set pos_array = pos.split() %}
+{% for i in range(words|length) %}
+
+{{words[i]}} : {{pos_array[i]}}
+<br>
 {% endfor %}
 <br>
+<br>
 Is this correct?
+<form action ="{{url_for('group')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="pos" value="{{pos}}">
+	<input type="hidden" name="language" value="{{language}}">
+	<button type ="submit" name= "Yes">Yes
+	</button>
+</form>
+
+<form action ="{{url_for('tag_pos')}}">
+	<input type="hidden" name="error" value="1">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="language" value="{{language}}">
+	<button type ="submit" name= "No">No
+	</button>
+</form>
+
 </html>
+
