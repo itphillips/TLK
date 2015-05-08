@@ -1,0 +1,31 @@
+<html>
+You said that phrase {{phrase}} was of type {{phrase_type}}, and that it had the following structure: <br>
+{{phrase_structure}}
+<br>
+Is this correct?
+<form name="all_ok" action="{{url_for('tag_subj')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
+	<button type="submit" name="submit">Yes</button>
+	</form>
+
+	<form name="structure_problem" action="{{url_for('tag_phrase_structure')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submit" name="submit">No. Change Structure</button>
+	</form>
+
+	<form name="phrase_problem" action="{{url_for('group')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submit" name="submit">No. Make new phrase</button>
+	</form>
+</html>

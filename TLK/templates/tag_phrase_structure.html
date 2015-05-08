@@ -33,7 +33,7 @@
 	{% endfor %}
 	</script>
 </head>
-You said that {{phrase}} was of type {{phrase_type}}.<br>
+You said that "{{phrase}}"was of type {{phrase_type}}.<br>
 
 Highlight the elements this phrase contains. <br>
 
@@ -44,9 +44,18 @@ Highlight the elements this phrase contains. <br>
 <br>
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 		<input type="hidden" name="phrase" value="{{phrase}}">
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
 <button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = ""> Submit</button>
 
 </form>
+<br>
+<form name="try_again" action="{{url_for('group')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submit" name = "retry"> I made a mistake! Take me back to the phrase tagging page.</button>
+</form>
+
 </html>

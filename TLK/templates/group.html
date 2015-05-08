@@ -30,6 +30,7 @@
 <form name="group" action="{{url_for('tag_phrase_structure')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 {% set count = 0 %}
 {% for word in sentence.split() %}
 	<button type = "button" id = "{{count}}" onClick="wordClick(event)">{{word}}</button>

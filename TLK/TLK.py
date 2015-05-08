@@ -160,11 +160,11 @@ def group():
 				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
 				found = dict_cur.fetchall()
 			wordID = found[0]["id"]
-			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID) VALUES (%s, %s)", (wordID, sentenceID))
+			dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID, position) VALUES (%s, %s, %s)", (wordID, sentenceID, i))
 		except Exception as e:
 			print e
 	print "hallo"
-	return render_template("group.html", sentence=sentence, userID=userID)
+	return render_template("group.html", sentence=sentence, userID=userID, sentenceID=sentenceID)
 
 @app.route("/tag_phr_struct")
 def tag_phrase_structure():
@@ -172,26 +172,56 @@ def tag_phrase_structure():
 	sentence= request.args.get("sentence")
 	words=sentence.split()
 	userID = request.args.get("userID")
+	sentenceID=request.args.get("sentenceID")
+	print sentenceID
 	word_positions_in_phrase = request.args.get("phrase").split()
-	phrase=[str(words[int(word_position)]) for word_position in word_positions_in_phrase]
+	phrase=" ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
 
 	phrase_type = request.args.get("phrase_type")
 	phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], "NP": [("det","optional"), ("AP", "optional"), ("N","necessary"), ("PP","optional")], "VP":[("V","necessary"), ("PP","optional"), ("NP","optional"), ("NP2", "optional"), ("S","optional"), ("CP", "optional"), ("AP","optional"), ("PP2","optional")], "PP":[("P","necessary"), ("NP","optional") ,("PP","optional")], "AP":[("deg","optional"), ("A","necessary")], "CP": [("C","necessary"), ("S","necessary")] }
 
 	phrase_structure_options=phrase_type_dict[phrase_type]
-	return render_template("tag_phrase_structure.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure_options=phrase_structure_options)
+	print phrase_structure_options
+	return render_template("tag_phrase_structure.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure_options=phrase_structure_options, sentenceID=sentenceID)
 
 @app.route("/confirm_phrase")
 def confirm_phrase():
 	phrase_structure=request.args.get("phrase_structure")
 	sentence= request.args.get("sentence")
+	sentenceID=request.args.get("sentenceID")
 	userID = request.args.get("userID")
 	phrase_type = request.args.get("phrase_type")
 	phrase=request.args.get("phrase")
+	print phrase
 	print phrase_structure
-	return render_template("confirm_phrase.html", )
+	return render_template("confirm_phrase.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure=phrase_structure, sentenceID=sentenceID)
 
+@app.route("/tagSubj")
+def tag_subj():
+	phrase_structure=request.args.get("phrase_structure")
+	sentence= request.args.get("sentence")
+	sentenceID=request.args.get("sentenceID")
+	userID = request.args.get("userID")
+	phrase_type = request.args.get("phrase_type")
+	phrase=request.args.get("phrase")
 
+	try: 
+		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, phrase_subtype) VALUES (%s, %s, %s)", (phrase, phrase_type, phrase_structure))
+	except Exception as e:
+		print e
+	dict_cur.execute("SELECT id from phrases WHERE phrase = '{}' AND phrase_type = '{}' AND phrase_subtype = '{}';".format(phrase, phrase_type, phrase_subtype))
+	phraseID=dict_cur.fetchall()[0]
+	try:
+		dict_cur.execute("INSERT INTO phrases_sentences (phraseID, sentenceID) VALUES (%s, %s)", (phraseID, sentenceID))
+	except Exception as e:
+		print e
+	words = phrase.split()
+	wordIDs=[]
+	for i in range(len(words)):
+		dict_cur.execute("SELECT id from words_sentences WHERE sentenceID = '{}' AND position = '{}';".format(i, sentenceID))
+		wordIDs.append(dict_cur.fetchall()[0])
+	print wordIDs
+	return render_template("tag_subj_obj.html", words=words, wordIDs=wordIDs)
 if __name__ == '__main__':
     app.run()
 
