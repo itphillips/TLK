@@ -1,4 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>POS_confirm</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+
 {% set words = sentence.split() %}
 {% set pos_array = pos.split() %}
 {% for i in range(words|length) %}
@@ -29,5 +40,7 @@ Is this correct?
 	</button>
 </form>
 
+{% endblock %}
+</body>
 </html>
 

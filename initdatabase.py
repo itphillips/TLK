@@ -2,8 +2,8 @@ import os
 import psycopg2
 import urlparse
 from psycopg2 import extras
-#conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
-conn = psycopg2.connect("user=SusanSteinman")
+conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
+#conn = psycopg2.connect("user=SusanSteinman")
 
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 cur = conn.cursor()

@@ -1,5 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
 <head>
+	<title>tag_phrase_structure</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+<!-- <head> -->
 	<script type="text/javascript">
 	var prev= null;
 	function wordClick(e){
@@ -32,7 +42,7 @@
 	{% endif %}
 	{% endfor %}
 	</script>
-</head>
+<!-- </head> -->
 You said that "{{phrase}}"was of type {{phrase_type}}.<br>
 
 Highlight the elements this phrase contains. <br>
@@ -58,4 +68,6 @@ Highlight the elements this phrase contains. <br>
 	<button type="submit" name = "retry"> I made a mistake! Take me back to the phrase tagging page.</button>
 </form>
 
+{% endblock %}
+</body>
 </html>

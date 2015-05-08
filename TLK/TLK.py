@@ -11,12 +11,16 @@ from psycopg2 import extras
 app = Flask(__name__, static_url_path='')
 app.config.from_object(__name__)
 
-#conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
-conn = psycopg2.connect("user=SusanSteinman")
+conn = psycopg2.connect("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
+#conn = psycopg2.connect("user=SusanSteinman") 
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 @app.route("/")
+@app.route("/home")
+def home():
+	return render_template("home.html")
+
 @app.route("/login")
 def login():
 	dict_cur.execute("SELECT * FROM users;")

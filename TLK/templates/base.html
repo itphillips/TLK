@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-	<title>login</title>
-	<style>
+	<head>
+		<title>base</title>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
         #header {
         	background-color:#FFF;
         		}
@@ -16,46 +18,56 @@
         	padding-left:20px;
         		}
         		
+        #guide	{
+        	float:right;
+        	width:400px;
+        	padding:10px;
+        		}
+        		
         #footer	{
         	background-color:#FFF;
         	clear:both;
         	text-align:center;
         		}
-    </style>
-</head>
+        </style>
+	</head>
 
 <body>
-<!--This is the container and title image header-->
-    <div id="container" style="width:1100px">
-        <div id="header">
-            <img src="LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210">    
-    	</div> 
 
+<!--This is the container and title image header-->
+<div id="container" style="width:1100px">
+        <div id="header">
+            <img src="LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="350" height="105">    
+        </div>
+        
 <!--this is the left menu box-->
     <div id="menu">
         <h3>Menu</h3>
         <p><a href="/home">Home</a></p>
+        <p><a href="/glossary">Glossary</a></p>
+        <p><a href="/workflow">Workflow</a></p>
+        <p><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing 
+            <br>Conventions</a></p>
         <p><a href="/help">Help</a></p>
     </div> 
             
 <!--This is the workspace box-->
     <div> 
-    <form name="nameinput" action="{{url_for('show_sentences', username=username, password=password)}}">
-	Please enter your email: <br>
-	<input type="text" name="username"> 
-	<p>Password: <br>
-	<input type="text" name="password">
-	</p>
-	<br>
-	<button type="submit">OK
-	</form>
+    {% block content %}{% endblock %}
     </div>
+    
+<!--This is the right guide box-->
+	<div id="guide">
+		<h3>Guide</h3>
+	</div>
             
 <!--This is the footer-->
 	<div id="footer">
         The Linguist's Kitchen
     </div>
-	
-    </div>
+</div>
+
+
 </body>
 </html>
+
