@@ -1,8 +1,42 @@
 <html>
-<form action="tag_obj">
-Which one of these is the subject?
-{% for i in range(words.count()) %}
-<input type="submit" value="{{wordIDs[i]}}" onClick="changeColor(e)">{{words[i]}}
-{% endfor %}
+	<script type="text/javascript">
+	var prev= null;
+	function changeColor(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="red";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
 
+	{% for element in phrase_structure_options %}
+	{% if element[1] == "necessary" %}
+	var button=document.getElementbyID("{{element[0]}}");
+	button.style.background='red';
+	{% endif %}
+	{% endfor %}
+	</script>
+<form action="{{url_for('tag_obj')}}">
+Which word(s) constitute(s) the subject?
+{% for i in range(words|count) %}
+<button type="button" id="{{wordIDs[i]}}" onClick="changeColor(event)">{{words[i]}}</button>
+{% endfor %}
+<br>
+<button type="submit" name="subject" onClick="submitClick(event)" value="">submit</button>
+</form>
 </html>

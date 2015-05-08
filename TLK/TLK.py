@@ -196,8 +196,7 @@ def confirm_phrase():
 	print phrase_structure
 	return render_template("confirm_phrase.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure=phrase_structure, sentenceID=sentenceID)
 
-@app.route("/tagSubj")
-def tag_subj():
+def put_phrase_in_database():
 	phrase_structure=request.args.get("phrase_structure")
 	sentence= request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
@@ -209,19 +208,44 @@ def tag_subj():
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, phrase_subtype) VALUES (%s, %s, %s)", (phrase, phrase_type, phrase_structure))
 	except Exception as e:
 		print e
-	dict_cur.execute("SELECT id from phrases WHERE phrase = '{}' AND phrase_type = '{}' AND phrase_subtype = '{}';".format(phrase, phrase_type, phrase_subtype))
-	phraseID=dict_cur.fetchall()[0]
+	try:
+		dict_cur.execute("SELECT id from phrases WHERE phrase = '{}' AND phrase_type = '{}' AND phrase_subtype = '{}';".format(phrase, phrase_type, phrase_structure))
+	except Exception as e:
+		print e
+	phraseID=dict_cur.fetchall()[0][0]
 	try:
 		dict_cur.execute("INSERT INTO phrases_sentences (phraseID, sentenceID) VALUES (%s, %s)", (phraseID, sentenceID))
 	except Exception as e:
 		print e
-	words = phrase.split()
-	wordIDs=[]
-	for i in range(len(words)):
-		dict_cur.execute("SELECT id from words_sentences WHERE sentenceID = '{}' AND position = '{}';".format(i, sentenceID))
-		wordIDs.append(dict_cur.fetchall()[0])
-	print wordIDs
+	return redirect(url_for('group'))
+
+@app.route("/tagSubj")
+def tag_subj():
+	sentence=request.args.get("sentence")
+	sentenceID=request.args.get("sentenceID")
+	words = []
+	try:
+		dict_cur.execute("SELECT position,wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
+		wordIDs= dict_cur.fetchall()
+	except Exception as e:
+		print e
+	wordIDs.sort(key=lambda x: int(x[1]))
+	wordIDs=[wordID[1] for wordID in wordIDs]
+	for wordID in wordIDs:
+		print wordID
+		try:
+			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
+		except Exception as e:
+			print e
+		word=dict_cur.fetchall()
+		words.append(word[0][0])
+	print words
 	return render_template("tag_subj_obj.html", words=words, wordIDs=wordIDs)
+
+@app.route("/tag_obj")
+def tag_obj():
+
+	return "hi"
 if __name__ == '__main__':
     app.run()
 

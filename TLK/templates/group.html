@@ -26,6 +26,7 @@
 	}
 
 	</script>
+Select words to create a phrase.
 
 <form name="group" action="{{url_for('tag_phrase_structure')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
@@ -49,7 +50,13 @@
 <br>
 		<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit</button>
  </form> 
-
+ <br>
+<form action="{{url_for('tag_subj')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submit" name= "done">I'm done tagging phrases</button>
+</form>
 <!--- above redirects to check work-->
 <!--- below redirects to next page-->
 </body>
