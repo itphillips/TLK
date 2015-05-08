@@ -166,18 +166,31 @@ def group():
 	print "hallo"
 	return render_template("group.html", sentence=sentence, userID=userID)
 
-@app.route("/record")
-def type_phrase():
+@app.route("/tag_phr_struct")
+def tag_phrase_structure():
+	print "hi"
+	sentence= request.args.get("sentence")
+	words=sentence.split()
+	userID = request.args.get("userID")
+	word_positions_in_phrase = request.args.get("phrase").split()
+	phrase=[str(words[int(word_position)]) for word_position in word_positions_in_phrase]
+
+	phrase_type = request.args.get("phrase_type")
+	phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], "NP": [("det","optional"), ("AP", "optional"), ("N","necessary"), ("PP","optional")], "VP":[("V","necessary"), ("PP","optional"), ("NP","optional"), ("NP2", "optional"), ("S","optional"), ("CP", "optional"), ("AP","optional"), ("PP2","optional")], "PP":[("P","necessary"), ("NP","optional") ,("PP","optional")], "AP":[("deg","optional"), ("A","necessary")], "CP": [("C","necessary"), ("S","necessary")] }
+
+	phrase_structure_options=phrase_type_dict[phrase_type]
+	return render_template("tag_phrase_structure.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure_options=phrase_structure_options)
+
+@app.route("/confirm_phrase")
+def confirm_phrase():
+	phrase_structure=request.args.get("phrase_structure")
 	sentence= request.args.get("sentence")
 	userID = request.args.get("userID")
-	phrase = request.args.get("phrase")
 	phrase_type = request.args.get("phrase_type")
-	phrase_type_dict = {"S":["NP", "VP"], "NP": ["det", "AP", "N", "PP"], "VP":["V", "PP", "NP", ["NP", "S", "CP"], "AP", "PP"], "PP":["P" ["NP" "PP"]], "AP":["deg" "A"], "CP": ["C" "S"] }
-	more_clarification = ["NP", "VP", "PP", "AP"]
-	if phrase_type in more_clarification:
-		return render_template("complex.html")
-	return render_template("type_phrase.html", phrase=phrase, sentence=sentence, userID=userID)
-	#return redirect(url_for("group"), sentence=sentence, userID= userID)
+	phrase=request.args.get("phrase")
+	print phrase_structure
+	return render_template("confirm_phrase.html", )
+
 
 if __name__ == '__main__':
     app.run()

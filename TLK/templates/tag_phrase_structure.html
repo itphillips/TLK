@@ -1,0 +1,52 @@
+<html>
+<head>
+	<script type="text/javascript">
+	var prev= null;
+	function wordClick(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="red";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
+
+	{% for element in phrase_structure_options %}
+	{% if element[1] == "necessary" %}
+	var button=document.getElementbyID("{{element[0]}}");
+	button.style.background='red';
+	{% endif %}
+	{% endfor %}
+	</script>
+</head>
+You said that {{phrase}} was of type {{phrase_type}}.<br>
+
+Highlight the elements this phrase contains. <br>
+
+<form name="phrase_subtype" action="{{url_for('confirm_phrase')}}">
+{% for element in phrase_structure_options %}
+<button type="button" id="{{element[0]}}" onClick="wordClick(event)">{{element[0]}}</button>
+{% endfor %}
+<br>
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+		<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+<button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = ""> Submit</button>
+
+</form>
+</html>
