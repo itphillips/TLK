@@ -4,35 +4,65 @@
 		<title>base</title>
 		<meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        #header {
+        	background-color:#FFF;
+        		}
+        		
+        #menu	{
+        	background-color:#FFF;
+        	height:600px;
+        	width:200px;
+        	float:left;
+        	text-align:left;
+        	padding-left:20px;
+        		}
+        		
+        #guide	{
+        	float:right;
+        	width:400px;
+        	padding:10px;
+        		}
+        		
+        #footer	{
+        	background-color:#FFF;
+        	clear:both;
+        	text-align:center;
+        		}
+        </style>
 	</head>
 
 <body>
 
 <!--This is the container and title image header-->
 <div id="container" style="width:1100px">
-        <div id="header" style="background-color:#FFF;">
+        <div id="header">
             <img src="LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="350" height="105">    
         </div>
         
 <!--this is the left menu box-->
-    <div id="menu" style="background-color:#FFF; height:600px;width:200px;float:left; text-align:left; padding-left:20px; ">
+    <div id="menu">
         <h3>Menu</h3>
-        <p><a href="/show_sentences">Home</a></p>
+        <p><a href="/home">Home</a></p>
         <p><a href="/glossary">Glossary</a></p>
         <p><a href="/workflow">Workflow</a></p>
         <p><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing 
             <br>Conventions</a></p>
         <p><a href="/help">Help</a></p>
     </div> 
-           
             
 <!--This is the workspace box-->
     <div> 
     {% block content %}{% endblock %}
     </div>
+    
+<!--This is the right guide box-->
+	<div id="guide">
+		<h3>Guide</h3>
+	</div>
             
 <!--This is the footer-->
-	<div id="footer" style="background-color:#FFF;clear:both; text-align:center;">
+	<div id="footer">
         The Linguist's Kitchen
     </div>
 </div>

@@ -49,12 +49,17 @@
 				{% endfor %}
 				<input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
 				<input type="hidden" name= "userID" value ="{{userID}}">
-        <input type="hidden" name= "sentence" value= "{{sentence}}">
-        <input type= "hidden" name="language" value= "{{language}}">
-					<input type="submit" value="Check my work">
+        		<input type="hidden" name= "sentence" value= "{{sentence}}">
+        		<input type= "hidden" name="language" value= "{{language}}">
+				<input type="submit" value="Check my work">
 			</form> 
     	</div>
-    </div>         
+    </div>
+    
+<!--content for the guidebox-->
+	<div id="guide">
+	<p style="font-size:100%">
+	First, label each word in your sentence with the appropriate part of speech.         
 
 {% endblock %}
 </body>

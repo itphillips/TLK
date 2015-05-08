@@ -17,6 +17,10 @@ conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 @app.route("/")
+@app.route("/home")
+def home():
+	return render_template("home.html")
+
 @app.route("/login")
 def login():
 	dict_cur.execute("SELECT * FROM users;")
