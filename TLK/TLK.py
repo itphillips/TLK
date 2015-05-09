@@ -319,12 +319,29 @@ def tag_subj():
 
 @app.route("/confirm_subj")
 def confirm_subj():
+	print "confirm_subj"
+	print request.args
 	sentence=request.args.get("sentence")
-	wordIDString=request.args.get(wordIDString)
+	print sentence
+	wordIDString=request.args.get("wordIDString")
+	print wordIDString, "yo"
 	word_IDs_of_subject_string=request.args.get("subject")
-	word_IDs_of_subject_list=request.args.get("subject").split()
+	print subject
+	#ok here's where I'm stumped! Not printing subject and failing silently
+	word_IDs_of_subject_list=word_IDs_of_subject_string.split()
+	print word_IDs_of_subject_list
+	words_of_subject=""
+	print sentence
+	print wordIDString
+	for wordID in word_IDs_of_subject_list:
+		try:
+			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
+			words_of_subject= words_of_subject+(dict_cur.fetchall()[0])+" "
+		except Exception as e:
+			print e
+	print "oy"
 
-	return render_template("confirm_subj.html")
+	return render_template("confirm_subj.html", subject=words_of_subject, sentence=sentence, wordIDs=request.args.get("wordIDString"), word_IDs_of_subject=word_IDs_of_subject_string, wordIDString=wordIDString)
 
 @app.route("/tag_obj")
 def tag_obj():
@@ -351,22 +368,75 @@ def tag_obj():
 		print wordID
 	return render_template("tag_obj.html", sentence=sentence, wordIDString=wordIDString, wordIDs=wordIDString.split(), words=sentence.split())
 
-@app.route("/end")
-def save_obj_prompt_new_sentence():
+@app.route("/confirm_obj")
+def confirm_obj():
+	sentence=request.args.get("sentence")
+	wordIDString=request.args.get("wordIDString")
 	DOIOstring=request.args.get("object")
 	DOIOlist=DOIOstring.replace("DO","").split("IO")
 	DO=DOIOlist[0]
 	IO=DOIOlist[1]
 	if DO != "_":
 		DO.replace("_","")
-	else:
-		DO=None
+		DOList=DO.split()
 	if IO != "_":
 		IO.replace("_","")
-	else:
-		IO=None
+		IOList=IO.split()
+	DOWords=""
+	IOWords=""
+	confirm_needed=False
+	if IOList:
+		confirm_needed=True
+		for wordID in IOList:
+			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
+			IOWords= IOWords+(dict_cur.fetchall()[0])+" "
 
-	return render_template("confirm_obj.html")
+	if DOList:
+		confirm_needed=True
+		for wordID in DOList:
+			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
+			DOWords= DOWords+(dict_cur.fetchall()[0])+" "
+	if confirm_needed:
+		return render_template("confirm_subj.html", DO=DO, IO=IO, sentence=sentence, wordIDs=request.args.get("wordIDString"), wordIDString=wordIDString, DOWords=DOWords, IOWords=IOWords)
+	return redirect(url_for("prompt_new_sentence"))
+
+@app.route("/end")
+def prompt_new_sentence():
+	DO=request.args.get("DO")
+	IO=request.args.get("IO")
+	wordIDs=request.args.get("wordIDString").split()
+	if DO:
+		for wordID in DO.split():
+			try:
+				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='ACC';".format(wordID))
+				words_in_words_cases = dict_cur.fetchall()
+			except Exception as e:
+				print e
+			print wordID
+			print words_in_words_cases
+			if words_in_words_cases == []:
+				try:
+					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "ACC"))
+				except Exception as e:
+					print e
+			print wordID		
+	if IO:
+		for wordID in IO.split():
+			try:
+				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
+				words_in_words_cases = dict_cur.fetchall()
+			except Exception as e:
+				print e
+			print wordID
+			print words_in_words_cases
+			if words_in_words_cases == []:
+				try:
+					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "DAT"))
+				except Exception as e:
+					print e
+			print wordID		
+
+	return render_template("prompt_new_sentence.html")
 
 if __name__ == '__main__':
     app.run()

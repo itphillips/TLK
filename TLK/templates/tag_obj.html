@@ -46,7 +46,7 @@ var tag_IO=document.getElementById("tag_IO");
 		}
 	}
 </script>
-<form action="{{url_for('save_obj_prompt_new_sentence')}}">
+<form action="{{url_for('confirm_obj')}}">
 Does the sentence "{{sentence}}" have an object?
 <input type="radio" name="obj" value="DO" onClick="showTagDO()">Yes, just a direct object</input>
 <input type="radio" name="obj" value="IO" onClick="showTagIO()">Yes, just an indirect object</input>

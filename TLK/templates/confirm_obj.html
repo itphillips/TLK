@@ -1,0 +1,23 @@
+<html>
+{% if DO != "" %}
+You said that {{DOWords}} was the direct object of the sentence.
+{% endif %}
+{% if IO != "" %}
+You said that {{IOWords}} was the indirect object of the sentence.
+{% endif %}
+
+<form action="{{url_for('prompt_new_sentence')}}">
+	<input type="submit" name="DO" value="{{DO}}">Yes</input>
+	<input type="hidden" name="IO" value="{{IO}}">
+	<input type="hidden" name="IOWords" value="{{IOWords}}">
+	<input type="hidden" name="DOWords" value="{{DOWords}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="wordIDs" value="{{wordIDs}}">
+	<input type="hidden" name="wordIDString" value="{{wordIDString}}">
+</form>
+<form action="{{url_for('tag_obj')}}">
+	<input type="submit" name="sentence" value="{{sentence}}">No</input>
+	<input type="hidden" name="wordIDs" value="{{wordIDs}}">
+	<input type="hidden" name="wordIDString" value="{{wordIDString}}">
+</form>
+</html>

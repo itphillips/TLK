@@ -31,7 +31,7 @@
 	{% endif %}
 	{% endfor %}
 	</script>
-<form action="{{url_for('tag_obj')}}">
+<form action="{{url_for('confirm_subj')}}">
 Which word(s) constitute(s) the subject?
 {% for i in range(words|count) %}
 <button type="button" id="{{wordIDs[i]}}" onClick="changeColor(event)">{{words[i]}}</button>
