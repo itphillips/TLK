@@ -301,6 +301,7 @@ def tag_subj():
 		print e
 	wordIDs.sort(key=lambda x: int(x[1]))
 	wordIDs=[wordID[1] for wordID in wordIDs]
+	wordIDString=""
 	for wordID in wordIDs:
 		print wordID
 		try:
@@ -308,14 +309,65 @@ def tag_subj():
 		except Exception as e:
 			print e
 		word=dict_cur.fetchall()
+		print word
 		words.append(word[0][0])
+		print words
+		wordIDString=wordIDString+str(wordID)+" "
+		print wordIDString
 	print words
-	return render_template("tag_subj_obj.html", words=words, wordIDs=wordIDs)
+	return render_template("tag_subj.html", words=words, sentence=sentence, wordIDs=wordIDs, wordIDString=wordIDString)
+
+@app.route("/confirm_subj")
+def confirm_subj():
+	sentence=request.args.get("sentence")
+	wordIDString=request.args.get(wordIDString)
+	word_IDs_of_subject_string=request.args.get("subject")
+	word_IDs_of_subject_list=request.args.get("subject").split()
+
+	return render_template("confirm_subj.html")
 
 @app.route("/tag_obj")
 def tag_obj():
+	sentence=request.args.get("sentence")
+	print sentence
+	wordIDString=request.args.get("wordIDString")
+	print wordIDString
+	word_IDs_of_subject=request.args.get("subject").split()
+	print word_IDs_of_subject
 
-	return "hi"
+	for wordID in word_IDs_of_subject:
+		try:
+			dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='N';".format(wordID))
+			words_in_words_cases = dict_cur.fetchall()
+		except Exception as e:
+			print e
+		print wordID
+		print words_in_words_cases
+		if words_in_words_cases == []:
+			try:
+				dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "N"))
+			except Exception as e:
+				print e
+		print wordID
+	return render_template("tag_obj.html", sentence=sentence, wordIDString=wordIDString, wordIDs=wordIDString.split(), words=sentence.split())
+
+@app.route("/end")
+def save_obj_prompt_new_sentence():
+	DOIOstring=request.args.get("object")
+	DOIOlist=DOIOstring.replace("DO","").split("IO")
+	DO=DOIOlist[0]
+	IO=DOIOlist[1]
+	if DO != "_":
+		DO.replace("_","")
+	else:
+		DO=None
+	if IO != "_":
+		IO.replace("_","")
+	else:
+		IO=None
+
+	return render_template("confirm_obj.html")
+
 if __name__ == '__main__':
     app.run()
 

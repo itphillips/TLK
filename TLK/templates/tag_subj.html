@@ -37,6 +37,9 @@ Which word(s) constitute(s) the subject?
 <button type="button" id="{{wordIDs[i]}}" onClick="changeColor(event)">{{words[i]}}</button>
 {% endfor %}
 <br>
+<input type="hidden" name="sentence" value="{{sentence}}">
+<input type="hidden" name="wordIDString" value="{{wordIDString}}">
+
 <button type="submit" name="subject" onClick="submitClick(event)" value="">submit</button>
 </form>
 </html>
