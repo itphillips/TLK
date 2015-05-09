@@ -14,13 +14,14 @@ You said that phrase {{phrase}} was of type {{phrase_type}}, and that it had the
 {{phrase_structure}}
 <br>
 Is this correct?
-<form name="all_ok" action="{{url_for('tag_subj')}}">
+<form name="all_ok" action="{{url_for('put_phrase_in_database')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 	<input type="hidden" name="phrase" value="{{phrase}}">
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
 	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
+	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
 	<button type="submit" name="submit">Yes</button>
 	</form>
 
@@ -29,14 +30,17 @@ Is this correct?
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="phrase" value="{{phrase}}">
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
-		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<button type="submit" name="submit">No. Change Structure</button>
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="redo" value="{{True}}">
+	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
+	<button type="submit" name="submit"> No. Change Structure</button>
 	</form>
 
 	<form name="phrase_problem" action="{{url_for('group')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="firstTime" value="False">
 	<button type="submit" name="submit">No. Make new phrase</button>
 	</form>
 	

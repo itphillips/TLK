@@ -36,8 +36,17 @@
 	}
 
 	{% for element in phrase_structure_options %}
+	console.log("{{element}}")
+	console.log("{{element[0]}}")
+	console.log("{{element[1]}}")
 	{% if element[1] == "necessary" %}
-	var button=document.getElementbyID("{{element[0]}}");
+    var button=document.forms.getElementById("{{element[0]}}");
+
+
+	console.log(button)
+	console.log("hi")
+	console.log("{{element[0]}}")
+	
 	button.style.background='red';
 	{% endif %}
 	{% endfor %}
@@ -55,8 +64,9 @@ Highlight the elements this phrase contains. <br>
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-		<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase" value="{{phrase}}">
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
 <button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = ""> Submit</button>
 
 </form>
@@ -65,6 +75,7 @@ Highlight the elements this phrase contains. <br>
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="redo" value="True">
 	<button type="submit" name = "retry"> I made a mistake! Take me back to the phrase tagging page.</button>
 </form>
 
