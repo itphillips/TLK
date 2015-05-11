@@ -1,13 +1,16 @@
 <html>
 You said that {{subject}} was the subject of the sentence.
+Is this correct?
 <form action="{{url_for('tag_obj')}}">
-	<input type="submit" name="subject" value="{{word_ids_of_subject}}">Yes</input>
+	<input type="submit" name="submit" value="yes">
+	<input type="hidden" name="subject" value="{{word_ids_of_subject}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="wordIDs" value="{{wordIDs}}">
 	<input type="hidden" name="wordIDString" value="{{wordIDString}}">
 </form>
 <form action="{{url_for('tag_subj')}}">
-	<input type="submit" name="sentence" value="{{sentence}}">No</input>
+	<input type="submit" name="submit" value="no">
+	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="wordIDs" value="{{wordIDs}}">
 	<input type="hidden" name="wordIDString" value="{{wordIDString}}">
 </form>

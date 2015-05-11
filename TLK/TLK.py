@@ -320,23 +320,19 @@ def tag_subj():
 @app.route("/confirm_subj")
 def confirm_subj():
 	print "confirm_subj"
-	print request.args
 	sentence=request.args.get("sentence")
-	print sentence
 	wordIDString=request.args.get("wordIDString")
-	print wordIDString, "yo"
 	word_IDs_of_subject_string=request.args.get("subject")
-	print subject
-	#ok here's where I'm stumped! Not printing subject and failing silently
 	word_IDs_of_subject_list=word_IDs_of_subject_string.split()
-	print word_IDs_of_subject_list
 	words_of_subject=""
-	print sentence
-	print wordIDString
 	for wordID in word_IDs_of_subject_list:
+		print wordID
+		print type(wordID)
 		try:
-			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
-			words_of_subject= words_of_subject+(dict_cur.fetchall()[0])+" "
+			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(int(wordID)))
+			first_result=dict_cur.fetchall()[0]
+			print first_result
+			words_of_subject= words_of_subject+(str(first_result[0]))+" "
 		except Exception as e:
 			print e
 	print "oy"
