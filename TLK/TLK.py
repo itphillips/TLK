@@ -345,27 +345,29 @@ def tag_obj():
 	print sentence
 	wordIDString=request.args.get("wordIDString")
 	print wordIDString
-	word_IDs_of_subject=request.args.get("subject").split()
-	print word_IDs_of_subject
-
-	for wordID in word_IDs_of_subject:
-		try:
-			dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='N';".format(wordID))
-			words_in_words_cases = dict_cur.fetchall()
-		except Exception as e:
-			print e
-		print wordID
-		print words_in_words_cases
-		if words_in_words_cases == []:
+	redo=request.args.get("redo")
+	if redo !="yes":
+		word_IDs_of_subject=request.args.get("subject").split()
+		print word_IDs_of_subject
+		for wordID in word_IDs_of_subject:
 			try:
-				dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "N"))
+				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='N';".format(wordID))
+				words_in_words_cases = dict_cur.fetchall()
 			except Exception as e:
 				print e
-		print wordID
+			print wordID
+			print words_in_words_cases
+			if words_in_words_cases == []:
+				try:
+					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "N"))
+				except Exception as e:
+					print e
+			print wordID
 	return render_template("tag_obj.html", sentence=sentence, wordIDString=wordIDString, wordIDs=wordIDString.split(), words=sentence.split())
 
 @app.route("/confirm_obj")
 def confirm_obj():
+	print "confirm_obj"
 	sentence=request.args.get("sentence")
 	wordIDString=request.args.get("wordIDString")
 	DOIOstring=request.args.get("object")
@@ -373,27 +375,37 @@ def confirm_obj():
 	DO=DOIOlist[0]
 	IO=DOIOlist[1]
 	if DO != "_":
-		DO.replace("_","")
+		DO=DO.replace("_","")
 		DOList=DO.split()
 	if IO != "_":
-		IO.replace("_","")
+		IO=IO.replace("_","")
 		IOList=IO.split()
+	print DOList, "do list"
+	print IOList, "io list"
 	DOWords=""
 	IOWords=""
 	confirm_needed=False
 	if IOList:
 		confirm_needed=True
 		for wordID in IOList:
-			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
-			IOWords= IOWords+(dict_cur.fetchall()[0])+" "
-
+			print wordID
+			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
+			print "ok"
+			IOWords= IOWords+(str(dict_cur.fetchall()[0][0]))+" "
+			print IOWords
+	print 'hi'
 	if DOList:
 		confirm_needed=True
 		for wordID in DOList:
-			dict_cur.execute("SELECT word from words WHERE id ='{}';").format(wordID)
-			DOWords= DOWords+(dict_cur.fetchall()[0])+" "
+			print wordID
+			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
+			print "ok"
+			DOWords= DOWords+(str(dict_cur.fetchall()[0][0]))+" "
+			print DOWords
+	print DO,"DO"
+	print IO,"IO"
 	if confirm_needed:
-		return render_template("confirm_subj.html", DO=DO, IO=IO, sentence=sentence, wordIDs=request.args.get("wordIDString"), wordIDString=wordIDString, DOWords=DOWords, IOWords=IOWords)
+		return render_template("confirm_obj.html", DO=DO, IO=IO, sentence=sentence, wordIDs=request.args.get("wordIDString"), wordIDString=wordIDString, DOWords=DOWords, IOWords=IOWords)
 	return redirect(url_for("prompt_new_sentence"))
 
 @app.route("/end")
