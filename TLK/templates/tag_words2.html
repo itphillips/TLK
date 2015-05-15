@@ -11,7 +11,7 @@
 {% block content %}
                
 <!--This is the workspace box-->
-    <div id="content" style="background-color:#FFF; height:600px;width:650px;float:left;">
+<!--    <div id="workspace"> -->
         <h2>Step 2</h2>
         {% if error != None %}
         <h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
@@ -54,13 +54,16 @@
 				<input type="submit" value="Check my work">
 			</form> 
     	</div>
-    </div>
-    
-<!--content for the guidebox-->
-	<div id="guide">
-	<p style="font-size:100%">
-	First, label each word in your sentence with the appropriate part of speech.         
-
+<!--    </div> -->
 {% endblock %}
+
+<!--content for the guidebox-->
+{% block guide %}
+	<p> First, label each word in your sentence with the appropriate <i  style="color:blue">part of speech</i>.<p>
+	<br> <p> For additional help, please check these resources:</p>
+	 <a href="http://partofspeech.org/">partofspeech.org</a> 
+	        
+{% endblock %}
+
 </body>
 </html>
