@@ -1,0 +1,11 @@
+# for each deployment, replace SECRET_KEY, USERNAME, PASS
+
+#activates cross-site request forgery prevention - makes app more secure
+WTF_CSRF_ENABLED = True
+#only needed when CSRF is enabled - creates cryptographic token that us used to 
+#validate a form - set secret key to something that is difficult to guess
+SECRET_KEY = 'SECRET_KEY'
+
+
+#database path
+SQLALCHEMY_DATABASE_URI = 'postgresql://USERNAME:PASS@localhost/tlk'
