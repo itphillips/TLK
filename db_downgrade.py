@@ -1,7 +1,7 @@
 #!tlkenv/bin/python
 # this script will downgrade the database one revision each time it is run
 from migrate.versioning import api
-from config import SQLALCHEMY_DATABASE_URI
+from privateconfig import SQLALCHEMY_DATABASE_URI
 from config import SQLALCHEMY_MIGRATE_REPO
 v = api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
 api.downgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, v - 1)
