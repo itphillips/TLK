@@ -1,0 +1,81 @@
+<!-- CREATED: 9/20/15 -->
+<!-- AUTHOR: Ian Phillips -->
+<!-- this corresponds to tagwords2 in old tlk -->
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Tag Parts of Speech</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+<h1>Step 2: Identify the part of speech for each word</h1>
+
+<!-- error handling -->
+<!-- {% if error != None %}
+<h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
+{% endif %} -->
+
+<!-- <u>Please identify the part of speech for each word in your sentence:</u><br>  -->
+<p><font size=6> {{ sentence }} </font></p>
+<div>
+
+<form name="tagpos" action="" method="POST" >
+	{{form.hidden_tag()}}
+
+	<!-- {% set count = 0 %} -->
+
+{% for word in sentence.split() %}
+<br><font size=4> {{word}} </font>
+{{ form.word() }}
+{{ form.partofspeech() }}
+
+<!-- 	<br> <input type="radio" name="{{count}}" value="adjective">Adjective 
+	<br> <input type="radio" name="{{count}}" value="adverb">Adverb 
+	<br> <input type="radio" name="{{count}}"  value="conjunction">Conjunction
+	<br> <input type="radio" name="{{count}}"  value="complementizer">Complementizer 
+	<br> <input type="radio" name="{{count}}"  value="determiner">Determiner					
+	<br> <input type="radio" name="{{count}}"  value="noun">Noun
+	<br> <input type="radio" name="{{count}}"  value="preposition">Preposition
+	<br> <input type="radio" name="{{count}}"  value="pronoun">Pronoun
+	<br> <input type="radio" name="{{count}}"  value="verb-auxiliary">Verb-auxiliary
+	<br> <input type="radio" name="{{count}}"  value="verb-copula">Verb-copula
+	<br> <input type="radio" name="{{count}}"  value="verb-ditransitive">Verb-ditransitive
+	<br> <input type="radio" name="{{count}}"  value="verb-intransitive">Verb-intransitive
+	<br> <input type="radio" name="{{count}}"  value="verb-transitive">Verb-transitive
+	<br> <input type="radio" name="{{count}}"  value="verb-sentential_complement">Verb-sentential complement -->
+
+	<br>
+	<input type="hidden" name= "sentence_id" value ="{{sentence_id}}">
+	<input type="hidden" name= "user" value ="{{user}}">
+	<input type="hidden" name= "sentence" value= "{{sentence}}">
+	<input type="hidden" name="sentence_id" value="{{setence_id}}">
+	<input type= "hidden" name="language" value= "{{language}}">
+
+	<!-- {% set count = count+1 %} -->
+	{% endfor %}
+<!-- 	<input type="string" name= "sentence_id" value ="{{sentence_id}}">
+	<input type="string" name= "user" value ="{{user}}">
+	<input type="string" name= "sentence" value= "{{sentence}}">
+	<input type="string" name="sentence_id" value="{{setence_id}}">
+	<input type= "string" name="language" value= "{{language}}"> -->
+	<br>
+	<button type="submit"> Check my work
+</form> 
+</div>
+
+
+
+{% endblock %}
+
+{% block guide %}
+	<p> First, label each word in your sentence with the appropriate <i  style="color:blue">part of speech</i>.<p>
+	<br> <p> For additional help, please check these resources:</p>
+	 <a href="http://partofspeech.org/">partofspeech.org</a>       
+{% endblock %}
+
+</body>
+</html>

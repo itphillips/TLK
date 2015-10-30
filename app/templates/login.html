@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>login</title>
+	<style>
+        #container	{
+        	width:1100px;
+        	margin-left:auto;
+        	margin-right:auto;
+        }
+        
+        #header {
+        	position:relative;
+        	background-color:#FFF;
+        	width:100%;
+        	height:250px;
+    	}
+        		
+        #menu	{
+        	background-color:#FFF;
+        	height:600px;
+        	width:200px;
+        	float:left;
+        	text-align:left;
+        	padding-left:20px;
+        		}
+        
+        #login	{
+        	position:relative;
+        	background-color:#FFF;
+        	width:80%;
+        	float:left;
+        	padding:20px;
+        }		
+        		
+        #footer	{
+        	background-color:#FFF;
+        	clear:both;
+        	text-align:center;
+        		}
+    </style>
+</head>
+
+<body>
+<!--This is the container and title image header-->
+    <div id="container">
+        <div id="header">
+            <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210">    
+    	</div> 
+
+<!--this is the left menu box-->
+    <div id="menu">
+        <h3>Menu</h3>
+        <p><a href="/home">Home</a></p>
+        <p><a href="/help">Help</a></p>
+    </div> 
+            
+<!--This is the workspace box-->
+    <div> 
+    <script type="text/javascript">
+    function set_openid(openid, pr)
+    {
+        u = openid.search('<username>')
+        if (u != -1) {
+            // openid requires username
+            user = prompt('Enter your ' + pr + ' username:')
+            openid = openid.substr(0, u) + user
+        }
+        form = document.forms['login'];
+        form.elements['openid'].value = openid
+    }
+    </script>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }} </li> 
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h1>Sign In</h1>
+    <form action="" method="post" name="login">
+        <!--this template argument gets replaced with a hidden field that implements
+        CSRF prevention we implemented in config.py - this needs to be in all forms if CSRF is enabled -->
+        {{ form.hidden_tag() }}
+        <p>
+            Please enter your OpenID, or click on the link below:<br>
+            <!--this field object renders the field 'openid' from loginform subclass-->
+            {{ form.openid(size=80) }}<br>
+            <!--this for loop renders any messages that are added by the validators under the openid field-->
+            {% for error in form.openid.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            |{% for pr in providers %}
+                <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">{{ pr.name }}</a> |
+            {% endfor %}
+        </p>
+        <p>{{ form.remember_me }} Remember Me</p>
+        <p><input type="submit" value="Sign In"></p>
+    </form>
+    </div>
+            
+<!--This is the footer-->
+	<div id="footer">
+        The Linguist's Kitchen
+    </div>
+	
+    </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Input Sentence</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+<h1>Step 1: Enter a sentence</h1>
+
+<form name="entersentence" action="" method="POST" >
+	{{form.hidden_tag()}}
+
+Please enter a sentence:<br> 
+{{ form.sentence(size=24)}}<br><br>
+
+{%for error in form.sentence.errors %}
+<span style="color: red;">[{{ error }}]</span><br><br>
+{% endfor %}
+
+Please paraphrase this sentence in standard English:<br>
+{{ form.english_gloss(size=24)}}<br><br>
+
+{%for error in form.english_gloss.errors %}
+<span style="color: red;">[{{ error }}]</span><br><br>
+{% endfor %}
+
+What language is this sentence? <br>
+{{ form.language(size=24)}}<br><br>
+
+{%for error in form.language.errors %}
+<span style="color: red;">[{{ error }}]</span><br><br>
+{% endfor %}
+
+
+
+<!-- <input type="radio" name="language" value="E">English <br>
+<input type="radio" name="language" value="S">Spanish <br> -->
+
+<!-- When was this sample collected? Please enter the date in YYYYMMDD format <br>
+<input type="text" name="date"> 
+<input type="hidden" name="userID" value="{{userID}}">
+<br> -->
+
+<!-- 	Have you previously input other sentences from this same recording session?
+<input type="radio" name="continued_session" value="yes">Yes<br>
+<input type="radio" name="continued_session" value="no">No -->
+
+<button type="submit">OK
+</form>
+	
+{% endblock %}
+
+{% block guide %}
+	<p> <b>Step 1:</b> Enter a sentence that you would like to analyze. </br><br>
+		<b>Step 2:</b> Paraphrase the sentence in 'standard' English.</br><br>
+		<b>Step 3:</b> Enter the language that this sentence belongs to.</br><br>
+	<p>        
+{% endblock %}
+
+</body>
+</html>

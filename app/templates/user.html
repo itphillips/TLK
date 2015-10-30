@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>User Page</title>
+</head>
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+<body>
+{% block content %}
+
+<h2>Hello {{ user.username }}!</h2>
+
+{% if sentences!=[] %}
+<h3><i>Click on the sentence you'd like to analyze:</i></h3>
+
+{% else %}
+Looks like you haven't added any sentences yet!
+{% endif %}
+
+{% for sentence in sentences %}
+
+<!-- this link invokes the delete function -->
+{% if sentence.author.id == g.user.id %}
+<div><a href="{{ url_for('delete', id=sentence.id) }}">{{ ('Delete') }}</a></div>
+{% endif %}
+
+<p>
+
+	<form name="{{showsentence}}" action="{{url_for('tagPOS', sentence=sentence)}}" method="GET"> 
+
+    	<button type="submit">{{sentence.sentence}}
+    	</button>
+    	<input type="hidden" name="user" value="{{user}}">
+    	<input type="hidden" name="sentence" value="{{sentence.sentence}}">
+    	<input type="hidden" name="english_gloss" value="{{sentence.english_gloss}}">
+    	<input type="hidden" name="language" value="{{sentence.language}}">
+    	<!-- <input type="string" name="date" value="{{sentence['collection_date']}}"> -->
+    	<input type="hidden" name="sentence_id" value="{{sentence.id}}">
+
+	</form>
+
+	<!-- this just shows the user's sentences -->
+	<!-- {{ sentence.sentence }}</b> -->
+</p> 
+
+
+{% endfor %}
+</br><hr></br>
+	<form name="NewSentence" action="{{url_for('input_sentence')}}">
+ 		<button type="submit">I want to add a new sentence
+ 		 	<input type="hidden" name="user" value="{{user}}">
+	</form>
+{% endblock %}
+
+{% block guide %}
+	<p> You can work on a sentence you've already entered, or add a new one.<p>        
+{% endblock %}
+
+</body>
+</html>
