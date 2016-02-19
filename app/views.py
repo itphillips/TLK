@@ -156,27 +156,30 @@ def delete(id):
 							username=g.user.username))
 
 
-@app.route('/tagPOS', methods=['GET', 'POST'])
+@app.route('/tagPOS/<sentence>', methods=['GET', 'POST'])
 @login_required
-def tagPOS():
-	form=TagPOSForm()
+def tagPOS(sentence):
+	form = TagPOSForm()
 
-	sentence = request.args.get("sentence")
+	# sentence = sentence
 	user = request.args.get("user")
 	english_gloss = request.args.get("english_gloss")
 	language = request.args.get("language")
 	sentence_id = request.args.get("sentence_id")
+	# if form.validate_on_submit():
+	if request.method == "POST":
+		for word in sentence.split():
+			print word
 
-	
-	if form.validate_on_submit():
-		word = Word(word=form.word.data,
+			word = Word(word=word,
 					partofspeech=form.partofspeech.data,
 					sentence_id=sentence_id)
 		
-		db.session.add(word)
-		db.session.commit()
+			db.session.add(word)
+			db.session.commit()
 
-	 	return redirect(url_for('test', sentence=sentence))
+	 	return render_template("test.html", 
+	 							sentence=sentence)
 
 	return render_template("tagPOS.html",
 							sentence=sentence, 
@@ -188,10 +191,12 @@ def tagPOS():
 
 
 #this is a page that can be used as a placeholder during development
-@app.route('/test', methods=['GET', 'POST'])
+@app.route('/test/<int:id>', methods=['GET', 'POST'])
 @login_required #ensures this page is only seen by logged in users
-def test():
+def test(id):
+	sentence = Sentence.query.get(id)
 	user = g.user #passes g.user down to the template
-	return render_template('test.html')
+	return render_template('test.html',
+							sentence=sentence)
 
 

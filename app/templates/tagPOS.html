@@ -30,7 +30,7 @@
 
 {% for word in sentence.split() %}
 <br><font size=4> {{word}} </font>
-{{ form.word() }}
+<!-- {{ form.word() }} -->
 {{ form.partofspeech() }}
 
 <!-- 	<br> <input type="radio" name="{{count}}" value="adjective">Adjective 
@@ -49,11 +49,11 @@
 	<br> <input type="radio" name="{{count}}"  value="verb-sentential_complement">Verb-sentential complement -->
 
 	<br>
-	<input type="hidden" name= "sentence_id" value ="{{sentence_id}}">
+	<input type="hidden" name= "sentence_id" value ="{{sentence.sentence_id}}">
 	<input type="hidden" name= "user" value ="{{user}}">
-	<input type="hidden" name= "sentence" value= "{{sentence}}">
-	<input type="hidden" name="sentence_id" value="{{setence_id}}">
-	<input type= "hidden" name="language" value= "{{language}}">
+	<input type="hidden" name= "sentence" value= "{{sentence.sentence}}">
+	<input type="hidden" name="sentence_id" value="{{sentence.setence_id}}">
+	<input type= "hidden" name="language" value= "{{sentence.language}}">
 
 	<!-- {% set count = count+1 %} -->
 	{% endfor %}

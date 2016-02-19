@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>tag_phrase_structure</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+<!-- <head> -->
+	<script type="text/javascript">
+	var prev= null;
+	function wordClick(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="lightgreen";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
+
+	{% for element in phrase_structure_options %}
+	console.log("{{element}}")
+	console.log("{{element[0]}}")
+	console.log("{{element[1]}}")
+	{% if element[1] == "necessary" %}
+    var button=document.forms.getElementById("{{element[0]}}");
+
+
+	console.log(button)
+	console.log("hi")
+	console.log("{{element[0]}}")
+	
+	button.style.background='lightgreen';
+	{% endif %}
+	{% endfor %}
+	</script>
+<!-- </head> -->
+<p>You said that "{{phrase}}" was of type {{phrase_type}}.</p>
+
+<p>Highlight the elements this phrase contains. </p>
+
+<form name="phrase_subtype" action="{{url_for('confirm_phrase')}}">
+{% for element in phrase_structure_options %}
+<button type="button" id="{{element[0]}}" onClick="wordClick(event)" style="font-size:16px;height:26px">{{element[0]}}</button>
+{% endfor %}
+<br>
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
+<br><button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = ""> Submit</button>
+
+</form>
+<br>
+<form name="try_again" action="{{url_for('group')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="redo" value="True">
+	<button type="submit" name = "retry"> I made a mistake! Go back.</button>
+</form>
+
+{% endblock %}
+
+{% block guide %}
+	<h2>Identify the parts of the phrase</h2>
+	<p align="left"> <b>Step 1:</b> Click on the elements that are contained in your phrase
+	<br><br><b>Step 2:</b> Either click "submit" to check your work or click "I made a mistake! Go back." if you need to edit this phrase
+
+	<br><br>Here are some tests you can use to determine if a group of words forms a constituent:</p>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px">Substitution</a> 
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px">Movement</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px">Question answer</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px">Clefting</a>
+	        
+{% endblock %}
+</body>
+</html>

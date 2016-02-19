@@ -10,7 +10,7 @@ from config import basedir
 app = Flask(__name__)
 #tells Flask to read and use configurations in config.py file
 app.config.from_object('config')
-app.config.from_object('privateconfig')
+app.config.from_object('privateconfigtwo') #privateconfig
 
 
 #initializes database - the db object instantiated from clas SQLAlchemy represents
@@ -28,7 +28,7 @@ oid = OpenID(app, os.path.join(basedir, '/tmp'))
 #imports views module, which imports the 'app' variable defined above
 #imports models module, which contains database structures
 #here 'app' is a package
-from app import views, models
-#imports the named tables from models.py
-from models import User, Sentence
+from app import viewstwo, modelstwo #views, models
+#imports the named tables from modelstwo.py
+from modelstwo import User, Sentence, Word, Words_sentence, Phrase, Phrases_sentence, Words_phrase, Users_sentence, Words_case
 

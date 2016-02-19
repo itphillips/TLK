@@ -27,21 +27,21 @@ Looks like you haven't added any sentences yet!
 
 <p>
 
-	<form name="{{showsentence}}" action="{{url_for('tagPOS', sentence=sentence)}}" method="GET"> 
+	<form name="showsentence" action="{{url_for('tagPOS', sentence=sentence.sentence)}}" method="GET"> 
 
-    	<button type="submit">{{sentence.sentence}}
-    	</button>
+    	<button type="submit">{{sentence.sentence}}</button>
     	<input type="hidden" name="user" value="{{user}}">
     	<input type="hidden" name="sentence" value="{{sentence.sentence}}">
     	<input type="hidden" name="english_gloss" value="{{sentence.english_gloss}}">
     	<input type="hidden" name="language" value="{{sentence.language}}">
-    	<!-- <input type="string" name="date" value="{{sentence['collection_date']}}"> -->
-    	<input type="hidden" name="sentence_id" value="{{sentence.id}}">
+    	<!-- <input type="string" name="date" value="{{sentence['collection_date']}}">
+    	<input type="hidden" name="sentence_id" value="{{sentence.id}}"> -->
 
 	</form>
 
 	<!-- this just shows the user's sentences -->
 	<!-- {{ sentence.sentence }}</b> -->
+
 </p> 
 
 

@@ -5,19 +5,22 @@ from migrate import *
 from migrate.changeset import schema
 pre_meta = MetaData()
 post_meta = MetaData()
-sentences = Table('sentences', pre_meta,
+words = Table('words', pre_meta,
     Column('id', INTEGER, primary_key=True, nullable=False),
-    Column('sessionID', VARCHAR(length=3)),
-    Column('session_number', INTEGER),
-    Column('sentence', VARCHAR(length=90)),
-    Column('sentence_type', VARCHAR(length=30)),
-    Column('language', VARCHAR(length=25)),
-    Column('english_gloss', VARCHAR(length=140)),
-    Column('collection_date', VARCHAR(length=70)),
-    Column('collection_location', VARCHAR(length=70)),
-    Column('notes', VARCHAR(length=140)),
-    Column('timestamp', TIMESTAMP),
-    Column('user_id', INTEGER),
+    Column('word', VARCHAR(length=30)),
+    Column('partofspeech', VARCHAR(length=30)),
+    Column('gram_case', VARCHAR(length=30)),
+    Column('sentence_id', INTEGER),
+    Column('language', VARCHAR(length=30)),
+)
+
+words = Table('words', post_meta,
+    Column('id', Integer, primary_key=True, nullable=False),
+    Column('word', String(length=30)),
+    Column('pos', String(length=30)),
+    Column('gram_case', String(length=30)),
+    Column('sentence_id', Integer),
+    Column('language', String(length=30)),
 )
 
 
@@ -26,11 +29,13 @@ def upgrade(migrate_engine):
     # migrate_engine to your metadata
     pre_meta.bind = migrate_engine
     post_meta.bind = migrate_engine
-    pre_meta.tables['sentences'].columns['collection_date'].drop()
+    pre_meta.tables['words'].columns['partofspeech'].drop()
+    post_meta.tables['words'].columns['pos'].create()
 
 
 def downgrade(migrate_engine):
     # Operations to reverse the above upgrade go here.
     pre_meta.bind = migrate_engine
     post_meta.bind = migrate_engine
-    pre_meta.tables['sentences'].columns['collection_date'].create()
+    pre_meta.tables['words'].columns['partofspeech'].create()
+    post_meta.tables['words'].columns['pos'].drop()

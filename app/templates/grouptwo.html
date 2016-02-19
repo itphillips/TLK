@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>group</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}  
+
+	<script type="text/javascript">
+	var prev= null;
+	function wordClick(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="lightgreen";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
+
+	</script>
+<br>
+<form name="group" action="{{url_for('tag_phrase_structure')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+{% set count = 0 %}
+{% for word in sentence.split() %}
+	<button type = "button" id = "{{count}}" onClick="wordClick(event)" style="font-size:16px;height:26px">{{word}}</button>
+		{% set count = count + 1 %}
+	{% endfor %}
+<!--- dropdown for type -->
+
+	<br>
+	<h3>What kind of phrase is this?</h3>
+	<p><input type="radio" name = "phrase_type" value="S">Sentence
+	<br><input type="radio" name = "phrase_type" value="NP">Noun Phrase
+	<br> <input type="radio" name = "phrase_type" value="VP">Verb Phrase
+	<br> <input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
+	<br> <input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<br> <input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
+	</p>
+
+	<button type="submit" name = "phrase" onClick = "submitClick(event)" value = ""> Submit </button>
+ </form> 
+ <br>
+<form action="{{url_for('tag_subj')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submit" name= "done">I'm done tagging phrases</button>
+</form>
+<!--- above redirects to check work-->
+<!--- below redirects to next page-->
+{% endblock %}
+
+<!--content for the guidebox-->
+{% block guide %}
+	<h2>Group words into syntactic constituents (aka phrases)</h2>
+	<p align="left"> <b>Step 1:</b> Click on a group of words that forms a <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29">syntactic constituent</a> or <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29"> phrase</a>
+	<br><br> <b>Step 2:</b> Indicate what kind of phrase the words form
+	<br><br> <b>Step 3:</b> Either, click "submit" to check your work and label another phrase in this sentence or click "I'm done tagging phrases" if you have finished labelling all syntactic constituents in this sentence
+	<br><br> Use these tests to determine if a group of words forms a constituent:</p>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px">Substitution</a> 
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px">Movement</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px">Question answer</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px">Clefting</a>
+	        
+{% endblock %}
+</body>
+</html>

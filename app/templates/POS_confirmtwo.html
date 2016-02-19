@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>POS_confirm</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+<h2>Are these labels correct?</h2>
+
+{% set words = sentence.split() %}
+{% set pos_array = pos.split() %}
+{% for i in range(words|length) %}
+
+<p style="font-size:20px"> {{words[i]}} = <i>{{pos_array[i]}}</i></p>
+{% endfor %}
+<br>
+
+<form action ="{{url_for('group')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="pos" value="{{pos}}">
+	<input type="hidden" name="language" value="{{language}}">
+	<button type ="submit" name= "Yes">Yes, please continue
+	</button>
+</form>
+
+<form action ="{{url_for('tag_pos')}}">
+	<input type="hidden" name="error" value="1">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="language" value="{{language}}">
+	<br>
+	<button type ="submit" name= "No">No, I need to fix them
+	</button>
+</form>
+
+{% endblock %}
+
+<!--content for the guidebox-->
+{% block guide %}
+	  <h2>Check your work!</h2>
+	<p> For help in identifying parts of speech, please check these resources:</p>
+	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a> 
+	        
+{% endblock %}
+</body>
+</html>
+

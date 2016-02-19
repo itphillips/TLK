@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>User Page</title>
+</head>
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+<body>
+{% block content %}
+
+<!-- <h2>Hello {{ user.username }}!</h2> -->
+
+{% if sentences!=[] %}
+<h2>Your sentences:</h2>
+
+{% else %}
+Looks like you haven't added any sentences yet!
+{% endif %}
+
+{% for sentence in sentences %}
+
+<!-- this link invokes the delete function -->
+{% if userID == g.user.id %}
+<div><a href="{{ url_for('delete', id=sentence.id) }}">{{ ('Delete') }}</a></div>
+{% endif %}
+<p>
+
+	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
+        <button type="submit" style="font-size:16px;height:26px">{{sentence['sentence']}}
+        </button>
+        <input type="hidden" name="userID" value="{{userID}}">
+        <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
+        <input type="hidden" name="language" value="{{sentence['language']}}">
+        <input type="hidden" name="date" value="{{sentence['collection_date']}}">
+        <input type="hidden" name="sentenceID" value="{{sentence['id']}}">
+
+	</form> 
+
+</p> 
+
+
+{% endfor %}
+</br><hr></br>
+	<form name="NewSentence" action="{{url_for('input_sentence')}}">
+ 		<button type="submit" style="font-size:16px;height:28px;background-color:lightgreen"><b>Add a new sentence</b>
+ 		 	<input type="hidden" name="userID" value="{{userID}}">
+	</form>
+{% endblock %}
+
+{% block guide %}
+	<h2>Hello {{ user.username }}!</h2>
+	<p> Welcome to The Linguist's Kitchen! This app will guide you through performing a syntactic analysis on a sentence.</p>
+	<p> Just follow the steps in this guide.</p>
+	<p> To get started, add a new sentence or click to analyze a sentence that you've already entered. <p>        
+{% endblock %}
+
+</body>
+</html>
