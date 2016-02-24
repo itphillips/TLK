@@ -16,6 +16,7 @@ from .modelstwo import User, Sentence, Word, Words_sentence, Phrase, Phrases_sen
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
 #this function loads a user from the db and is used by flask-login
 @lm.user_loader #this decorator registers the function with flask-login
 def load_user(id):
@@ -116,9 +117,8 @@ def logout():
 @login_required #ensures this page is only seen by logged in users
 def user(username):
 	#first() returns the first result and discards the rest
+	#this is SQLalchemy
 	user = User.query.filter_by(username=username).first()
-	#queries the db for all sentences from user and assigns them to 'sentences' 
-	# sentences = g.user.sentences.all()
 	dict_cur.execute("SELECT id FROM users WHERE username = '{}';".format(username))
 	userID = dict_cur.fetchone()
 
@@ -128,7 +128,7 @@ def user(username):
 
 	else:
 		try:
-			dict_cur.execute("SELECT * FROM sentences s INNER JOIN users_sentences us ON us.sentenceID = s.id WHERE us.userID='{0}'".format(userID[0]))
+			dict_cur.execute("SELECT * FROM sentences INNER JOIN users_sentences ON users_sentences.sentenceID = sentences.id WHERE users_sentences.userID='{0}'".format(userID[0]))
 			sentences=dict_cur.fetchall()
 		except Exception as e:
 			print e
