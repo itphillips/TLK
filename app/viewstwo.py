@@ -8,7 +8,7 @@ import collections
 import urlparse
 from psycopg2 import extras
 from flask.ext.login import login_user, logout_user, current_user, login_required
-#imporst class 'LoginForm' from forms.py
+#imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
 from .modelstwo import User, Sentence, Word, Words_sentence, Phrase, Phrases_sentence, Words_phrase, Users_sentence, Words_case
@@ -22,18 +22,15 @@ dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 def load_user(id):
 	return User.query.get(int(id))
 
-
 @app.before_request
 def before_request():
 	g.user = current_user
-
 
 @app.route('/')
 @app.route('/home')
 def home():
 	return render_template("home.html",
 							title='Home')
-
 
 #view function that renders the login template by passing the form object LoginForm(Form)
 #to the template login.html
@@ -115,13 +112,16 @@ def logout():
 
 @app.route('/user/<username>')
 @login_required #ensures this page is only seen by logged in users
-def user(username):
-	#first() returns the first result and discards the rest
-	#this is SQLalchemy
-	user = User.query.filter_by(username=username).first()
-	dict_cur.execute("SELECT id FROM users WHERE username = '{}';".format(username))
+def user(username): #'username' gets passed from after_login(), =g.user.username
+	#this is SQLalchemy version
+	#user = User.query.filter_by(username=username).first()
+	
+	dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
 	userID = dict_cur.fetchone()
-
+	
+	dict_cur.execute("SELECT username FROM users WHERE username = %s;", (username,))
+	user = dict_cur.fetchone()
+	
 	if user == None:
 		flash('User %s not found.', (username))
 		return redirect(url_for('login'))

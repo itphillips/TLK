@@ -1,5 +1,7 @@
 # TLK
-This is the workspace for The Linguist's Kitchen
+*****************************************************************************************
+Welcome to the Linguist's Kitchen!
+*****************************************************************************************
 
 This is a web-based app, designed to help guide students in intro to language/linguistics 
 courses in dissecting their own language(s). 
@@ -29,5 +31,6 @@ etc.
 The main idea is to help students see that their own language(s) is/are systematic and 
 rule-based.
 
-
+****************************************************************************************
+Instructions for use and development...on the way!
 
