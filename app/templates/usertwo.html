@@ -22,7 +22,7 @@ Looks like you haven't added any sentences yet!
 
 <!-- this link invokes the delete function -->
 {% if userID == g.user.id %}
-<div><a href="{{ url_for('delete', id=sentence.id) }}">{{ ('Delete') }}</a></div>
+<div><a href="{{ url_for('delete', sent_id=sentence[0]) }}">{{ ('Delete') }}</a></div>
 {% endif %}
 <p>
 
@@ -31,7 +31,7 @@ Looks like you haven't added any sentences yet!
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
         <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
-        <input type="hidden" name="language" value="{{sentence['language']}}">
+        <input type="hidden" name="language" value="{{sentence['sentence_language']}}">
         <input type="hidden" name="date" value="{{sentence['collection_date']}}">
         <input type="hidden" name="sentenceID" value="{{sentence['id']}}">
 

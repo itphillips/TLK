@@ -17,10 +17,16 @@
 	<input type="text" name="sentence" size=40> <br><br>
 	What language is this sentence? <br>
 	<input type="text" name="language" size=25><br><br>
+	What kind of sentence is this? <br>
+	<select name="sentence_type">
+		<option value="declarative">declarative</option>
+		<option value="interrogative">interrogative</option>
+		<option value="imperative">imperative</option>
+    </select> <br><br>
 	Please paraphrase this sentence in standard English:<br>
 	<input type="text" name="paraphrase" size=40><br><br>
 	When was this sentence collected? <br>
-	(Please enter the date in YYYYMMDD format)<br>
+	(Please enter the date:)<br>
 	<input type="text" name="date" size=15><br><br>
 
 	<input type="hidden" name="userID" value="{{userID}}">

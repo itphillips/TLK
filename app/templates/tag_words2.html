@@ -34,12 +34,12 @@
         <option value="verb-auxiliary">verb-auxiliary</option>
       </select>
       </p>
-
 				
         {% set count = count+1 %}
 				{% endfor %}
-				<input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
-				<input type="hidden" name= "userID" value ="{{userID}}">
+				
+        <input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
+		<input type="hidden" name= "userID" value ="{{userID}}">
         <input type="hidden" name= "sentence" value= "{{sentence}}">
         <input type= "hidden" name="language" value= "{{language}}">
 				<br>

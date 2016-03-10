@@ -11,7 +11,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
-from .modelstwo import User, Sentence, Word, Words_sentence, Phrase, Phrases_sentence, Words_phrase, Users_sentence, Words_case
+from .modelstwo import User, Sentence, Word, Word_sent_position, Phrase, Word_phrase_position, Gram_function
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
 conn.set_session(autocommit=True)
@@ -118,9 +118,11 @@ def user(username): #'username' gets passed from after_login(), =g.user.username
 	
 	dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
 	userID = dict_cur.fetchone()
+	#returns list containing users.id as the only element
 	
 	dict_cur.execute("SELECT username FROM users WHERE username = %s;", (username,))
 	user = dict_cur.fetchone()
+	#returns list containing users.username as the only element
 	
 	if user == None:
 		flash('User %s not found.', (username))
@@ -128,14 +130,14 @@ def user(username): #'username' gets passed from after_login(), =g.user.username
 
 	else:
 		try:
-			dict_cur.execute("SELECT * FROM sentences INNER JOIN users_sentences ON users_sentences.sentenceID = sentences.id WHERE users_sentences.userID='{0}'".format(userID[0]))
-			sentences=dict_cur.fetchall()
+			dict_cur.execute("SELECT * FROM sentences INNER JOIN users ON users.id = sentences.id_user WHERE users.id = %s;", (userID[0],))
+			sentences = dict_cur.fetchall()
+			print sentences[0]
 		except Exception as e:
 			print e
-		print "done show sentences"
 
 		return render_template('usertwo.html',
-								user=user,
+								user=user[0],
 								sentences=sentences,
 								userID=userID[0])
 
@@ -155,12 +157,13 @@ def confirm_sentence():
 		language=request.args.get("language")
 		date=request.args.get("date")
 		paraphrase=request.args.get("paraphrase")
+		sentence_type=request.args.get("sentence_type")
 		sessionID=date+language
 	except Exception as e:
 		print e
 
 	try:
-		dict_cur.execute("SELECT sessionnumber FROM sentences s INNER JOIN users_sentences us ON us.userID=s.ID WHERE us.userID = '{}'  AND sessionID='{}';".format(userID, sessionID))
+		dict_cur.execute("SELECT sessionnumber FROM sentences INNER JOIN users ON users.id=sentences.id_user WHERE users.id = %s AND sessionid = %s;", (userID, sessionID))
 		sessionnumber = dict_cur.fetchall()	
 	except Exception as e:
 		print e
@@ -170,11 +173,9 @@ def confirm_sentence():
 		sessionnumber=1	
 	try:
 		#make sure that this sentence isn't already in the database
-		dict_cur.execute("INSERT INTO sentences (sentence, language, collection_date, sessionnumber, sessionID, english_gloss) VALUES (%s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase))
-		dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
-		sentenceID= dict_cur.fetchone()[0]
-		#make sure that this sentence isn't already in the database users-sentennces
-		dict_cur.execute("INSERT INTO users_sentences (userID, sentenceID) VALUES (%s, %s)", (userID, sentenceID))
+		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, collection_date, sessionnumber, sessionid, english_gloss, id_user, sentence_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase, userID, sentence_type))
+		# dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
+		# sentenceID = dict_cur.fetchone()[0]
 	except Exception as e:
 		print e
 		#return redirect to same page with error message==make sure you fill in all fields.
@@ -182,19 +183,16 @@ def confirm_sentence():
 	print "done confirm_sentence"
 	return redirect(url_for('user',
 							username=g.user.username))
-	# return render_template("usertwo.html", 
-	# 						userID=userID, 
-	# 						sentence=sentence, 
-	# 						language=language, 
-	# 						date=date)
 
 
-@app.route('/delete/<int:id>')
+@app.route('/delete/<int:sent_id>')
 @login_required
-def delete(id):
-	sentence = Sentence.query.get(id)
-	print "this is id", id
-	print "this is sentence", sentence
+def delete(sent_id):
+	# sentence = Sentence.query.get(sent_id)
+	dict_cur.execute("SELECT * FROM sentences WHERE id = %s;", (sent_id,))
+	sentence = dict_cur.fetchone()
+	# print "this is id", sent_id
+	# print "this is sentence", sentence
 
 	if sentence is None:
 		flash('Sentence not found!')
@@ -204,14 +202,12 @@ def delete(id):
 	# 	flash('You cannot delete this sentence!')
 	# 	return redirect(url_for('user', 
 	# 							username=g.user.username))
-	dict_cur.execute("DELETE FROM sentences s WHERE s.id = %s", [id])	
-	dict_cur.execute("DELETE FROM users_sentences us WHERE us.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM words w WHERE w.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM words_sentences ws WHERE ws.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM phrases p WHERE p.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM phrases_sentences ps WHERE ps.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM words_phrases wp WHERE wp.sentenceid = %s", [id])
-	dict_cur.execute("DELETE FROM users_sentences us WHERE us.sentenceid = %s", [id])
+
+	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s", (sent_id,))	
+	dict_cur.execute("DELETE FROM words WHERE words.id_sentence = %s", [sent_id])
+	dict_cur.execute("DELETE FROM phrases WHERE phrases.id_sentence = %s", [sent_id])
+	dict_cur.execute("DELETE FROM word_phrase_positions WHERE word_phrase_positions.id_sentence = %s", [sent_id])
+	dict_cur.execute("DELETE FROM word_sentence_positions WHERE word_sentence_positions.id_sentence = %s", [sent_id])
 	return redirect(url_for('user', 
 							username=g.user.username))
 
@@ -222,42 +218,9 @@ def tag_pos():
 	error= request.args.get("error")
 	sentence = request.args.get("sentence")
 	userID = request.args.get("userID")
-	language=request.args.get("language")
+	language=request.args.get("sentence_language")
 	sentenceID=request.args.get("sentenceID")
 
-	# if error:
-	# 	sentenceID = request.args.get("sentenceID")
-	# 	return render_template("tag_words2two.html", 
-	# 							sentence=sentence, 
-	# 							userID=userID, 
-	# 							sentenceID=sentenceID, 
-	# 							error=error, 
-	# 							language=language)
-
-	# try:
-	# 	date=request.args.get("date")
-	# 	sessionID=date+language
-	# except Exception as e:
-	# 	print e
-
-	# try:
-	# 	dict_cur.execute("SELECT sessionnumber FROM sentences s INNER JOIN users_sentences us ON us.userID=s.ID WHERE us.userID = '{}'  AND sessionID='{}';".format(userID, sessionID))
-	# 	sessionnumber = dict_cur.fetchall()	
-	# except Exception as e:
-	# 	print e
-	# if dict_cur.fetchall() != []:
-	# 	sessionnumber=sessionnumber+1
-	# else:
-	# 	sessionnumber=1	
-	# try:
-	# 	#make sure that this sentence isn't already in the database
-	# 	dict_cur.execute("INSERT INTO sentences (sentence, language, collection_date, sessionnumber, sessionID) VALUES (%s,%s, %s,%s, %s)",(sentence, language, date, sessionnumber, sessionID))
-	# 	dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
-	# 	sentenceID= dict_cur.fetchone()[0]
-	# 	#make sure that this sentence isn't already in the database users-sentennces
-	# 	dict_cur.execute("INSERT INTO users_sentences (userID, sentenceID) VALUES (%s, %s)", (userID, sentenceID))
-	# except Exception as e:
-	# 	print e	
 	print "all done tag pos"
 	return render_template("tag_words2.html", 
 							sentence=sentence, 
@@ -274,6 +237,8 @@ def pos_confirm():
 	sentenceID = request.args.get("sentenceID")
 	language = request.args.get("language")
 	pos = ""
+	linear_position = request.args.get("linear_position")
+	print linear_position
 	for i in range(len(sentence.split())):
 		if request.args.get(str(i)):
 			try:

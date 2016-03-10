@@ -53,96 +53,96 @@ class Sentence(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	sessionid = db.Column(db.String(40))
 	sessionnumber = db.Column(db.Integer)
-	sentence = db.Column(db.String(140))
+	sentence = db.Column(db.String)
 	sentence_type = db.Column(db.String(30))
-	language = db.Column(db.String(50))
-	english_gloss = db.Column(db.String(140))
-	collection_date = db.Column(db.String(70))
+	sentence_language = db.Column(db.String(50))
+	english_gloss = db.Column(db.String)
+	collection_date = db.Column(db.DateTime)
 	collection_location = db.Column(db.String(70))
 	notes = db.Column(db.String(140))
 	timestamp = db.Column(db.DateTime)
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-	# words = db.relationship('Word', backref='author', lazy='dynamic')
-	
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 	def __repr__(self):
 		return '<Sentence %r>' % (self.sentence)
 
+
 class Word(db.Model):
 	__tablename__ = 'words'
 	id = db.Column(db.Integer, primary_key = True)
-	word = db.Column(db.String(30))
-	pos = db.Column(db.String(30))
-	gram_case = db.Column(db.String(30))
-	sentenceid = db.Column(db.Integer)
-	language = db.Column(db.String(30))
+	word = db.Column(db.String(60))
+	pos = db.Column(db.String(40))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 	def __repr__(self):
 		return '<Word %r>' % (self.word)
 
 
-
-class Words_sentence(db.Model):
-	__tablename__ = 'words_sentences'
+class Word_sent_position(db.Model):
+	__tablename__ = 'word_sentence_positions'
 	id = db.Column(db.Integer, primary_key = True)
-	sentenceid = db.Column(db.Integer)
-	wordid = db.Column(db.Integer)
-	position = db.Column(db.Integer)
+	ws_linear_position = db.Column(db.Integer)
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_word = db.Column(db.Integer, db.ForeignKey('words.id'))
 
 	def __repr__(self):
-		return '<Words_sentence %r>' % (self.sentenceID)
-
+		return '<Word_sent_position %r>' % (self.ws_linear_position)
 
 
 class Phrase(db.Model):
 	__tablename__ = 'phrases'
 	id = db.Column(db.Integer, primary_key = True)
-	phrase = db.Column(db.String(60))
-	phrase_type = db.Column(db.String(30))
-	phrase_subtype = db.Column(db.String(30))
-	sentenceid = db.Column(db.Integer)
+	phrase = db.Column(db.String(120))
+	phrase_type = db.Column(db.String(60))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 	def __repr__(self):
 		return '<Phrase %r>' % (self.phrase)
 
 
-class Phrases_sentence(db.Model):
-	__tablename__ = 'phrases_sentences'
+# class Phrases_sentence(db.Model):
+# 	__tablename__ = 'phrases_sentences'
+# 	id = db.Column(db.Integer, primary_key = True)
+# 	sentenceid = db.Column(db.Integer)
+# 	phraseid = db.Column(db.Integer)
+
+# 	def __repr__(self):
+# 		return '<Phrases_sentence %r>' % (self.sentenceID)
+
+
+class Word_phrase_position(db.Model):
+	__tablename__ = 'word_phrase_positions'
 	id = db.Column(db.Integer, primary_key = True)
-	sentenceid = db.Column(db.Integer)
-	phraseid = db.Column(db.Integer)
+	wp_linear_position = db.Column(db.Integer)
+	id_word = db.Column(db.Integer, db.ForeignKey('words.id'))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
 
 	def __repr__(self):
-		return '<Phrases_sentence %r>' % (self.sentenceID)
+		return '<Word_phrase_position %r>' % (self.wp_linear_position)
 
 
-class Words_phrase(db.Model):
-	__tablename__ = 'words_phrases'
+# class Users_sentence(db.Model):
+# 	__tablename__ = 'users_sentences'
+# 	id = db.Column(db.Integer, primary_key = True)
+# 	userid = db.Column(db.Integer)
+# 	sentenceid = db.Column(db.Integer)
+
+# 	def __repr__(self):
+# 		return '<Users_sentence %r>' % (self.userID)
+
+
+class Gram_function(db.Model):
+	__tablename__ = 'gram_functions'
 	id = db.Column(db.Integer, primary_key = True)
-	wordid = db.Column(db.Integer)
-	phraseid = db.Column(db.Integer)
-	position = db.Column(db.Integer)
-	sentenceid = db.Column(db.Integer)
+	gram_function = db.Column(db.String(60))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 	def __repr__(self):
-		return '<Words_phrase %r>' % (self.wordID)
-
-
-class Users_sentence(db.Model):
-	__tablename__ = 'users_sentences'
-	id = db.Column(db.Integer, primary_key = True)
-	userid = db.Column(db.Integer)
-	sentenceid = db.Column(db.Integer)
-
-	def __repr__(self):
-		return '<Users_sentence %r>' % (self.userID)
-
-
-class Words_case(db.Model):
-	__tablename__ = 'words_cases'
-	id = db.Column(db.Integer, primary_key = True)
-	wordid = db.Column(db.Integer)
-	gram_case = db.Column(db.String(30))
+		return '<Gram_function %r>' % (self.gram_function)
 
 
 

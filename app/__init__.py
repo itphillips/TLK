@@ -30,5 +30,5 @@ oid = OpenID(app, os.path.join(basedir, '/tmp'))
 #here 'app' is a package
 from app import viewstwo, modelstwo #views, models
 #imports the named tables from modelstwo.py
-from modelstwo import User, Sentence, Word, Words_sentence, Phrase, Phrases_sentence, Words_phrase, Users_sentence, Words_case
+from modelstwo import User, Sentence, Word, Word_sent_position, Phrase, Word_phrase_position, Gram_function
 
