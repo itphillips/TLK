@@ -217,9 +217,13 @@ def delete(sent_id):
 def tag_pos():
 	error= request.args.get("error")
 	sentence = request.args.get("sentence")
+	print sentence
 	userID = request.args.get("userID")
 	language=request.args.get("sentence_language")
-	sentenceID=request.args.get("sentenceID")
+	
+	dict_cur.execute("SELECT id from sentences WHERE sentence = %s;", (sentence,))
+	sentenceID = dict_cur.fetchone()[0]
+	print "sentenceID for tagPOS = ", sentenceID
 
 	print "all done tag pos"
 	return render_template("tag_words2.html", 
@@ -235,6 +239,7 @@ def pos_confirm():
 	sentence=request.args.get("sentence")
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
+	print "sentenceID for confirmPOS = ", sentenceID
 	language = request.args.get("language")
 	pos = ""
 	
@@ -268,13 +273,14 @@ def group():
 	print redo, "redo"
 	userID = request.args.get("userID")
 	sentenceID = request.args.get("sentenceID")
+	print "this is sentenceID", sentenceID
 	sentence = request.args.get("sentence")
 
 	wordlist = sentence.split()
 	for word in wordlist:
 		wordlinposition = 1 + wordlist.index(word)
 		
-	print wordlinposition
+		print wordlinposition
 	
 	if redo == None:
 		language=request.args.get("language")
@@ -282,11 +288,12 @@ def group():
 		words = sentence.split()
 		for i in range(len(words)):
 			try:
-				dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
+				dict_cur.execute("SELECT * from words INNER JOIN sentences ON words.id_sentence=sentences.id WHERE words.word = %s AND words.pos = %s AND sentences.sentence_language = %s;", (words[i], pos_array[i], language))
 				found_words = dict_cur.fetchall()
 				print found_words, "found words"
 				if found_words == []:
-					dict_cur.execute("INSERT INTO words (word, pos, language, sentenceid) VALUES (%s, %s, %s, %s)", (words[i], pos_array[i], language, sentenceID))
+					dict_cur.execute("INSERT INTO words (word, pos, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (words[i], pos_array[i], sentenceID, userID))
+					
 					dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
 					found_words = dict_cur.fetchall()
 				wordID = found_words[0]["id"]
