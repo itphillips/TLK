@@ -237,8 +237,7 @@ def pos_confirm():
 	sentenceID = request.args.get("sentenceID")
 	language = request.args.get("language")
 	pos = ""
-	linear_position = request.args.get("linear_position")
-	print linear_position
+	
 	for i in range(len(sentence.split())):
 		if request.args.get(str(i)):
 			try:
@@ -271,6 +270,12 @@ def group():
 	sentenceID = request.args.get("sentenceID")
 	sentence = request.args.get("sentence")
 
+	wordlist = sentence.split()
+	for word in wordlist:
+		wordlinposition = 1 + wordlist.index(word)
+		
+	print wordlinposition
+	
 	if redo == None:
 		language=request.args.get("language")
 		pos_array = str(request.args.get("pos")).split()
