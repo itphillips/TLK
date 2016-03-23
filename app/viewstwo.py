@@ -288,19 +288,20 @@ def group():
 		words = sentence.split()
 		for i in range(len(words)):
 			try:
-				dict_cur.execute("SELECT * from words INNER JOIN sentences ON words.id_sentence=sentences.id WHERE words.word = %s AND words.pos = %s AND sentences.sentence_language = %s;", (words[i], pos_array[i], language))
+				dict_cur.execute("SELECT * FROM words INNER JOIN sentences ON words.id_sentence=sentences.id WHERE words.word = %s AND words.pos = %s AND sentences.sentence_language = %s;", (words[i], pos_array[i], language))
 				found_words = dict_cur.fetchall()
 				print found_words, "found words"
 				if found_words == []:
 					dict_cur.execute("INSERT INTO words (word, pos, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (words[i], pos_array[i], sentenceID, userID))
 					
-					dict_cur.execute("SELECT id from words WHERE word = '{}' AND pos = '{}' AND language = '{}';".format(words[i], pos_array[i], language))
+					dict_cur.execute("SELECT id FROM words WHERE words.word = %s AND words.pos = %s AND words.id_sentence = %s AND words.id_user = %s;", (words[i], pos_array[i], sentenceID, userID))
 					found_words = dict_cur.fetchall()
 				wordID = found_words[0]["id"]
-				dict_cur.execute("SELECT id from words_sentences WHERE wordID = '{}' AND sentenceID = '{}';".format(wordID, sentenceID))
-				found_words_sentences=dict_cur.fetchall()
-				if found_words_sentences == []:
-					dict_cur.execute("INSERT INTO words_sentences (wordID, sentenceID, position) VALUES (%s, %s, %s)", (wordID, sentenceID, i))
+				dict_cur.execute("SELECT id FROM word_sentence_positions wsp WHERE wsp.id_word = %s AND wsp.id_sentence = %s;", (wordID, sentenceID))
+				found_wsp = dict_cur.fetchall()
+				if found_wsp == []:
+					dict_cur.execute("INSERT INTO word_sentence_positions (id_word, id_sentence, ws_linear_position) VALUES (%s, %s, %s)", (wordID, sentenceID, i))
+				print "word: %s wordID: %s sentenceID: %s ws position: %s" % (word, wordID, sentenceID, i)
 			except Exception as e:
 				print e
 
