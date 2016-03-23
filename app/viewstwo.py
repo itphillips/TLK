@@ -401,7 +401,7 @@ def put_phrase_in_database():
 	wordposlist = phrase.split()
 	for item in wordposlist:
 		position = wordposlist.index(item)
-		dict_cur.execute("SELECT id FROM words WHERE word = %s, AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
+		dict_cur.execute("SELECT id FROM words WHERE word = %s AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
 		wordID = dict_cur.fetchone()
 		print "the id for '%s' is: %s" % (item, wordID)
 		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID, sentenceID, phraseID))
