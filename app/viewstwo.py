@@ -313,7 +313,6 @@ def group():
 @app.route("/tag_phr_struct")
 @login_required
 def tag_phrase_structure():
-	print "hi"
 	sentence= request.args.get("sentence")
 	words=sentence.split()
 	userID = request.args.get("userID")
@@ -339,7 +338,15 @@ def tag_phrase_structure():
 
 	phrase_structure_options=phrase_type_dict[phrase_type]
 	print phrase_structure_options, "phrase_structure_options"
-	return render_template("tag_phrase_structure.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure_options=phrase_structure_options, sentenceID=sentenceID, word_positions_in_phrase=word_positions_in_phrase_string)
+	return render_template("tag_phrase_structure.html", 
+							sentence=sentence, 
+							userID=userID, 
+							phrase=phrase, 
+							phrase_type=phrase_type, 
+							phrase_structure_options=phrase_structure_options, 
+							sentenceID=sentenceID, 
+							word_positions_in_phrase=word_positions_in_phrase_string)
+
 
 @app.route("/confirm_phrase")
 @login_required
@@ -354,12 +361,19 @@ def confirm_phrase():
 	print word_positions_in_phrase, "word_positions_in_phrase"
 	print phrase, "phrase"
 	print phrase_structure, "phrase_structure"
-	return render_template("confirm_phrase.html", sentence=sentence, userID=userID, phrase=phrase, phrase_type=phrase_type, phrase_structure=phrase_structure, sentenceID=sentenceID, word_positions_in_phrase=word_positions_in_phrase)
+	return render_template("confirm_phrase.html", 
+							sentence=sentence, 
+							userID=userID, 
+							phrase=phrase, 
+							phrase_type=phrase_type, 
+							phrase_structure=phrase_structure, 
+							sentenceID=sentenceID, 
+							word_positions_in_phrase=word_positions_in_phrase)
+
 
 @app.route("/phr_to_database")
 @login_required
 def put_phrase_in_database():
-	print "hi"
 	phrase_structure=request.args.get("phrase_structure")
 	sentence= request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
@@ -369,29 +383,32 @@ def put_phrase_in_database():
 	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
 	print word_positions_in_phrase
 	print "prh in database "
-	#should check if this phrase is already in the database and notify user
+
 	try: 
-		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, phrase_subtype, sentenceid) VALUES (%s, %s, %s, %s)", (phrase, phrase_type, phrase_structure, sentenceID))
+		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s)", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
 		print e
 	print "insert phrases"
 
 	try:
-		dict_cur.execute("SELECT id from phrases WHERE phrase = '{}' AND phrase_type = '{}' AND phrase_subtype = '{}';".format(phrase, phrase_type, phrase_structure))
+		dict_cur.execute("SELECT id FROM phrases WHERE phrase = %s AND phrase_type = %s and id_user = %s;", (phrase, phrase_type, userID))
 	except Exception as e:
 		print e
 	print "select from phrases"
-	phraseID=dict_cur.fetchall()[0][0]
+	phraseID=dict_cur.fetchall()
+	print phraseID, "phrase id"
 
-	#should also check to see if this is in phrases_sentences
-	try:
-		dict_cur.execute("INSERT INTO phrases_sentences (phraseID, sentenceID) VALUES (%s, %s)", (phraseID, sentenceID))
-	except Exception as e:
-		print e
-	print "insert into phrases_sentences"
+	wordposlist = phrase.split()
+	for item in wordposlist:
+		position = wordposlist.index(item)
+		dict_cur.execute("SELECT id FROM words WHERE word = %s, AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
+		wordID = dict_cur.fetchone()
+		print "the id for '%s' is: %s" % (item, wordID)
+		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID, sentenceID, phraseID))
 
+		
 	try:
-		dict_cur.execute("SELECT position,wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
+		dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
 		wordIDPairs= dict_cur.fetchall()
 	except Exception as e:
 		print e
