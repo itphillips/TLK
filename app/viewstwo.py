@@ -276,11 +276,11 @@ def group():
 	print "this is sentenceID", sentenceID
 	sentence = request.args.get("sentence")
 
-	wordlist = sentence.split()
-	for word in wordlist:
-		wordlinposition = 1 + wordlist.index(word)
-		
-		print wordlinposition
+# 	wordlist = sentence.split()
+# 	for word in wordlist:
+# 		wordlinposition = 1 + wordlist.index(word)
+# 		
+# 		print wordlinposition
 	
 	if redo == None:
 		language=request.args.get("language")
@@ -301,7 +301,7 @@ def group():
 				found_wsp = dict_cur.fetchall()
 				if found_wsp == []:
 					dict_cur.execute("INSERT INTO word_sentence_positions (id_word, id_sentence, ws_linear_position) VALUES (%s, %s, %s)", (wordID, sentenceID, i))
-				print "word: %s wordID: %s sentenceID: %s ws position: %s" % (word, wordID, sentenceID, i)
+# 			print "word: %s wordID: %s sentenceID: %s ws position: %s" % (word, wordID, sentenceID, i)
 			except Exception as e:
 				print e
 
