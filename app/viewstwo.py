@@ -395,7 +395,7 @@ def put_phrase_in_database():
 	except Exception as e:
 		print e
 	print "select from phrases"
-	phraseID=dict_cur.fetchall()
+	phraseID=dict_cur.fetchone()
 	print phraseID, "phrase id"
 
 	wordposlist = phrase.split()
@@ -403,35 +403,36 @@ def put_phrase_in_database():
 		position = wordposlist.index(item)
 		dict_cur.execute("SELECT id FROM words WHERE word = %s AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
 		wordID = dict_cur.fetchone()
-		print "the id for '%s' is: %s" % (item, wordID)
-		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID, sentenceID, phraseID))
+
+		print "the id for '%s' is: %s" % (item, wordID[0])
+		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID[0], sentenceID, phraseID[0]))
 
 		
-	try:
-		dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
-		wordIDPairs= dict_cur.fetchall()
-	except Exception as e:
-		print e
-	print "select id pairs"
-	wordIDPairs.sort(key=lambda x: int(x[1]))
-	print wordIDPairs,"wordIDPairs"
-	wordIDs=[wordID[1] for wordID in wordIDPairs]
-	print wordIDs, "wordIDs"
-	print word_positions_in_phrase, "word_positions_in_phrase"
-	print type(word_positions_in_phrase)
-	word_positions_in_phrase=word_positions_in_phrase.split()
-	try:
-		word_ids_in_phrase = [wordIDs[int(position)] for position in word_positions_in_phrase]
-	except Exception as e:
-		print e
-	print word_ids_in_phrase, "word_ids_in_phrase"
-	#anddd check to see if they're in words_phrases. They probably are if they're in one of the others...need to reason about this]
-	for i in range(len(word_ids_in_phrase)):
-		try:
-			dict_cur.execute("INSERT INTO words_phrases (wordID, phraseID, position, sentenceid) VALUES (%s, %s, %s, %s)", (wordIDs[i], phraseID, i, sentenceID))
-		except Exception as e:
-			print e
-	print "hi"
+	# try:
+	# 	dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
+	# 	wordIDPairs= dict_cur.fetchall()
+	# except Exception as e:
+	# 	print e
+	# print "select id pairs"
+	# wordIDPairs.sort(key=lambda x: int(x[1]))
+	# print wordIDPairs,"wordIDPairs"
+	# wordIDs=[wordID[1] for wordID in wordIDPairs]
+	# print wordIDs, "wordIDs"
+	# print word_positions_in_phrase, "word_positions_in_phrase"
+	# print type(word_positions_in_phrase)
+	# word_positions_in_phrase=word_positions_in_phrase.split()
+	# try:
+	# 	word_ids_in_phrase = [wordIDs[int(position)] for position in word_positions_in_phrase]
+	# except Exception as e:
+	# 	print e
+	# print word_ids_in_phrase, "word_ids_in_phrase"
+	# #anddd check to see if they're in words_phrases. They probably are if they're in one of the others...need to reason about this]
+	# for i in range(len(word_ids_in_phrase)):
+	# 	try:
+	# 		dict_cur.execute("INSERT INTO words_phrases (wordID, phraseID, position, sentenceid) VALUES (%s, %s, %s, %s)", (wordIDs[i], phraseID, i, sentenceID))
+	# 	except Exception as e:
+	# 		print e
+	# print "hi"
 	return redirect(url_for('group', redo=False, sentence=sentence, sentenceID=sentenceID, userID=userID))
 
 @app.route("/tagSubj")
