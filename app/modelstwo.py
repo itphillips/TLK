@@ -102,15 +102,6 @@ class Phrase(db.Model):
 		return '<Phrase %r>' % (self.phrase)
 
 
-# class Phrases_sentence(db.Model):
-# 	__tablename__ = 'phrases_sentences'
-# 	id = db.Column(db.Integer, primary_key = True)
-# 	sentenceid = db.Column(db.Integer)
-# 	phraseid = db.Column(db.Integer)
-
-# 	def __repr__(self):
-# 		return '<Phrases_sentence %r>' % (self.sentenceID)
-
 
 class Word_phrase_position(db.Model):
 	__tablename__ = 'word_phrase_positions'
@@ -124,14 +115,17 @@ class Word_phrase_position(db.Model):
 		return '<Word_phrase_position %r>' % (self.wp_linear_position)
 
 
-# class Users_sentence(db.Model):
-# 	__tablename__ = 'users_sentences'
-# 	id = db.Column(db.Integer, primary_key = True)
-# 	userid = db.Column(db.Integer)
-# 	sentenceid = db.Column(db.Integer)
 
-# 	def __repr__(self):
-# 		return '<Users_sentence %r>' % (self.userID)
+class Phrase_sentence_position(db.Model):
+	__tablename__ = 'phrase_sentence_positions'
+	id = db.Column(db.Integer, primary_key = True)
+	ps_linear_position = db.Column(db.Integer)
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+
+	def __repr__(self):
+		return '<Phrase_sentence_position %r>' % (self.ps_linear_position)
+
 
 
 class Gram_function(db.Model):
@@ -140,6 +134,7 @@ class Gram_function(db.Model):
 	gram_function = db.Column(db.String(60))
 	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
 	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
 
 	def __repr__(self):
 		return '<Gram_function %r>' % (self.gram_function)

@@ -203,11 +203,13 @@ def delete(sent_id):
 	# 	return redirect(url_for('user', 
 	# 							username=g.user.username))
 
-	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s", (sent_id,))	
-	dict_cur.execute("DELETE FROM words WHERE words.id_sentence = %s", [sent_id])
-	dict_cur.execute("DELETE FROM phrases WHERE phrases.id_sentence = %s", [sent_id])
-	dict_cur.execute("DELETE FROM word_phrase_positions WHERE word_phrase_positions.id_sentence = %s", [sent_id])
-	dict_cur.execute("DELETE FROM word_sentence_positions WHERE word_sentence_positions.id_sentence = %s", [sent_id])
+	dict_cur.execute("DELETE FROM word_phrase_positions WHERE word_phrase_positions.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM word_sentence_positions WHERE word_sentence_positions.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM phrase_sentence_positions WHERE phrase_sentence_positions.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM gram_functions WHERE gram_functions.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM words WHERE words.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM phrases WHERE phrases.id_sentence = %s;", (sent_id,))
+	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s;", (sent_id,))	
 	return redirect(url_for('user', 
 							username=g.user.username))
 
@@ -310,19 +312,21 @@ def group():
 							userID=userID, 
 							sentenceID=sentenceID)
 
+
 @app.route("/tag_phr_struct")
 @login_required
 def tag_phrase_structure():
-	sentence= request.args.get("sentence")
-	words=sentence.split()
+	sentence = request.args.get("sentence")
+	words = sentence.split()
 	userID = request.args.get("userID")
-	sentenceID=request.args.get("sentenceID")
+	sentenceID = request.args.get("sentenceID")
 	print sentenceID, "sentenceID"
 	redo = request.args.get("redo")
 	print redo
-	if redo=="True":
+	
+	if redo == "True":
 		print "redo true"
-		word_positions_in_phrase_string= request.args.get("word_positions_in_phrase")
+		word_positions_in_phrase_string = request.args.get("word_positions_in_phrase")
 	else:
 		word_positions_in_phrase_string = request.args.get("phrase")
 		print word_positions_in_phrase_string, "phrase"
@@ -433,7 +437,12 @@ def put_phrase_in_database():
 	# 	except Exception as e:
 	# 		print e
 	# print "hi"
-	return redirect(url_for('group', redo=False, sentence=sentence, sentenceID=sentenceID, userID=userID))
+	return redirect(url_for('group', 
+							redo=False, 
+							sentence=sentence, 
+							sentenceID=sentenceID, 
+							userID=userID))
+
 
 @app.route("/tagSubj")
 @login_required
@@ -441,31 +450,35 @@ def tag_subj():
 	sentence=request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
 	userID = request.args.get("userID")
-	words = []
+	phrases = []
 	try:
-		dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
-		dict_cur.execute("SELECT ws_linear_position, word FROM word_sentence_positions wsp INNER JOIN words w ON w.id = wsp.id_word WHERE w.id_sentence = %s;", (sentenceID,))
-		wordIDs= dict_cur.fetchall()
-		print wordIDs
+		dict_cur.execute("SELECT phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
+		phrases= dict_cur.fetchall()
 	except Exception as e:
 		print e
-	wordIDs.sort(key=lambda x: int(x[1]))
-	wordIDs=[wordID[1] for wordID in wordIDs]
-	wordIDString=""
-	for wordID in wordIDs:
-		print wordID
-		try:
-			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
-		except Exception as e:
-			print e
-		word=dict_cur.fetchall()
-		print word
-		words.append(word[0][0])
-		print words
-		wordIDString=wordIDString+str(wordID)+" "
-		print wordIDString
-	print words
-	return render_template("tag_subj.html", words=words, sentence=sentence, wordIDs=wordIDs, wordIDString=wordIDString)
+	# wordIDs.sort(key=lambda x: int(x[1]))
+	# wordIDs=[wordID[1] for wordID in wordIDs]
+	# wordIDString=""
+	for phrase in phrases:
+		print phrase
+	# 	try:
+	# 		dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
+	# 	except Exception as e:
+	# 		print e
+	# 	word=dict_cur.fetchall()
+	# 	print word
+	# 	words.append(word[0][0])
+	# 	print words
+	# 	wordIDString=wordIDString+str(wordID)+" "
+	# 	print wordIDString
+	# print words
+	return render_template("tag_subj.html", 
+							phrases=phrases, 
+							sentence=sentence, 
+							# wordIDs=wordIDs, 
+							# wordIDString=wordIDString
+							)
+
 
 @app.route("/confirm_subj")
 @login_required
@@ -488,7 +501,13 @@ def confirm_subj():
 			print e
 	print "oy"
 
-	return render_template("confirm_subj.html", subject=words_of_subject, sentence=sentence, wordIDs=request.args.get("wordIDString"), word_IDs_of_subject=word_IDs_of_subject_string, wordIDString=wordIDString)
+	return render_template("confirm_subj.html", 
+							subject=words_of_subject, 
+							sentence=sentence, 
+							wordIDs=request.args.get("wordIDString"), 
+							word_IDs_of_subject=word_IDs_of_subject_string, 
+							wordIDString=wordIDString)
+
 
 @app.route("/tag_obj")
 @login_required
@@ -515,7 +534,12 @@ def tag_obj():
 				except Exception as e:
 					print e
 			print wordID
-	return render_template("tag_obj.html", sentence=sentence, wordIDString=wordIDString, wordIDs=wordIDString.split(), words=sentence.split())
+	return render_template("tag_obj.html", 
+							sentence=sentence, 
+							wordIDString=wordIDString, 
+							wordIDs=wordIDString.split(), 
+							words=sentence.split())
+
 
 @app.route("/confirm_obj")
 @login_required
@@ -558,8 +582,16 @@ def confirm_obj():
 	print DO,"DO"
 	print IO,"IO"
 	if confirm_needed:
-		return render_template("confirm_obj.html", DO=DO, IO=IO, sentence=sentence, wordIDs=request.args.get("wordIDString"), wordIDString=wordIDString, DOWords=DOWords, IOWords=IOWords)
+		return render_template("confirm_obj.html", 
+								DO=DO, 
+								IO=IO, 
+								sentence=sentence, 
+								wordIDs=request.args.get("wordIDString"), 
+								wordIDString=wordIDString, 
+								DOWords=DOWords, 
+								IOWords=IOWords)
 	return redirect(url_for("prompt_new_sentence"))
+
 
 @app.route("/end")
 @login_required
