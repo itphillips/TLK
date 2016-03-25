@@ -407,7 +407,7 @@ def put_phrase_in_database():
 		print "the id for '%s' is: %s" % (item, wordID[0])
 		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID[0], sentenceID, phraseID[0]))
 
-		
+	# Just commented these lines out on 3/22/16 - may need to uncomment them if it turns out they do something required later	
 	# try:
 	# 	dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
 	# 	wordIDPairs= dict_cur.fetchall()
@@ -440,10 +440,13 @@ def put_phrase_in_database():
 def tag_subj():
 	sentence=request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
+	userID = request.args.get("userID")
 	words = []
 	try:
-		dict_cur.execute("SELECT position,wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
+		dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
+		dict_cur.execute("SELECT ws_linear_position, word FROM word_sentence_positions wsp INNER JOIN words w ON w.id = wsp.id_word WHERE w.id_sentence = %s;", (sentenceID,))
 		wordIDs= dict_cur.fetchall()
+		print wordIDs
 	except Exception as e:
 		print e
 	wordIDs.sort(key=lambda x: int(x[1]))
