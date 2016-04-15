@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>tag subject</title>
+	<title>tag_subject</title>
 </head>
 
 {% extends "base.html" %}
@@ -9,14 +9,8 @@
 <body>
 
 {% block content %}
-          
-<!--This is the workspace box-->
-<!--    <div id="workspace"> -->
-        {% if error != None %}
-        <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
-        {% endif %}
 
-	<script type="text/javascript">
+<script type="text/javascript">
 	var prev= null;
 	function changeColor(e){
 		var target = e.target;
@@ -27,7 +21,7 @@
 		}
 		else{
 			target.setAttribute("value", "active");
-			target.style.backgroundColor="red";
+			target.style.backgroundColor="orange";
 		}
 	}
 	function submitClick(e){
@@ -42,33 +36,52 @@
 	}
 
 	{% for element in phrase_structure_options %}
+	console.log("{{element}}")
+	console.log("{{element[0]}}")
+	console.log("{{element[1]}}")
 	{% if element[1] == "necessary" %}
-	var button=document.getElementbyID("{{element[0]}}");
-	button.style.background='red';
+	var button=document.forms.getElementById("{{element[0]}}");
+	
+	console.log(button)
+	console.log("hi")
+	console.log("{{element[0]}}")
+
+	button.style.background='orange';
 	{% endif %}
 	{% endfor %}
 	</script>
 
+
+<!--This is the workspace box-->
+        <h2>Which phrase from the last step is the grammatical subject?</h2>
+        {% if error != None %}
+        <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
+        {% endif %}
+
 <form action="{{url_for('confirm_subj')}}">
 
 {% for i in range(phrases|count) %}
-<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)">{{phrases[i]}}</button></br></br>
+<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+
 {% endfor %}
-<br>
 <input type="hidden" name="sentence" value="{{sentence}}">
-<input type="hidden" name="wordIDString" value="{{wordIDString}}">
+<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+<input type="hidden" name="userID" value="{{userID}}">
 
-<button type="submit" name="subject" onClick="submitClick(event)" value="">submit</button>
+<br>
+<button type="submit" name="subject" onClick="submitClick(event)" value="">Submit</button>
+
 </form>
-
 {% endblock %}
+
 
 <!--content for the guidebox-->
 {% block guide %}
-    <h2>Identify the grammatical subject for your sentence</h2>
-	<p align="left"> <b>Step 1:</b> Click the phrase that's the <i  style="color:blue">grammatical subject</i> for your sentence.
-    <br><br> <b>Step 2:</b> Click the "check my work" button
-	<br><br> For information on grammatical functions, please check these resources:</p>
+
+	<p style="font-size:100%">
+    Now, it's time to identify the <i  style="color:blue">grammatical subject</i> for your sentence.
+	
+	<br><br> Not sure what a "grammatical subject" is? Check these resources:</p>
 	 <a href="http://www.englicious.org/lesson/grammatical-functions-clause" style="font-size:24px">englicious.org</a> 
 	        
 {% endblock %}

@@ -6,6 +6,7 @@ import string
 import psycopg2
 import collections
 import urlparse
+import ast
 from psycopg2 import extras
 from flask.ext.login import login_user, logout_user, current_user, login_required
 #imports class 'LoginForm' from forms.py
@@ -392,7 +393,7 @@ def put_phrase_in_database():
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s)", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
 		print e
-	print "insert phrases"
+	print "inserted phrases"
 
 	try:
 		dict_cur.execute("SELECT id FROM phrases WHERE phrase = %s AND phrase_type = %s and id_user = %s;", (phrase, phrase_type, userID))
@@ -447,12 +448,13 @@ def put_phrase_in_database():
 @app.route("/tagSubj")
 @login_required
 def tag_subj():
+	error=request.args.get("error")
 	sentence=request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
 	userID = request.args.get("userID")
 	phrases = []
 	try:
-		dict_cur.execute("SELECT phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
+		dict_cur.execute("SELECT id, phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
 		phrases= dict_cur.fetchall()
 	except Exception as e:
 		print e
@@ -460,7 +462,7 @@ def tag_subj():
 	# wordIDs=[wordID[1] for wordID in wordIDs]
 	# wordIDString=""
 	for phrase in phrases:
-		print phrase
+		print "id", phrase[0], "phrase: ", phrase[1]
 	# 	try:
 	# 		dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
 	# 	except Exception as e:
@@ -474,9 +476,10 @@ def tag_subj():
 	# print words
 	return render_template("tag_subj.html", 
 							phrases=phrases, 
-							sentence=sentence, 
-							# wordIDs=wordIDs, 
-							# wordIDString=wordIDString
+							sentence=sentence,
+							userID=userID,
+							sentenceID=sentenceID,
+							error=error
 							)
 
 
@@ -484,61 +487,53 @@ def tag_subj():
 @login_required
 def confirm_subj():
 	print "confirm_subj"
+	gramfunc="subject"
+	userID=request.args.get("userID")
 	sentence=request.args.get("sentence")
-	wordIDString=request.args.get("wordIDString")
-	word_IDs_of_subject_string=request.args.get("subject")
-	word_IDs_of_subject_list=word_IDs_of_subject_string.split()
-	words_of_subject=""
-	for wordID in word_IDs_of_subject_list:
-		print wordID
-		print type(wordID)
-		try:
-			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(int(wordID)))
-			first_result=dict_cur.fetchall()[0]
-			print first_result
-			words_of_subject= words_of_subject+(str(first_result[0]))+" "
-		except Exception as e:
-			print e
-	print "oy"
-
-	return render_template("confirm_subj.html", 
-							subject=words_of_subject, 
-							sentence=sentence, 
-							wordIDs=request.args.get("wordIDString"), 
-							word_IDs_of_subject=word_IDs_of_subject_string, 
-							wordIDString=wordIDString)
-
-
-@app.route("/tag_obj")
-@login_required
-def tag_obj():
-	sentence=request.args.get("sentence")
+	sentenceID=request.args.get("sentenceID")
+	subject=request.args.get("subject")
+	subject_li=ast.literal_eval(subject)
+	phraseID = subject_li[0]
+	print userID
 	print sentence
-	wordIDString=request.args.get("wordIDString")
-	print wordIDString
-	redo=request.args.get("redo")
-	if redo !="yes":
-		word_IDs_of_subject=request.args.get("subject").split()
-		print word_IDs_of_subject
-		for wordID in word_IDs_of_subject:
-			try:
-				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='N';".format(wordID))
-				words_in_words_cases = dict_cur.fetchall()
-			except Exception as e:
-				print e
-			print wordID
-			print words_in_words_cases
-			if words_in_words_cases == []:
-				try:
-					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "N"))
-				except Exception as e:
-					print e
-			print wordID
+	print sentenceID
+	print type(subject), subject
+	print type(subject_li), subject_li, "subject id: ", phraseID
+
+
+	try:
+		dict_cur.execute("INSERT INTO gram_functions (gram_function, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (gramfunc, phraseID, userID, sentenceID))
+	except Exception as e:
+		print e
+	print "inserted grammmatical function"
+
+	return redirect(url_for('tag_obj',
+							userID=userID,
+							sentence=sentence,
+							sentenceID=sentenceID
+							))
+
+
+@app.route('/tag_obj/<userID>/<sentence>/<sentenceID>')
+@login_required
+def tag_obj(userID, sentence, sentenceID):
+	phrases = []
+	try:
+		dict_cur.execute("SELECT id, phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
+		phrases= dict_cur.fetchall()
+	except Exception as e:
+		print e
+
+	for phrase in phrases:
+		print "id", phrase[0], "phrase: ", phrase[1]
+
 	return render_template("tag_obj.html", 
-							sentence=sentence, 
-							wordIDString=wordIDString, 
-							wordIDs=wordIDString.split(), 
-							words=sentence.split())
+							phrases=phrases, 
+							sentence=sentence,
+							userID=userID,
+							sentenceID=sentenceID,
+							)
+
 
 
 @app.route("/confirm_obj")
