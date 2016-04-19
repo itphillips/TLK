@@ -627,3 +627,10 @@ def prompt_new_sentence():
 
 	return render_template("prompt_new_sentence.html")
 
+@app.route("/sent_analysis")
+@login_required
+def sent_analysis():
+	return render_template("sent_analysis.html",
+							username="Ian",
+							sentence="hardcoded test sentence")
+

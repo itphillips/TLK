@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>User Page</title>
+	<title>{{user}}'s TLK Homepage</title>
+	<style>
+	sent {
+	font-family: "arial", Times, sans-serif;
+    font-size: 20px;
+	}
+	</style>
 </head>
 <!-- extend base layout -->
 {% extends "base.html" %}
@@ -20,14 +26,15 @@ Looks like you haven't added any sentences yet!
 
 {% for sentence in sentences %}
 
-<!-- this link invokes the delete function -->
-{% if userID == g.user.id %}
-<div><a href="{{ url_for('delete', sent_id=sentence[0]) }}">{{ ('Delete') }}</a></div>
-{% endif %}
-<p>
+<table>
+<tr>
+<sent>{{sentence['sentence']}}</sent>
+</tr>
 
+<tr>
+<td>
 	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">{{sentence['sentence']}}
+        <button type="submit" style="font-size:16px;height:26px">Analyze!
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
         <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
@@ -36,10 +43,27 @@ Looks like you haven't added any sentences yet!
         <input type="hidden" name="sentenceID" value="{{sentence['id']}}">
 
 	</form> 
+</td>
 
-</p> 
+<td>
+    <form name="{{sentence['sentence']}}" action="{{url_for('sent_analysis')}}" method="GET">
+        <button type="submit" style="font-size:16px;height:26px">See analysis
+        </button>
+        <!-- this link invokes the delete function -->
+	</form>
+</td>
 
+<td>
+	{% if userID == g.user.id %}
+	<form name="delete" action="{{url_for('delete', sent_id=sentence[0])}}" method="GET">
+		<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete
+        </button>
+    </form>
+	{% endif %}
+</td>
 
+</table>
+<br>
 {% endfor %}
 </br><hr></br>
 	<form name="NewSentence" action="{{url_for('input_sentence')}}">
