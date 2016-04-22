@@ -34,7 +34,7 @@ Looks like you haven't added any sentences yet!
 <tr>
 <td>
 	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">Analyze!
+        <button type="submit" style="font-size:16px;height:26px">Start new analysis
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
         <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
@@ -46,9 +46,13 @@ Looks like you haven't added any sentences yet!
 </td>
 
 <td>
-    <form name="{{sentence['sentence']}}" action="{{url_for('sent_analysis')}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">See analysis
+    <form name="{{sentence['sentence']}}" action="{{url_for('analyzed_sent')}}" method="GET">
+        <button type="submit" style="font-size:16px;height:26px">See old analysis
         </button>
+        <input type="hidden" name="userID" value="{{userID}}">
+        <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
+        <input type="hidden" name="sentenceID" value="{{sentence['id']}}">
+        
         <!-- this link invokes the delete function -->
 	</form>
 </td>

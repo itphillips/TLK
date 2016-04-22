@@ -382,12 +382,21 @@ def put_phrase_in_database():
 	phrase_structure=request.args.get("phrase_structure")
 	sentence= request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
-	userID = request.args.get("userID")
+	# userID = request.args.get("userID")
+	# print "this is phr to db userID", userID
+	username=g.user.username
 	phrase_type = request.args.get("phrase_type")
 	phrase=request.args.get("phrase")
 	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
 	print word_positions_in_phrase
 	print "prh in database "
+
+	try:
+		dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
+		userID = dict_cur.fetchone()[0]
+		print type(userID), userID
+	except Exception as e:
+		print e
 
 	try: 
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s)", (phrase, phrase_type, sentenceID, userID))
@@ -540,52 +549,32 @@ def tag_obj(userID, sentence, sentenceID):
 @login_required
 def confirm_obj():
 	print "confirm_obj"
+	gramfunc="direct object"
+	userID=request.args.get("userID")
 	sentence=request.args.get("sentence")
-	wordIDString=request.args.get("wordIDString")
-	DOIOstring=request.args.get("object")
-	DOIOlist=DOIOstring.replace("DO","").split("IO")
-	DO=DOIOlist[0]
-	IO=DOIOlist[1]
-	if DO != "_":
-		DO=DO.replace("_","")
-		DOList=DO.split()
-	if IO != "_":
-		IO=IO.replace("_","")
-		IOList=IO.split()
-	print DOList, "do list"
-	print IOList, "io list"
-	DOWords=""
-	IOWords=""
-	confirm_needed=False
-	if IOList:
-		confirm_needed=True
-		for wordID in IOList:
-			print wordID
-			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
-			print "ok"
-			IOWords= IOWords+(str(dict_cur.fetchall()[0][0]))+" "
-			print IOWords
-	print 'hi'
-	if DOList:
-		confirm_needed=True
-		for wordID in DOList:
-			print wordID
-			dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
-			print "ok"
-			DOWords= DOWords+(str(dict_cur.fetchall()[0][0]))+" "
-			print DOWords
-	print DO,"DO"
-	print IO,"IO"
-	if confirm_needed:
-		return render_template("confirm_obj.html", 
-								DO=DO, 
-								IO=IO, 
-								sentence=sentence, 
-								wordIDs=request.args.get("wordIDString"), 
-								wordIDString=wordIDString, 
-								DOWords=DOWords, 
-								IOWords=IOWords)
-	return redirect(url_for("prompt_new_sentence"))
+	sentenceID=request.args.get("sentenceID")
+	dobject=request.args.get("dobject")
+	print type(dobject), dobject
+	dobject_li=ast.literal_eval(dobject)
+	phraseID = dobject_li[0]
+	print userID
+	print sentence
+	print sentenceID
+	print type(dobject), dobject
+	print type(dobject_li), dobject_li, "direct object id: ", phraseID
+
+
+	try:
+		dict_cur.execute("INSERT INTO gram_functions (gram_function, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (gramfunc, phraseID, userID, sentenceID))
+	except Exception as e:
+		print e
+	print "inserted grammmatical function"
+
+	return render_template('analyzed_sent.html',
+							userID=userID,
+							sentence=sentence,
+							sentenceID=sentenceID
+							)
 
 
 @app.route("/end")
@@ -612,7 +601,7 @@ def prompt_new_sentence():
 	if IO:
 		for wordID in IO.split():
 			try:
-				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
+				dict_cur.execute("SELECT * FROM words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
 				words_in_words_cases = dict_cur.fetchall()
 			except Exception as e:
 				print e
@@ -627,10 +616,60 @@ def prompt_new_sentence():
 
 	return render_template("prompt_new_sentence.html")
 
-@app.route("/sent_analysis")
+@app.route("/analyzed_sent")
 @login_required
-def sent_analysis():
-	return render_template("sent_analysis.html",
-							username="Ian",
-							sentence="hardcoded test sentence")
+def analyzed_sent():
+	error= request.args.get("error")	
+	userID = request.args.get("userID")
+	sentence = request.args.get("sentence")
+	print "analyzed_sent", type(sentence), sentence
+	language=request.args.get("sentence_language")
+
+
+	try:
+		dict_cur.execute("SELECT id FROM sentences WHERE sentence = %s;", (sentence,))
+		sentenceID = dict_cur.fetchone()[0]
+
+
+		dict_cur.execute("SELECT word, pos FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id=%s ORDER BY w.id ASC;", (sentenceID,))
+		POSlist = dict_cur.fetchall()
+
+
+		dict_cur.execute("SELECT username FROM users WHERE id=%s;", (userID,))
+		username = dict_cur.fetchone()[0]
+
+
+		dict_cur.execute("SELECT sentence_type FROM sentences WHERE id = %s;", (sentenceID,))
+		sent_type = dict_cur.fetchone()[0]
+
+
+		dict_cur.execute("SELECT english_gloss FROM sentences WHERE id = %s;", (sentenceID,))
+		english_gloss = dict_cur.fetchone()[0]
+
+
+		dict_cur.execute("SELECT notes FROM sentences WHERE id = %s;", (sentenceID,))
+		notes = dict_cur.fetchone()[0]
+
+
+		dict_cur.execute("SELECT collection_date FROM sentences WHERE id = %s;", (sentenceID,))
+		collection_date = dict_cur.fetchone()[0]
+
+		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY wpp.id_word ASC;", (sentenceID,))
+		phrases = dict_cur.fetchall()
+
+	except Exception as e:
+		print e
+
+	return render_template("analyzed_sent.html",
+							username=userID,
+							sentence=sentence,
+							sentenceID=sentenceID,
+							language=language,
+							sent_type=sent_type,
+							gloss=english_gloss,
+							notes=notes, #there is no field to enter notes in the sentence input screen
+							collection_date=collection_date,
+							POSlist=POSlist,
+							phrases=phrases
+							)
 

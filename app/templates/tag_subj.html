@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>tag_subject</title>
+	<title>Tag Subject</title>
 </head>
 
 {% extends "base.html" %}
@@ -53,10 +53,10 @@
 
 
 <!--This is the workspace box-->
-        <h2>Which phrase from the last step is the grammatical subject?</h2>
-        {% if error != None %}
-        <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
-        {% endif %}
+<h2>Which phrase from the last step is the grammatical subject?</h2>
+{% if error != None %}
+<h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
+{% endif %}
 
 <form action="{{url_for('confirm_subj')}}">
 

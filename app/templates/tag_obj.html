@@ -1,8 +1,20 @@
-<html>
-<script>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Tag Object</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+
+{% block content %}
+
+
+<script type="text/javascript">
 window.onload = function () {
 var tag_DO=document.getElementById("tag_DO");
-var tag_IO=document.getElementById("tag_IO");
+// var tag_IO=document.getElementById("tag_IO");
 }
 
 	function showTagDO(){
@@ -12,14 +24,14 @@ var tag_IO=document.getElementById("tag_IO");
 		tag_DO.style.display="None";
 		tag_IO.style.display="None";
 	}
-	function showTagIO(){
-		tag_DO.style.display="None"
-		tag_IO.style.display="block";
-	}
-	function showTagDOIO(){
-		tag_DO.style.display="block";
-		tag_IO.style.display="block";
-	}
+	// function showTagIO(){
+	// 	tag_DO.style.display="None"
+	// 	tag_IO.style.display="block";
+	// }
+	// function showTagDOIO(){
+	// 	tag_DO.style.display="block";
+	// 	tag_IO.style.display="block";
+	// }
 
 	var prev= null;
 	function changeColor(e){
@@ -46,25 +58,58 @@ var tag_IO=document.getElementById("tag_IO");
 		}
 	}
 </script>
+
+<!--This is the workspace box-->
+
+<h2>Does "{{sentence}}" have a direct object?</h2>
+<!-- {% if error != None %}
+<h4 style="color:red"> Click a button! </h4>
+{% endif %} -->
 <form action="{{url_for('confirm_obj')}}">
-Does the sentence "{{sentence}}" have an object?
-<input type="radio" name="obj" value="DO" onClick="showTagDO()">Yes, just a direct object</input>
-<input type="radio" name="obj" value="IO" onClick="showTagIO()">Yes, just an indirect object</input>
-<input type="radio" name="obj" value="DOIO" onClick="showTagDOIO()">Yes, both a direct and indirect object</input>
+
+<input type="radio" name="obj" value="DO" onClick="showTagDO()">Yes</input>
+<!-- <input type="radio" name="obj" value="IO" onClick="showTagIO()">Just an indirect object</input>
+<input type="radio" name="obj" value="DOIO" onClick="showTagDOIO()">Yes, both a direct and indirect object</input> -->
 <input type="radio" name="obj" value="no" onClick="hideTagObj()">No</input>
 
 <div id="tag_DO" style="display:none">
-Which word(s) constitute(s) the direct object?
+<p>Which phrase is the direct object?</p>
 <div style="display:none">
 <button type="button" id="DO" style="outline: 0;" value="active">hiding!</button>
 </div>
-{% for i in range(wordIDs|count) %}
-<button type="button" id="{{wordIDs[i]}}" onClick="changeColor(event)">{{words[i]}}</button>
-{% endfor %}
-<br>
-</div>
 
-<div id="tag_IO" style="display:none">
+{% for i in range(phrases|count) %}
+<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+{% endfor %}
+
+<input type="hidden" name="sentence" value="{{sentence}}">
+<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+<input type="hidden" name="userID" value="{{userID}}">
+
+<br>
+<button type="submit" name="dobject" onClick="submitClick(event)" value="">Submit</button>
+
+</form>
+{% endblock %}
+
+
+<!--content for the guidebox-->
+{% block guide %}
+
+	<p style="font-size:100%">
+    Now, it's time to identify the <i  style="color:blue">direct object</i> for your sentence.
+	
+	<br><br> Not sure what a "direct object" is? Check these resources:</p>
+	 <a href="http://www.englicious.org/lesson/grammatical-functions-clause" style="font-size:24px">englicious.org</a> 
+	        
+{% endblock %}
+
+</body>
+</html>
+
+<!-- </div> -->
+
+<!-- <div id="tag_IO" style="display:none">
 Which word(s) constitute(s) the indirect object?
 <div style="display:none">
 <button type="button" id="IO" style="outline: 0;" value="active">also hiding!</button>
@@ -72,12 +117,5 @@ Which word(s) constitute(s) the indirect object?
 {% for i in range(wordIDs|count) %}
 <button type="button" id="{{wordIDs[i]}}" onClick="changeColor(event)">{{words[i]}}</button>
 {% endfor %}
-</div>
+</div> -->
 
-<br>
-<input type="hidden" name="sentence" value="{{sentence}}">
-<input type="hidden" name="wordIDString" value="{{wordIDString}}">
-
-<button type="submit" name="object" onClick="submitClick(event)" value="_">submit</button>
-</form>
-</html>

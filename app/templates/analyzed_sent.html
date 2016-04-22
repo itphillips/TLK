@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Analyzed Sentence</title>
+	<style>
+		table, th, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 20px;
+			font-weight: normal
+		}
+	</style>
+</head>
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+<body>
+{% block content %}
+
+{% if sentences!=[] %}
+	
+<h2>Parts of speech:</h2>
+<!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
+
+<table>
+<tr>
+{% for i in POSlist %}
+<th>{{i[0]}}</th>
+{% endfor %}
+</tr>
+
+<tr>
+{% for i in POSlist %}
+<th>|</th>
+{% endfor %}
+</tr>
+
+<tr>
+{% for i in POSlist %}
+<th>{{i[1]}}</th>
+{% endfor %}
+</tr>
+</table>
+</p> 
+
+<form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
+    <button type="submit" style="font-size:16px;height:26px">redo POS analysis
+    </button>
+    <input type="hidden" name="userID" value="{{userID}}">
+    <input type="hidden" name="sentence" value="{{sentence}}">
+    <input type="hidden" name="language" value="{{language}}">
+    <input type="hidden" name="date" value="{{collection_date}}">
+    <input type="hidden" name="sentenceID" value="{{sentenceID}}">
+
+</form> 
+<hr>
+<h2>Basic word order:</h2>
+<p>basic word order</p>
+
+<hr>
+<h2>Syntactic phrases:</h2>
+<table>
+<tr>
+{% for i in phrases %}
+<th>{{i[6]}}</th>
+{% endfor %}
+</tr>
+
+<tr>
+{% for i in phrases %}
+<th>|</th>
+{% endfor %}
+</tr>
+
+<tr>
+{% for i in phrases %}
+<th>{{i[7]}}</th>
+{% endfor %}
+</tr>
+</table>
+
+<hr>
+<h2>Syntactic structure:</h2>
+<p>syntactic structure</p>
+
+{% endif %}
+
+{% endblock %}
+
+{% block guide %}
+	<h2 align="left">Here's the info for your sentence: </h2>
+	<p align="left" style="font-size:20px;color:blue">{{sentence}}</p>
+	<p align="left"><b>Language:</b> {{language}}</p>
+	<p align="left"><b>Sentence type:</b> {{sent_type}}</p>
+	<p align="left"><b>English gloss:</b> {{gloss}}</p>
+	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
+	<p align="left"><b>Notes:</b> {{notes}}</p>
+	<form name="analysis" action="{{url_for('user', username=username)}}" method="GET">
+        <button type="submit" style="font-size:16px;height:26px">See all sentences
+        </button>
+        <input type="hidden" name="userID" value="{{userID}}">
+
+	</form> 
+{% endblock %}
+
+</body>
+</html>
