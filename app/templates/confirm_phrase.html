@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>confirm_phrase</title>
+	<title>Confirm Phrase Type</title>
+	<style>
+	sent {
+	font-family: "arial", Times, sans-serif;
+    font-size: 20px;
+	}
+	</style>
 </head>
 
 {% extends "base.html" %}
@@ -10,22 +16,14 @@
 
 {% block content %}
 <p>
-You said that phrase "{{phrase}}" was a {{phrase_type}}, and that it had the following structure: <br><br>
+You said that phrase "{{phrase}}" is a(n) {{phrase_type}}, and it contains the following: <br><br>
+<sent style="font-weight:bold">
 {{phrase_structure}}
-<br><br>
-Is this correct?</p>
-<form name="all_ok" action="{{url_for('put_phrase_in_database')}}">
-	<input type="hidden" name="userID" value="{{userID}}">
-	<input type="hidden" name="sentence" value="{{sentence}}">
-	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<input type="hidden" name="phrase" value="{{phrase}}">
-	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
-	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
-	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
-	<br><button type="submit" name="submit">Yes</button>
-	</form>
+</sent>
 
-	<form name="structure_problem" action="{{url_for('tag_phrase_structure')}}">
+<table>
+<tr>
+<!-- 	<form name="structure_problem" action="{{url_for('tag_phrase_structure')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="phrase" value="{{phrase}}">
@@ -34,16 +32,32 @@ Is this correct?</p>
 	<input type="hidden" name="redo" value="{{True}}">
 	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
 	<br><button type="submit" name="submit"> No. Change Structure</button>
+	</form> -->
+<td style="padding-right:5px">
+	<form name="phrase_problem" action="{{url_for('group', userID=userID, sentenceID=sentenceID)}}">
+<!-- 	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}"> -->
+	<input type="hidden" name="firstTime" value="False">
+	<br><button type="submit" style="font-size:16px;height:26px; background-color:red">Go back</button>
 	</form>
+</td>
 
-	<form name="phrase_problem" action="{{url_for('group')}}">
+<td style="padding-left:5px">
+<form name="all_ok" action="{{url_for('put_phrase_in_database')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<input type="hidden" name="firstTime" value="False">
-	<br><button type="submit" name="submit">No. Make new phrase</button>
+	<input type="hidden" name="phrase" value="{{phrase}}">
+	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
+	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
+	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
+	<br><button type="submit" style="font-size:16px;height:26px; background-color:lightgreen">Next</button>
 	</form>
-	
+</td>
+
+</tr>
+</table>
 {% endblock %}
 
 {% block guide %}

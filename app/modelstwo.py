@@ -3,6 +3,8 @@
 #NEVER RENAME AN EXISTING FIELD OR MODEL -- instead, add a new field or model
 from app import db
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 # from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
@@ -18,7 +20,10 @@ class User(db.Model):
 	#relationship - not sure if this need to be the table name or class name
 	#backref defines a field that will be added to the objects of the 'many' class
 	#that points back at the 'one' object
-	sentences = db.relationship('Sentence', backref='author', lazy='dynamic')
+	sentences = db.relationship('Sentence', backref='users', lazy='dynamic', cascade="delete")
+	words = db.relationship('Word', backref='users', cascade='delete')
+	phrases = db.relationship('Phrase', backref='users', cascade='delete')
+	gram_functions = db.relationship('Gram_function', backref='users', cascade='delete')
 
 	
 	#this should just return true unless the object represents a user that should not
@@ -61,7 +66,13 @@ class Sentence(db.Model):
 	collection_location = db.Column(db.String(70))
 	notes = db.Column(db.String(140))
 	timestamp = db.Column(db.DateTime)
-	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	# words = db.relationship('Word', backref='sentences', cascade='delete')
+	# word_sentence_positions = db.relationship('Word_sent_position', backref='sentences', cascade='delete')
+	# phrases = db.relationship('Phrase', backref='sentences', cascade='delete')
+	# word_phrase_positions = db.relationship('Word_phrase_position', backref='sentences', cascade='delete')
+	# phrase_sentence_positions = db.relationship('Phrase_sentence_position', backref='sentences', cascade='delete')
+	# gram_functions = db.relationship('Gram_function', backref='sentences', cascade='delete')
 
 	def __repr__(self):
 		return '<Sentence %r>' % (self.sentence)
@@ -72,22 +83,15 @@ class Word(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	word = db.Column(db.String(60))
 	pos = db.Column(db.String(40))
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
-	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+	ws_linear_position = db.Column(db.Integer)
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	# words = db.relationship('Word_sent_position', cascade='delete')
+	# word_phrase_positions = db.relationship('Word_phrase_position', cascade='delete')
 
 	def __repr__(self):
 		return '<Word %r>' % (self.word)
 
-
-class Word_sent_position(db.Model):
-	__tablename__ = 'word_sentence_positions'
-	id = db.Column(db.Integer, primary_key = True)
-	ws_linear_position = db.Column(db.Integer)
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
-	id_word = db.Column(db.Integer, db.ForeignKey('words.id'))
-
-	def __repr__(self):
-		return '<Word_sent_position %r>' % (self.ws_linear_position)
 
 
 class Phrase(db.Model):
@@ -95,8 +99,11 @@ class Phrase(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	phrase = db.Column(db.String(120))
 	phrase_type = db.Column(db.String(60))
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
-	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	# word_phrase_positions = db.relationship('Word_phrase_position', cascade='delete')
+	# phrase_sentence_positions = db.relationship('Phrase_sentence_position', cascade='delete')
+	# gram_functions = db.relationship('Gram_function', cascade='delete')
 
 	def __repr__(self):
 		return '<Phrase %r>' % (self.phrase)
@@ -107,9 +114,9 @@ class Word_phrase_position(db.Model):
 	__tablename__ = 'word_phrase_positions'
 	id = db.Column(db.Integer, primary_key = True)
 	wp_linear_position = db.Column(db.Integer)
-	id_word = db.Column(db.Integer, db.ForeignKey('words.id'))
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
-	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
+	id_word = db.Column(db.Integer, db.ForeignKey('words.id', ondelete="CASCADE"))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id', ondelete="CASCADE"))
 
 	def __repr__(self):
 		return '<Word_phrase_position %r>' % (self.wp_linear_position)
@@ -120,8 +127,8 @@ class Phrase_sentence_position(db.Model):
 	__tablename__ = 'phrase_sentence_positions'
 	id = db.Column(db.Integer, primary_key = True)
 	ps_linear_position = db.Column(db.Integer)
-	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id', ondelete="CASCADE"))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
 
 	def __repr__(self):
 		return '<Phrase_sentence_position %r>' % (self.ps_linear_position)
@@ -132,9 +139,9 @@ class Gram_function(db.Model):
 	__tablename__ = 'gram_functions'
 	id = db.Column(db.Integer, primary_key = True)
 	gram_function = db.Column(db.String(60))
-	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id'))
-	id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
-	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id'))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id', ondelete="CASCADE"))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
 
 	def __repr__(self):
 		return '<Gram_function %r>' % (self.gram_function)

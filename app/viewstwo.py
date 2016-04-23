@@ -12,7 +12,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
-from .modelstwo import User, Sentence, Word, Word_sent_position, Phrase, Word_phrase_position, Gram_function
+from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Gram_function
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
 conn.set_session(autocommit=True)
@@ -204,12 +204,6 @@ def delete(sent_id):
 	# 	return redirect(url_for('user', 
 	# 							username=g.user.username))
 
-	dict_cur.execute("DELETE FROM word_phrase_positions WHERE word_phrase_positions.id_sentence = %s;", (sent_id,))
-	dict_cur.execute("DELETE FROM word_sentence_positions WHERE word_sentence_positions.id_sentence = %s;", (sent_id,))
-	dict_cur.execute("DELETE FROM phrase_sentence_positions WHERE phrase_sentence_positions.id_sentence = %s;", (sent_id,))
-	dict_cur.execute("DELETE FROM gram_functions WHERE gram_functions.id_sentence = %s;", (sent_id,))
-	dict_cur.execute("DELETE FROM words WHERE words.id_sentence = %s;", (sent_id,))
-	dict_cur.execute("DELETE FROM phrases WHERE phrases.id_sentence = %s;", (sent_id,))
 	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s;", (sent_id,))	
 	return redirect(url_for('user', 
 							username=g.user.username))
@@ -268,50 +262,72 @@ def pos_confirm():
 							pos=pos, 
 							language=language)
 
-@app.route("/group")
+@app.route("/pos_to_db")
 @login_required
-def group():
+def pos_to_db():
 	print request.args
 	redo = request.args.get("redo")
 	print redo, "redo"
-	userID = request.args.get("userID")
-	sentenceID = request.args.get("sentenceID")
+	userID = int(request.args.get("userID"))
+	print "group userID:", userID, type(userID)
+	sentenceID = int(request.args.get("sentenceID"))
 	print "this is sentenceID", sentenceID
-	sentence = request.args.get("sentence")
-
-# 	wordlist = sentence.split()
-# 	for word in wordlist:
-# 		wordlinposition = 1 + wordlist.index(word)
-# 		
-# 		print wordlinposition
+	sentence = str(request.args.get("sentence"))
 	
 	if redo == None:
-		language=request.args.get("language")
+		language=request.args.get("language") #this is not getting passed
+		print language, type(language)
 		pos_array = str(request.args.get("pos")).split()
+		print pos_array, type(pos_array)
 		words = sentence.split()
-		for i in range(len(words)):
+		print words, type(words)
+		for i in range(len(words)):	
 			try:
-				dict_cur.execute("SELECT * FROM words INNER JOIN sentences ON words.id_sentence=sentences.id WHERE words.word = %s AND words.pos = %s AND sentences.sentence_language = %s;", (words[i], pos_array[i], language))
-				found_words = dict_cur.fetchall()
-				print found_words, "found words"
-				if found_words == []:
-					dict_cur.execute("INSERT INTO words (word, pos, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (words[i], pos_array[i], sentenceID, userID))
-					
-					dict_cur.execute("SELECT id FROM words WHERE words.word = %s AND words.pos = %s AND words.id_sentence = %s AND words.id_user = %s;", (words[i], pos_array[i], sentenceID, userID))
-					found_words = dict_cur.fetchall()
-				wordID = found_words[0]["id"]
-				dict_cur.execute("SELECT id FROM word_sentence_positions wsp WHERE wsp.id_word = %s AND wsp.id_sentence = %s;", (wordID, sentenceID))
-				found_wsp = dict_cur.fetchall()
-				if found_wsp == []:
-					dict_cur.execute("INSERT INTO word_sentence_positions (id_word, id_sentence, ws_linear_position) VALUES (%s, %s, %s)", (wordID, sentenceID, i))
-# 			print "word: %s wordID: %s sentenceID: %s ws position: %s" % (word, wordID, sentenceID, i)
+				#assign word_sentence_positions: check if already in wsp table, if not then add insert them
+				word = words[i]
+				print "\nword= ", word, type(word)
+				print "wsp= ", i, type(i)
+
+				dict_cur.execute("SELECT w.id, w.word, s.id, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence = s.id WHERE s.id = %s AND w.ws_linear_position = %s AND w.id_user = %s ORDER BY w.id ASC;", (sentenceID, i, userID))
+				found_word = list(dict_cur.fetchall())
+				print "found_word=", found_word, type(found_word)
+
+				if found_word != []: 
+
+					#delete words and their dependencies
+					dict_cur.execute("DELETE FROM words w WHERE w.word = %s AND w.id_sentence = %s AND w.ws_linear_position = %s AND w.id_user = %s;", (word, sentenceID, i, userID))
+					print "deleted word!"
+
+				#insert record into words
+				dict_cur.execute("INSERT INTO words (word, pos, ws_linear_position, id_sentence, id_user) VALUES (%s, %s, %s, %s, %s);", (words[i], pos_array[i], i, sentenceID, userID))
+				print "sent word to db= ", words[i]
+				
 			except Exception as e:
 				print e
 
-	return render_template("grouptwo.html", 
-							sentence=sentence, 
-							userID=userID, 
-							sentenceID=sentenceID)
+		return redirect(url_for('group',
+								userID=userID,
+								sentenceID=sentenceID
+								))
+
+
+@app.route("/group/<userID>/<sentenceID>")
+@login_required
+def group(userID, sentenceID):
+		dict_cur.execute("SELECT * FROM sentences s INNER JOIN users u ON s.id_user = u.id WHERE s.id = %s;", (sentenceID,))
+		s_record = dict_cur.fetchone()
+		sentence = str(s_record[3])
+		print "sentence= ", sentence, type(sentence)	
+		userID = int(userID)
+		print "userID= ", userID, type(userID)
+		sentenceID = int(sentenceID)
+		print "sentenceID= ", sentenceID, type(sentenceID)
+
+		return render_template("grouptwo.html", 
+				sentence=sentence, 
+				userID=userID, 
+				sentenceID=sentenceID)
+
 
 
 @app.route("/tag_phr_struct")
@@ -399,7 +415,7 @@ def put_phrase_in_database():
 		print e
 
 	try: 
-		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s)", (phrase, phrase_type, sentenceID, userID))
+		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
 		print e
 	print "inserted phrases"
@@ -662,6 +678,7 @@ def analyzed_sent():
 
 	return render_template("analyzed_sent.html",
 							username=userID,
+							userID=userID,
 							sentence=sentence,
 							sentenceID=sentenceID,
 							language=language,

@@ -6,8 +6,9 @@
 		table, th, td, tr {
 			/*border: 1px solid black; */
 			padding: 5px;
-			font-size: 20px;
-			font-weight: normal
+			font-size: 18px;
+			font-weight: normal;
+			font-family: arial;
 		}
 	</style>
 </head>
@@ -43,16 +44,6 @@
 </table>
 </p> 
 
-<form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
-    <button type="submit" style="font-size:16px;height:26px">redo POS analysis
-    </button>
-    <input type="hidden" name="userID" value="{{userID}}">
-    <input type="hidden" name="sentence" value="{{sentence}}">
-    <input type="hidden" name="language" value="{{language}}">
-    <input type="hidden" name="date" value="{{collection_date}}">
-    <input type="hidden" name="sentenceID" value="{{sentenceID}}">
-
-</form> 
 <hr>
 <h2>Basic word order:</h2>
 <p>basic word order</p>
@@ -82,13 +73,23 @@
 <hr>
 <h2>Syntactic structure:</h2>
 <p>syntactic structure</p>
+<hr><br>
+<form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
+    <button type="submit" style="font-size:16px;height:26px">Reanalyze this sentence
+    </button>
+    <input type="hidden" name="userID" value="{{userID}}">
+    <input type="hidden" name="sentence" value="{{sentence}}">
+    <input type="hidden" name="language" value="{{language}}">
+    <input type="hidden" name="date" value="{{collection_date}}">
+    <input type="hidden" name="sentenceID" value="{{sentenceID}}">
 
+</form> 
 {% endif %}
 
 {% endblock %}
 
 {% block guide %}
-	<h2 align="left">Here's the info for your sentence: </h2>
+	<h2 align="left">Sentence info: </h2>
 	<p align="left" style="font-size:20px;color:blue">{{sentence}}</p>
 	<p align="left"><b>Language:</b> {{language}}</p>
 	<p align="left"><b>Sentence type:</b> {{sent_type}}</p>

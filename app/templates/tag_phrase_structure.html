@@ -52,9 +52,9 @@
 	{% endfor %}
 	</script>
 <!-- </head> -->
-<p>You said that "{{phrase}}" was of type {{phrase_type}}.</p>
+<p>You said that "{{phrase}}" is a(n) {{phrase_type}}.</p>
 
-<p>Highlight the elements this phrase contains. </p>
+<p>Click the elements this phrase contains. </p>
 
 <form name="phrase_subtype" action="{{url_for('confirm_phrase')}}">
 {% for element in phrase_structure_options %}
@@ -71,10 +71,10 @@
 
 </form>
 <br>
-<form name="try_again" action="{{url_for('group')}}">
-	<input type="hidden" name="userID" value="{{userID}}">
+<form name="try_again" action="{{url_for('group', userID=userID, sentenceID=sentenceID)}}">
+<!-- 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
-	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}"> -->
 	<input type="hidden" name="redo" value="True">
 	<button type="submit" name = "retry"> I made a mistake! Go back.</button>
 </form>
