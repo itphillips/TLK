@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>tag_phrase_structure</title>
+	<title>Check phrases</title>
 </head>
 
 {% extends "base.html" %}
@@ -52,11 +52,13 @@
 	{% endfor %}
 	</script>
 <!-- </head> -->
-<p>You said that "{{phrase}}" is a(n) {{phrase_type}}.</p>
+<p style="font-size:30px;">{{sentence}}</p>
 
-<p>Click the elements this phrase contains. </p>
+<p>You said that <b>"{{phrase}}"</b> is a(n) <b>{{phrase_type}}</b>.</p>
 
-<form name="phrase_subtype" action="{{url_for('confirm_phrase')}}">
+<!-- <p>Click the elements this phrase contains. </p> -->
+
+<form name="phrase_subtype" action="{{url_for('put_phrase_in_database')}}">
 {% for element in phrase_structure_options %}
 <button type="button" id="{{element[0]}}" onClick="wordClick(event)" style="font-size:16px;height:26px">{{element[0]}}</button>
 {% endfor %}
@@ -67,7 +69,7 @@
 	<input type="hidden" name="phrase" value="{{phrase}}">
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
 	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
-<br><button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = ""> Submit</button>
+<br><button type="submit" name = "phrase_structure" onClick = "submitClick(event)" value = "">Submit</button>
 
 </form>
 <br>
@@ -87,14 +89,21 @@
 	<br><br><b>Step 2:</b> Either click "submit" to check your work or click "I made a mistake! Go back." if you need to edit this phrase
 
 	<br><br>Here are some tests you can use to determine if a group of words forms a constituent:</p>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px">Substitution</a> 
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px" target="helpbox_iframe">Substitution</a> 
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px">Movement</a>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px" target="helpbox_iframe">Movement</a>
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px">Question answer</a>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px" target="helpbox_iframe">Question answer</a>
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px">Clefting</a>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px" target="helpbox_iframe">Clefting</a>
 	        
 {% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">How to identify syntactic phrases</h2>
+<iframe src="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" style="border:none;" width="100%" height="80%">
+</iframe>
+{% endblock %}
+
 </body>
 </html>

@@ -34,6 +34,11 @@ p {
     font-size: 18px;
 
 }
+
+table.center {
+    margin-left:auto;
+    margin-right:auto;
+}
         #container	{
         	width:1100px;
         	margin-left:auto;
@@ -59,22 +64,9 @@ p {
             border-left:solid 1px black;
         }
         		
-        #workspace	{
-        	position:relative;
-        	background-color:#FFF;
-        	width:50%;
-        	float:right;
-        	padding:10px;
-            padding-left:20px;
-            padding-bottom:20px;
-            border-radius:25px;
-            margin-top:20px;
-            margin-left:5px;
-            border:solid 2px black;
-        }
-        		
         #guide	{
-        	position:relative;
+        	display:inline-block;
+            position:relative;
         	background-color:#FFFFCC;
             border-radius:25px;
         	width:40%;
@@ -83,12 +75,46 @@ p {
             padding-bottom:20px;
         	text-align:center;
             margin-top:20px;
-            margin-right:5px;
+            /*margin-right:5px;*/
         	border:solid 2px black;
         }
-        		
+
+        #helpbox {
+            display:inline-block;
+            position:relative;
+            background-color:#FFF;
+            width:54%;
+            height:400px;
+            float:right;
+            padding:10px;
+            padding-bottom:20px;
+            margin-top:20px;
+            /*margin-left:5px;*/
+            border:solid 2px black;
+            border-radius:25px;
+            text-align:center;
+        }
+        	
+        #workspace  {
+            display:inline-block;
+            position:relative;
+            background-color:#FFF;
+            width:97%;
+            float:left;
+            padding:10px;
+            padding-left:20px;
+            padding-bottom:20px;
+            border-radius:25px;
+            margin-top:20px;
+/*            margin-left:5px;*/
+            margin-left:auto;
+            margin-right:auto;
+            border:solid 2px black;
+            text-align:center;
+        }    	
+
         #footer	{
-        	position:relative;
+        	position:static;
         	background-color:#FFF;
         	text-align:center;
         	width:100%;
@@ -109,7 +135,7 @@ p {
             <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="350" height="105">    
     </div>
 
-<!--this is the left menu box-->
+<!--this is the menu box-->
     <ul>
         <li><a href={{ url_for('home') }}>About TLK</a></li>
         {% if g.user.is_authenticated() %}
@@ -120,12 +146,17 @@ p {
         {% endif %}
         <!-- <p><a href="/help">Help</a></p> -->
     </ul> 
-<!--This is the right guide box-->
+<!--This is the left guide box-->
     <div id="guide">
        <!--  <h3>Guide</h3> -->
     {% block guide %}{% endblock %}
     </div>
-            
+
+<!--This is the right helper box-->
+    <div id="helpbox">
+    {% block helpbox %}{% endblock %}
+    </div>
+
 <!--This is the workspace box-->
     <div id="workspace">
     <!--the following block determines how flashed messages are displayed-->
@@ -142,9 +173,9 @@ p {
     </div>
             
 <!--This is the footer-->
-    <div id="footer">
+    <footer id="footer">
         The Linguist's Kitchen
-    </div>
+    </footer>
 
 </div>
 

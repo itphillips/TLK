@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>POS_confirm</title>
+	<title>Confirm POS</title>
+	<style>
+		table, th, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 24px;
+			font-weight: normal;
+			font-family: arial;
+		}
+	</style>
 </head>
 
 {% extends "base.html" %}
@@ -13,19 +22,35 @@
 
 {% set words = sentence.split() %}
 {% set pos_array = pos.split() %}
+
+<table class="center">
+<tr>
 {% for i in range(words|length) %}
-
-<p style="font-size:20px"> {{words[i]}} = <i>{{pos_array[i]}}</i></p>
+<th> {{words[i]}}</th>
 {% endfor %}
-<br>
+</tr>
 
+<tr>
+{% for i in range(words|length) %}
+<th>|</th>
+{% endfor %}
+</tr>
+
+<tr>
+{% for i in range(words|length) %}
+<th> {{pos_array[i]}}</th>
+{% endfor %}
+</tr>
+</table>
+
+<br>
 <form action ="{{url_for('pos_to_db')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 	<input type="hidden" name="pos" value="{{pos}}">
 	<input type="hidden" name="language" value="{{language}}">
-	<button type ="submit" name= "Yes">Yes, please continue
+	<button type ="submit" name= "Yes" style="background-color:lightgreen;">Yes! Go to next step
 	</button>
 </form>
 
@@ -36,7 +61,7 @@
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 	<input type="hidden" name="language" value="{{language}}">
 	<br>
-	<button type ="submit" name= "No">No, I need to fix them
+	<button type ="submit" name= "No" style="background-color:red;">No! Go back
 	</button>
 </form>
 
@@ -45,10 +70,17 @@
 <!--content for the guidebox-->
 {% block guide %}
 	  <h2>Check your work!</h2>
-	<p> For help in identifying parts of speech, please check these resources:</p>
-	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a> 
+<!-- 	<p> For help in identifying parts of speech, please check these resources:</p>
+	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a>  -->
 	        
 {% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">How to identify parts of speech</h2>
+<iframe src="http://partofspeech.org/" style="border:none;" width="100%" height="80%">
+</iframe>
+{% endblock %}
+
 </body>
 </html>
 

@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>tag words</title>
+	<title>Tag POS</title>
+    <style>
+        table, th, td, tr {
+            /*border: 1px solid black; */
+            padding: 5px;
+            font-size: 30px;
+            font-weight: normal;
+            font-family: arial;
+        }
+    </style>
 </head>
 
 {% extends "base.html" %}
@@ -15,13 +24,22 @@
         {% if error != None %}
         <h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
         {% endif %}
-        <p><font size=6> {{ sentence }} </font></p>
-        <div>
+<!--         <p><font size=6> {{ sentence }} </font></p>
+        <div> -->
 		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
-      {% set count = 0 %}
+       
+        <table class="center">
+        <tr>
 		{% for word in sentence.split() %}
-		<p><font size=4> {{word}} </font>
-      <select name="{{count}}">
+		<th> {{word}} </th>
+        {% endfor %}
+        </tr>
+
+        {% set count = 0 %}
+        <tr>
+        {% for word in sentence.split() %}
+        <th>
+      <select name="{{count}}" style="width:80px;">
         <option value="adjective">adjective</option>
         <option value="adverb">adverb</option>
         <option value="conjunction">conjunction</option>
@@ -33,10 +51,12 @@
         <option value="verb">verb</option>
         <option value="verb-auxiliary">verb-auxiliary</option>
       </select>
-      </p>
 				
         {% set count = count+1 %}
-				{% endfor %}
+		{% endfor %}
+        </th>
+        </tr>
+        </table>
 				
         <input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
 		<input type="hidden" name= "userID" value ="{{userID}}">
@@ -44,6 +64,8 @@
         <input type= "hidden" name="language" value= "{{language}}">
 				<br>
         <input type="submit" value="Check my work">
+
+
 			</form> 
     	</div>
 <!--    </div> -->
@@ -54,9 +76,15 @@
     <h2>Identify the part of speech for each word</h2>
 	<p align="left"> <b>Step 1:</b> Label each word in your sentence with the appropriate <i  style="color:blue">part of speech</i>.
     <br><br> <b>Step 2:</b> Click the "check my work" button
-	<br><br> For help in identifying parts of speech, please check these resources:</p>
-	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a> 
+	<!-- <br><br> For help in identifying parts of speech, please check these resources:</p>
+	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a>  -->
 	        
+{% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">How to identify parts of speech</h2>
+<iframe src="http://partofspeech.org/" style="border:none;" width="100%" height="80%">
+</iframe>
 {% endblock %}
 
 </body>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Confirm Phrase Type</title>
+	<title>Check phrase</title>
 	<style>
 	sent {
 	font-family: "arial", Times, sans-serif;
@@ -15,31 +15,21 @@
 <body>
 
 {% block content %}
-<p>
-You said that phrase "{{phrase}}" is a(n) {{phrase_type}}, and it contains the following: <br><br>
-<sent style="font-weight:bold">
-{{phrase_structure}}
-</sent>
+<p style="font-size:30px;">{{sentence}}</p>
 
-<table>
+<p>You said that <b>"{{phrase}}"</b> is a(n) <b>{{phrase_type}}</b>.</p>
+
+
+<table class="center">
 <tr>
-<!-- 	<form name="structure_problem" action="{{url_for('tag_phrase_structure')}}">
-	<input type="hidden" name="userID" value="{{userID}}">
-	<input type="hidden" name="sentence" value="{{sentence}}">
-	<input type="hidden" name="phrase" value="{{phrase}}">
-	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
-	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<input type="hidden" name="redo" value="{{True}}">
-	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
-	<br><button type="submit" name="submit"> No. Change Structure</button>
-	</form> -->
+
 <td style="padding-right:5px">
 	<form name="phrase_problem" action="{{url_for('group', userID=userID, sentenceID=sentenceID)}}">
 <!-- 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}"> -->
 	<input type="hidden" name="firstTime" value="False">
-	<br><button type="submit" style="font-size:16px;height:26px; background-color:red">Go back</button>
+	<br><button type="submit" style="font-size:16px;height:26px; background-color:red">Whoops! Go back</button>
 	</form>
 </td>
 
@@ -52,7 +42,7 @@ You said that phrase "{{phrase}}" is a(n) {{phrase_type}}, and it contains the f
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
 	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
 	<input type="hidden" name="word_positions_in_phrase" value="{{word_positions_in_phrase}}">
-	<br><button type="submit" style="font-size:16px;height:26px; background-color:lightgreen">Next</button>
+	<br><button type="submit" style="font-size:16px;height:26px; background-color:lightgreen">Correct! Next step</button>
 	</form>
 </td>
 
@@ -61,15 +51,26 @@ You said that phrase "{{phrase}}" is a(n) {{phrase_type}}, and it contains the f
 {% endblock %}
 
 {% block guide %}
- <h2>Check your work!</h2>
-	<p>Here are some tests you can use to determine if a group of words forms a constituent:</p>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px">Substitution</a> 
+	<h2>Identify the parts of the phrase</h2>
+	<p align="left"> <b>Step 1:</b> Click on the elements that are contained in your phrase
+	<br><br><b>Step 2:</b> Either click "submit" to check your work or click "I made a mistake! Go back." if you need to edit this phrase
+
+	<br><br>Here are some tests you can use to determine if a group of words forms a constituent:</p>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px" target="helpbox_iframe">Substitution</a> 
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px">Movement</a>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px" target="helpbox_iframe">Movement</a>
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px">Question answer</a>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px" target="helpbox_iframe">Question answer</a>
 	 <br><br>
-	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px">Clefting</a>
-{% endblock %}	
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px" target="helpbox_iframe">Clefting</a>
+	        
+{% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">How to identify syntactic phrases</h2>
+<iframe src="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" style="border:none;" width="100%" height="80%">
+</iframe>
+{% endblock %}
+
 </body>
 </html>

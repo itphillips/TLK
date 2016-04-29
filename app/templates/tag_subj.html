@@ -53,7 +53,10 @@
 
 
 <!--This is the workspace box-->
-<h2>Which phrase from the last step is the grammatical subject?</h2>
+<p style="font-size: 30px;">
+{{sentence}}
+</p>
+<p>Which phrase from the last step is the grammatical subject?</p>
 {% if error != None %}
 <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
 {% endif %}
@@ -81,9 +84,15 @@
 	<p style="font-size:100%">
     Now, it's time to identify the <i  style="color:blue">grammatical subject</i> for your sentence.
 	
-	<br><br> Not sure what a "grammatical subject" is? Check these resources:</p>
-	 <a href="http://www.englicious.org/lesson/grammatical-functions-clause" style="font-size:24px">englicious.org</a> 
+	<br><br> Not sure what a "grammatical subject" is? Check the box on the right</p>
+<!-- 	 <a href="http://www.englicious.org/lesson/grammatical-functions-clause" style="font-size:24px">englicious.org</a>  -->
 	        
+{% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">Grammatical functions</h2>
+<iframe src="http://www.englicious.org/lesson/grammatical-functions-clause" style="border:none;" width="100%" height="80%">
+</iframe>
 {% endblock %}
 
 </body>

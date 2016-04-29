@@ -3,22 +3,23 @@
 <head>
 	<title>{{user}}'s TLK Homepage</title>
 	<style>
-	sent {
+	td {
 	font-family: "arial", Times, sans-serif;
     font-size: 20px;
-	}
+    text-align: left;
+/*    border-style: solid;*/
 	</style>
 </head>
 <!-- extend base layout -->
 {% extends "base.html" %}
 
 <body>
-{% block content %}
+{% block helpbox %}
 
 <!-- <h2>Hello {{ user.username }}!</h2> -->
 
 {% if sentences!=[] %}
-<h2>Your sentences:</h2>
+<h2 align="left">Your sentences:</h2>
 
 {% else %}
 Looks like you haven't added any sentences yet!
@@ -28,7 +29,7 @@ Looks like you haven't added any sentences yet!
 
 <table>
 <tr>
-<sent>{{sentence['sentence']}}</sent>
+<td colspan="3">{{sentence['sentence']}}</td>
 </tr>
 
 <tr>
@@ -59,7 +60,7 @@ Looks like you haven't added any sentences yet!
 
 <td>
 	{% if userID == g.user.id %}
-	<form name="delete" action="{{url_for('delete', sent_id=sentence[0])}}" method="GET">
+	<form name="delete" action="{{url_for('delete_sent', sent_id=sentence[0])}}">
 		<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete
         </button>
     </form>
@@ -81,6 +82,10 @@ Looks like you haven't added any sentences yet!
 	<p> Welcome to The Linguist's Kitchen! This app will guide you through performing a syntactic analysis on a sentence.</p>
 	<p> Just follow the steps in this guide.</p>
 	<p> To get started, add a new sentence or click to analyze a sentence that you've already entered. <p>        
+{% endblock %}
+
+{% block content %}
+<h2>This is the workspace box</h2>
 {% endblock %}
 
 </body>

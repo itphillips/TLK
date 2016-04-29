@@ -186,9 +186,9 @@ def confirm_sentence():
 							username=g.user.username))
 
 
-@app.route('/delete/<int:sent_id>')
+@app.route('/delete_sent/<int:sent_id>')
 @login_required
-def delete(sent_id):
+def delete_sent(sent_id):
 	# sentence = Sentence.query.get(sent_id)
 	dict_cur.execute("SELECT * FROM sentences WHERE id = %s;", (sent_id,))
 	sentence = dict_cur.fetchone()
@@ -317,79 +317,96 @@ def group(userID, sentenceID):
 		dict_cur.execute("SELECT * FROM sentences s INNER JOIN users u ON s.id_user = u.id WHERE s.id = %s;", (sentenceID,))
 		s_record = dict_cur.fetchone()
 		sentence = str(s_record[3])
-		print "sentence= ", sentence, type(sentence)	
+		print "group - sentence= ", sentence, type(sentence)	
 		userID = int(userID)
-		print "userID= ", userID, type(userID)
+		print "group - userID= ", userID, type(userID)
 		sentenceID = int(sentenceID)
-		print "sentenceID= ", sentenceID, type(sentenceID)
+		print "group - sentenceID= ", sentenceID, type(sentenceID)
+
+		dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s;", (sentenceID,))
+		identified_phrases = dict_cur.fetchall()
+		if identified_phrases != []:
+			identified_phrases = identified_phrases
+		print identified_phrases, "identified_phrases"
+
+		dict_cur.execute("SELECT w.id, w.word, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id = %s AND w.id_user = %s;", (sentenceID, userID))
+		wordlist = dict_cur.fetchall()
+		print "group - wordlist: ", wordlist
 
 		return render_template("grouptwo.html", 
 				sentence=sentence, 
 				userID=userID, 
-				sentenceID=sentenceID)
+				sentenceID=sentenceID,
+				identified_phrases=identified_phrases,
+				wordlist=wordlist)
 
-
-
-@app.route("/tag_phr_struct")
-@login_required
-def tag_phrase_structure():
-	sentence = request.args.get("sentence")
-	words = sentence.split()
-	userID = request.args.get("userID")
-	sentenceID = request.args.get("sentenceID")
-	print sentenceID, "sentenceID"
-	redo = request.args.get("redo")
-	print redo
-	
-	if redo == "True":
-		print "redo true"
-		word_positions_in_phrase_string = request.args.get("word_positions_in_phrase")
-	else:
-		word_positions_in_phrase_string = request.args.get("phrase")
-		print word_positions_in_phrase_string, "phrase"
-
-	word_positions_in_phrase = word_positions_in_phrase_string.split()
-	print word_positions_in_phrase, "word_positions_in_phrase"
-	
-	phrase=" ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
-	print phrase, "phrase"
-	phrase_type = request.args.get("phrase_type")
-	print phrase_type
-	phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], "NP": [("det","optional"), ("AP", "optional"), ("N","necessary"), ("PP","optional")], "VP":[("V","necessary"), ("PP","optional"), ("NP","optional"), ("NP2", "optional"), ("S","optional"), ("CP", "optional"), ("AP","optional"), ("PP2","optional")], "PP":[("P","necessary"), ("NP","optional") ,("PP","optional")], "AP":[("deg","optional"), ("A","necessary")], "CP": [("C","necessary"), ("S","necessary")] }
-
-	phrase_structure_options=phrase_type_dict[phrase_type]
-	print phrase_structure_options, "phrase_structure_options"
-	return render_template("tag_phrase_structure.html", 
-							sentence=sentence, 
-							userID=userID, 
-							phrase=phrase, 
-							phrase_type=phrase_type, 
-							phrase_structure_options=phrase_structure_options, 
-							sentenceID=sentenceID, 
-							word_positions_in_phrase=word_positions_in_phrase_string)
 
 
 @app.route("/confirm_phrase")
 @login_required
 def confirm_phrase():
+	sentence = str(request.args.get("sentence"))
+	print "tagps sentence: ", sentence, type(sentence)
+	words = sentence.split()
+	userID = int(request.args.get("userID"))
+	sentenceID = int(request.args.get("sentenceID"))
+	print "tag ps sentenceID: ", sentenceID
+	phrase_type = str(request.args.get("phrase_type"))
 	phrase_structure=request.args.get("phrase_structure")
-	sentence= request.args.get("sentence")
-	sentenceID=request.args.get("sentenceID")
-	userID = request.args.get("userID")
-	phrase_type = request.args.get("phrase_type")
-	phrase=request.args.get("phrase")
-	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
-	print word_positions_in_phrase, "word_positions_in_phrase"
-	print phrase, "phrase"
-	print phrase_structure, "phrase_structure"
+	# redo = request.args.get("redo")
+	# print redo
+	
+	# if redo == "True":
+	# 	print "redo true"
+	# 	word_positions_in_phrase_string = request.args.get("word_positions_in_phrase")
+	# else:
+
+	word_positions_in_phrase = str(request.args.get("word_positions_in_phrase")).split()
+	print "word_positions_in_phrase: ", word_positions_in_phrase
+	
+	phrase=" ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
+	print "phrase: %s - %s" % (phrase, phrase_type)
+
+	# phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], 
+	# 					"NP": [("det","optional"), ("AP", "optional"), ("N","necessary"), ("PP","optional")], 
+	# 					"VP":[("V","necessary"), ("PP","optional"), ("NP","optional"), ("NP2", "optional"), ("S","optional"), ("CP", "optional"), ("AP","optional"), ("PP2","optional")], 
+	# 					"PP":[("P","necessary"), ("NP","optional") ,("PP","optional")], 
+	# 					"AP":[("deg","optional"), ("A","necessary")], 
+	# 					"CP": [("C","necessary"), ("S","necessary")] }
+
+	# phrase_structure_options=phrase_type_dict[phrase_type]
+	# print "PS options: ", phrase_structure_options
 	return render_template("confirm_phrase.html", 
 							sentence=sentence, 
+							sentenceID=sentenceID,
 							userID=userID, 
 							phrase=phrase, 
 							phrase_type=phrase_type, 
 							phrase_structure=phrase_structure, 
-							sentenceID=sentenceID, 
 							word_positions_in_phrase=word_positions_in_phrase)
+
+
+# @app.route("/confirm_phrase")
+# @login_required
+# def confirm_phrase():
+# 	phrase_structure=request.args.get("phrase_structure")
+# 	sentence= request.args.get("sentence")
+# 	sentenceID=request.args.get("sentenceID")
+# 	userID = request.args.get("userID")
+# 	phrase_type = request.args.get("phrase_type")
+# 	phrase=request.args.get("phrase")
+# 	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
+# 	print word_positions_in_phrase, "word_positions_in_phrase"
+# 	print phrase, "phrase"
+# 	print phrase_structure, "phrase_structure"
+# 	return render_template("confirm_phrase.html", 
+# 							sentence=sentence, 
+# 							userID=userID, 
+# 							phrase=phrase, 
+# 							phrase_type=phrase_type, 
+# 							phrase_structure=phrase_structure, 
+# 							sentenceID=sentenceID, 
+# 							word_positions_in_phrase=word_positions_in_phrase)
 
 
 @app.route("/phr_to_database")
@@ -431,6 +448,7 @@ def put_phrase_in_database():
 	wordposlist = phrase.split()
 	for item in wordposlist:
 		position = wordposlist.index(item)
+		#the problem assigning word id occurs here
 		dict_cur.execute("SELECT id FROM words WHERE word = %s AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
 		wordID = dict_cur.fetchone()
 
@@ -469,6 +487,30 @@ def put_phrase_in_database():
 							sentenceID=sentenceID, 
 							userID=userID))
 
+@app.route('/delete_phr/<int:phr_id>')
+@login_required
+def delete_phr(phr_id):
+	userID = int(request.args.get("userID"))
+	sentenceID = int(request.args.get("sentenceID"))
+	dict_cur.execute("SELECT * FROM phrases WHERE id = %s;", (phr_id,))
+	phrase = dict_cur.fetchone()
+	# print "this is id", sent_id
+	# print "this is sentence", sentence
+
+	#this is copied from sentence delete - need to update it later 4/29/16
+	if phrase is None:
+		flash('Phrase not found!')
+		return redirect(url_for('user', 
+								username=g.user.username))
+	# if userID != g.user.id:
+	# 	flash('You cannot delete this sentence!')
+	# 	return redirect(url_for('user', 
+	# 							username=g.user.username))
+
+	dict_cur.execute("DELETE FROM phrases p WHERE p.id = %s;", (phr_id,))	
+	return redirect(url_for('group',
+							userID=userID,
+							sentenceID=sentenceID))
 
 @app.route("/tagSubj")
 @login_required
@@ -672,6 +714,7 @@ def analyzed_sent():
 
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY wpp.id_word ASC;", (sentenceID,))
 		phrases = dict_cur.fetchall()
+		print phrases, "as phrases"
 
 	except Exception as e:
 		print e

@@ -109,7 +109,7 @@ class Phrase(db.Model):
 		return '<Phrase %r>' % (self.phrase)
 
 
-
+#this will serve as the association table for words and phrases
 class Word_phrase_position(db.Model):
 	__tablename__ = 'word_phrase_positions'
 	id = db.Column(db.Integer, primary_key = True)
