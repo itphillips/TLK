@@ -38,7 +38,7 @@
 		for (var i = 0, element; element = elements[i++];) {
 			console.log(element);
     	if (element.value === "active"){
-    		target.value = target.value.concat(element.id).concat(" ");
+    		target.value = target.value.concat(element.id).concat("|");
 		}
 		}
 	}
@@ -55,11 +55,8 @@
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 	<!-- <input type="hidden" id="refreshed" value="no"> -->
 
-<!-- {% set count = 0 %} -->
-<!-- {% for word in sentence.split() %} -->
 	{% for word in wordlist %}
-	<button type = "button" id = "{{word}}[0]" onClick="wordClick(event)" style="font-size:16px;height:26px">{{word}}</button>
-		<!-- {% set count = count + 1 %} -->
+	<button type = "button" id = "{{word}}" onClick="wordClick(event)" style="font-size:16px;height:26px">{{word[1]}}</button>
 	{% endfor %}
 <!--- dropdown for type -->
 
@@ -73,7 +70,7 @@
 	<br> <input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
 	</p>
 
-	<button type="submit" name = "word_positions_in_phrase" onClick = "submitClick(event)" value = "">Submit</button>
+	<button type="submit" name = "words_in_phrase" onClick = "submitClick(event)" value = "">Submit</button>
  </form> 
 
  <br>
@@ -90,29 +87,34 @@
 
 <td style="vertical-align:top;padding:auto;text-align: center">
 <h2>These are the phrases you've identified</h2>
-{% if identified_phrases == [] %}
-<p>None yet! <br> Click on the buttons to the left to get started.</p>
+
+{% if identified_phrases != [] %}
+	<table class="center">
+
+	{% for phrase in identified_phrases %}
+		<tr>
+		<td><p>{{phrase[2]}} - {{phrase[1]}}</p></td>
+
+		{% if userID == g.user.id %}
+			<td>
+			<form name="delete" action="{{url_for('delete_phr', phr_id=phrase[0])}}" method="GET">
+				<input type="hidden" name="userID" value="{{userID}}">
+				<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+				<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete</button>
+			</form>
+			</td>
+		{% endif %}
+
+		</tr>
+	{% endfor %}
+
+	</table>
 
 {% else %}
-<table class="center">
+	<p style="color:red;">None yet! <br> Click on the buttons to the left to get started.</p>
 
-{% for phrase in identified_phrases %}
-<tr>
-<td><p>{{phrase[2]}} - {{phrase[1]}}</p></td>
-<td>
-{% if userID == g.user.id %}
-<form name="delete" action="{{url_for('delete_phr', phr_id=phrase[0])}}" method="GET">
-	<input type="hidden" name="userID" value="{{userID}}">
-	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete
-    </button>
-</form>
-</td>
 {% endif %}
-</tr>
-{% endfor %}
-</table>
-{% endif %}
+
 </td>
 </tr>
 </table>

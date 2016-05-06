@@ -352,7 +352,7 @@ def confirm_phrase():
 	sentenceID = int(request.args.get("sentenceID"))
 	print "tag ps sentenceID: ", sentenceID
 	phrase_type = str(request.args.get("phrase_type"))
-	phrase_structure=request.args.get("phrase_structure")
+	# phrase_structure=request.args.get("phrase_structure")
 	# redo = request.args.get("redo")
 	# print redo
 	
@@ -361,10 +361,27 @@ def confirm_phrase():
 	# 	word_positions_in_phrase_string = request.args.get("word_positions_in_phrase")
 	# else:
 
-	word_positions_in_phrase = str(request.args.get("word_positions_in_phrase")).split()
-	print "word_positions_in_phrase: ", word_positions_in_phrase
+	words_in_phrase = str(request.args.get("words_in_phrase")).split("|")
+	for word in words_in_phrase:
+		if word == "":
+			words_in_phrase.remove(word)
+
+	wplist = []
+	for word in words_in_phrase:
+		word = ast.literal_eval(word)
+		wplist.append(word)
+		print word, type(word)
+
+	print "words_in_phrase: ", wplist, type(wplist)
 	
-	phrase=" ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
+	phrase = ""
+	for word in wplist:
+		phrase = phrase + word[1] + " "
+
+	phrase = phrase.rstrip()
+	print phrase
+
+	# " ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
 	print "phrase: %s - %s" % (phrase, phrase_type)
 
 	# phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], 
@@ -382,8 +399,8 @@ def confirm_phrase():
 							userID=userID, 
 							phrase=phrase, 
 							phrase_type=phrase_type, 
-							phrase_structure=phrase_structure, 
-							word_positions_in_phrase=word_positions_in_phrase)
+							# phrase_structure=phrase_structure, 
+							words_in_phrase=wplist)
 
 
 # @app.route("/confirm_phrase")
@@ -412,75 +429,80 @@ def confirm_phrase():
 @app.route("/phr_to_database")
 @login_required
 def put_phrase_in_database():
-	phrase_structure=request.args.get("phrase_structure")
-	sentence= request.args.get("sentence")
-	sentenceID=request.args.get("sentenceID")
-	# userID = request.args.get("userID")
-	# print "this is phr to db userID", userID
+	print "prh in database"
+	# phrase_structure = request.args.get("phrase_structure")
+	# print "phrase structure: ", phrase_structure, type(phrase_structure)
+	sentence = str(request.args.get("sentence"))
+	sentenceID = int(request.args.get("sentenceID"))
 	username=g.user.username
-	phrase_type = request.args.get("phrase_type")
-	phrase=request.args.get("phrase")
-	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
-	print word_positions_in_phrase
-	print "prh in database "
+	phrase_type = str(request.args.get("phrase_type"))
+	phrase = str(request.args.get("phrase"))
+	print "phrase: ", phrase, type(phrase)
+	words_in_phrase = ast.literal_eval(request.args.get("words_in_phrase"))
+	print "words in phrase: ", words_in_phrase, type(words_in_phrase)
 
 	try:
 		dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
 		userID = dict_cur.fetchone()[0]
-		print type(userID), userID
+		print "userID: ", userID, type(userID)
 	except Exception as e:
 		print e
+
+
+	#insert phrase into phrases table
+	#this gets the word id for the first word in the phrase
+	firstwordid = words_in_phrase[0][0]
+	try:
+		dict_cur.execute("SELECT * FROM phrases p INNER JOIN word_phrase_positions wpp ON p.id = wpp.id_phrase WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s AND wpp.id_word = %s;", (phrase, sentenceID, userID, firstwordid))
+		dup_phrase = list(dict_cur.fetchall())
+		print "found duplicate phrase: ", dup_phrase, type(dup_phrase)
+
+		#delete duplicate phrase and its dependencies
+		if dup_phrase != []:
+			for record in dup_phrase:
+				dict_cur.execute("DELETE FROM phrases p WHERE p.id = %s;", (record[0],))
+				print "deleted duplicate phrase entry: ", record
+	except Exception as e:
+		print e
+
 
 	try: 
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
 		print e
-	print "inserted phrases"
+	print "inserted phrase into phrases table"
 
+
+	#get phrase ID
 	try:
-		dict_cur.execute("SELECT id FROM phrases WHERE phrase = %s AND phrase_type = %s and id_user = %s;", (phrase, phrase_type, userID))
+		dict_cur.execute("SELECT * FROM phrases p WHERE p.phrase = %s;", (phrase,))
+		phraseID = dict_cur.fetchone()[0]
+		print phraseID
 	except Exception as e:
 		print e
-	print "select from phrases"
-	phraseID=dict_cur.fetchone()
-	print phraseID, "phrase id"
 
-	wordposlist = phrase.split()
-	for item in wordposlist:
-		position = wordposlist.index(item)
-		#the problem assigning word id occurs here
-		dict_cur.execute("SELECT id FROM words WHERE word = %s AND id_sentence = %s AND id_user = %s;", (item, sentenceID, userID))
-		wordID = dict_cur.fetchone()
 
-		print "the id for '%s' is: %s" % (item, wordID[0])
-		dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (position, wordID[0], sentenceID, phraseID[0]))
+	#check word_phrase_positions table 
+	try:
+		for word in words_in_phrase:
+			wordid = word[0]
+			wordpos = words_in_phrase.index(word)
+			dict_cur.execute("SELECT wpp.id, w.word, wpp.id_phrase FROM word_phrase_positions wpp INNER JOIN words w ON w.id = wpp.id_word INNER JOIN sentences s ON wpp.id_sentence = s.id WHERE wp_linear_position = %s AND wpp.id_word = %s AND wpp.id_phrase = %s AND s.id = %s AND s.id_user = %s;", (wordpos, wordid, phraseID, sentenceID, userID))
+			found_wpp_match = list(dict_cur.fetchall())
+			print "found_wpp_match=", found_wpp_match, type(found_wpp_match)
 
-	# Just commented these lines out on 3/22/16 - may need to uncomment them if it turns out they do something required later	
-	# try:
-	# 	dict_cur.execute("SELECT position, wordID from words_sentences WHERE sentenceID = '{}';".format(sentenceID))
-	# 	wordIDPairs= dict_cur.fetchall()
-	# except Exception as e:
-	# 	print e
-	# print "select id pairs"
-	# wordIDPairs.sort(key=lambda x: int(x[1]))
-	# print wordIDPairs,"wordIDPairs"
-	# wordIDs=[wordID[1] for wordID in wordIDPairs]
-	# print wordIDs, "wordIDs"
-	# print word_positions_in_phrase, "word_positions_in_phrase"
-	# print type(word_positions_in_phrase)
-	# word_positions_in_phrase=word_positions_in_phrase.split()
-	# try:
-	# 	word_ids_in_phrase = [wordIDs[int(position)] for position in word_positions_in_phrase]
-	# except Exception as e:
-	# 	print e
-	# print word_ids_in_phrase, "word_ids_in_phrase"
-	# #anddd check to see if they're in words_phrases. They probably are if they're in one of the others...need to reason about this]
-	# for i in range(len(word_ids_in_phrase)):
-	# 	try:
-	# 		dict_cur.execute("INSERT INTO words_phrases (wordID, phraseID, position, sentenceid) VALUES (%s, %s, %s, %s)", (wordIDs[i], phraseID, i, sentenceID))
-	# 	except Exception as e:
-	# 		print e
-	# print "hi"
+			if found_wpp_match != []: 
+
+				#delete wpp entries and their dependencies
+				dict_cur.execute("DELETE FROM word_phrase_positions wpp WHERE wp_linear_position = %s AND wpp.id_word = %s AND s.id = %s AND s.id_user = %s;", (wordpos, wordid, sentenceID, userID))
+				print "deleted wpp entry!"
+
+			#insert record into word_phrase_positions
+			dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (wordpos, wordid, sentenceID, phraseID))
+			print "sent wpp to db= ", word[1]
+	except Exception as e:
+		print e
+
 	return redirect(url_for('group', 
 							redo=False, 
 							sentence=sentence, 
@@ -677,14 +699,20 @@ def prompt_new_sentence():
 @app.route("/analyzed_sent")
 @login_required
 def analyzed_sent():
+	print "analyzed_sent function"
 	error= request.args.get("error")	
-	userID = request.args.get("userID")
-	sentence = request.args.get("sentence")
-	print "analyzed_sent", type(sentence), sentence
-	language=request.args.get("sentence_language")
+	userID = int(request.args.get("userID"))
+	print "userID: ", userID
+	sentence = str(request.args.get("sentence"))
+	print "analyzed_sent", sentence, type(sentence)
+	sentenceID = int(request.args.get("sentenceID"))
+	print "sentenceID: ", sentenceID
+	language = str(request.args.get("sentence_language"))
 
 
 	try:
+		#need to have sentence ID passed from template - if the user inputs the same sentence twice, searching the db
+		#by sentence will be a problem - the above sentenceID isn't passing the right number
 		dict_cur.execute("SELECT id FROM sentences WHERE sentence = %s;", (sentence,))
 		sentenceID = dict_cur.fetchone()[0]
 
@@ -712,9 +740,33 @@ def analyzed_sent():
 		dict_cur.execute("SELECT collection_date FROM sentences WHERE id = %s;", (sentenceID,))
 		collection_date = dict_cur.fetchone()[0]
 
-		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY wpp.id_word ASC;", (sentenceID,))
-		phrases = dict_cur.fetchall()
-		print phrases, "as phrases"
+		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
+		phrases = list(dict_cur.fetchall())
+		print "phrases: ", phrases, type(phrases)
+
+		dict_cur.execute("SELECT DISTINCT phrase_type FROM phrases p INNER JOIN sentences s ON p.id_sentence = s.id WHERE s.id = %s;", (sentenceID,))
+		phrase_types = dict_cur.fetchall()
+
+		ptlist = []
+		for i in phrase_types:
+			li = ast.literal_eval(str(i))
+			print "li: ", li, type(li)
+			ptlist.append(li)
+
+		print "pt list: ", ptlist, type(ptlist)
+		print "phrase types in sentence '%s' : %s" % (sentence, ptlist)
+
+		phrase_groups = []
+		for t in ptlist:
+			print "type", t, type(t)
+			print "t[0]: ", t[0], type(t[0])
+			for p in phrases:
+				print "p[7]: ", p[7], type(p[7])
+				if p[7] == t[0]:
+					t.append(p[6])
+			phrase_groups.append(t)
+
+		print "phrase groups: ", phrase_groups
 
 	except Exception as e:
 		print e
@@ -730,6 +782,8 @@ def analyzed_sent():
 							notes=notes, #there is no field to enter notes in the sentence input screen
 							collection_date=collection_date,
 							POSlist=POSlist,
+							phrase_types=ptlist,
+							phrase_groups=phrase_groups,
 							phrases=phrases
 							)
 

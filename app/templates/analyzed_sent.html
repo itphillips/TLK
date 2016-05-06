@@ -24,23 +24,23 @@
 <!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
 
 <table class="center">
-<tr>
-{% for i in POSlist %}
-<th>{{i[0]}}</th>
-{% endfor %}
-</tr>
+	<tr>
+	{% for i in POSlist %}
+		<th>{{i[0]}}</th>
+	{% endfor %}
+	</tr>
 
-<tr>
-{% for i in POSlist %}
-<th>|</th>
-{% endfor %}
-</tr>
+	<tr>
+	{% for i in POSlist %}
+		<th>|</th>
+	{% endfor %}
+	</tr>
 
-<tr>
-{% for i in POSlist %}
-<th>{{i[1]}}</th>
-{% endfor %}
-</tr>
+	<tr>
+	{% for i in POSlist %}
+		<th style="padding-left: 15px;padding-right: 15px;">{{i[1]}}</th>
+	{% endfor %}
+	</tr>
 </table>
 <!-- </p>  -->
 
@@ -50,29 +50,30 @@
 
 <hr>
 <h2>Syntactic phrases:</h2>
-<table class="center">
-<tr>
-{% for i in phrases %}
-<th>{{i[6]}}</th>
-{% endfor %}
-</tr>
+<table class="center" >
 
-<tr>
-{% for i in phrases %}
-<th>|</th>
-{% endfor %}
-</tr>
+	<tr>
+	{% for i in phrase_groups %}
+		<th style="font-weight:bold;font-size:30px;">{{i[0]}}</th>
+	{% endfor %}
+	</tr>
 
-<tr>
-{% for i in phrases %}
-<th>{{i[7]}}</th>
-{% endfor %}
-</tr>
+	<tr>
+	{% for group in phrase_groups %}
+		<td style="vertical-align: top;padding-left: 15px;padding-right: 15px;text-align: left;border-left: 1px solid; border-right: 1px solid;">
+		{% for item in group[1:] %}
+			<p>{{item}}</p>
+		{% endfor %}
+		</td>
+	{% endfor %}
+	</tr>
 </table>
 
 <hr>
 <h2>Syntactic structure:</h2>
 <p>syntactic structure</p>
+
+
 <hr><br>
 <form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
     <button type="submit" style="font-size:16px;height:26px">Reanalyze this sentence
