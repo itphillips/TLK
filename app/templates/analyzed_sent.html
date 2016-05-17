@@ -90,11 +90,11 @@
 {% endblock %}
 
 {% block guide %}
-	<h2 align="left">Sentence info: </h2>
-	<p align="left" style="font-size:20px;color:blue">{{sentence}}</p>
+	<h2 align="left" style="font-family:arial">Sentence info: </h2>
+	<p align="left" style="font-size:20px;color:#47476b">{{sentence}}</p>
 	<p align="left"><b>Language:</b> {{language}}</p>
 	<p align="left"><b>Sentence type:</b> {{sent_type}}</p>
-	<p align="left"><b>English gloss:</b> {{gloss}}</p>
+	<p align="left"><b>Meaning:</b> {{gloss}}</p>
 	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
 	<p align="left"><b>Notes:</b> {{notes}}</p>
 	<form name="analysis" action="{{url_for('user', username=username)}}" method="GET">

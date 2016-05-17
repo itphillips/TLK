@@ -67,7 +67,8 @@ table.center {
         #guide	{
         	display:inline-block;
             position:relative;
-        	background-color:#FFFFCC;
+        	/*background-color:#FFFFCC;*/
+            background-color:#99ffeb;
             border-radius:25px;
         	width:40%;
         	float:left;
@@ -76,7 +77,7 @@ table.center {
         	text-align:center;
             margin-top:20px;
             /*margin-right:5px;*/
-        	border:solid 2px black;
+        	border:solid 2px gray;
         }
 
         #helpbox {
@@ -90,7 +91,7 @@ table.center {
             padding-bottom:20px;
             margin-top:20px;
             /*margin-left:5px;*/
-            border:solid 2px black;
+            border:solid 2px gray;
             border-radius:25px;
             text-align:center;
         }
@@ -109,7 +110,7 @@ table.center {
 /*            margin-left:5px;*/
             margin-left:auto;
             margin-right:auto;
-            border:solid 2px black;
+            border:solid 2px gray;
             text-align:center;
         }    	
 
@@ -132,7 +133,8 @@ table.center {
 
 <!--This is the title image header-->
     <div id="header">
-            <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="350" height="105">    
+            <!-- <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="350" height="105">   --> 
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="500" height="105"> 
     </div>
 
 <!--this is the menu box-->
@@ -140,7 +142,7 @@ table.center {
         <li><a href={{ url_for('home') }}>About TLK</a></li>
         {% if g.user.is_authenticated() %}
         <li><a href="{{ url_for('user', username=g.user.username) }}">Home</a></li>
-        <li><a href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
+        <li><a target="_blank" href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
         <!-- <li><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing Conventions</a></li> -->
         <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
         {% endif %}
