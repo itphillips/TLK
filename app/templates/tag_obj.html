@@ -56,42 +56,12 @@ var tag_DO=document.getElementById("tag_DO");
 <p style="font-size: 30px;">
 Does "{{sentence}}" have a direct object?
 </p>
-{% if error != None %}
+<!-- {% if error != None %}
 <h4 style="color:red"> Click "yes" or "no"! </h4>
-{% endif %}
+{% endif %} -->
 
 <table class="center">
 <tr>
-
-<td style="padding-right:5px">
-	<form action="{{url_for('confirm_obj')}}">
-
-		<button type="button" id="yes" name="yes_DO" onClick="showTagDO()" style="font-size:16px;height:26px">Yes</button>
-
-		<div id="tag_DO" style="display:none">
-		<p style="font-size: 30px;">Which phrase is the direct object? (Click one.)</p>
-		<!-- 
-
-		<div style="display:none">
-		<button type="button" id="DO" style="outline: 0;" value="active">hiding!</button>
-		</div> -->
-
-
-		{% for i in range(phrases|count) %}
-		<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
-		{% endfor %}
-
-		<input type="hidden" name="sentence" value="{{sentence}}">
-		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-		<input type="hidden" name="userID" value="{{userID}}">
-
-
-		<br>
-		<button type="submit" name="dobject" onClick="submitClick(event)" value="">Submit</button>
-		</div>
-
-	</form>
-</td>
 
 <td style="padding-left:5px">
 	<form name="no_obj" action="{{url_for('analyzed_sent')}}">
@@ -102,10 +72,42 @@ Does "{{sentence}}" have a direct object?
 		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 		<input type="hidden" name="userID" value="{{userID}}">
 	</form>
+
+
+
 </td>
 
+<td style="padding-right:5px">
+	<button type="button" id="yes" name="yes_DO" onClick="showTagDO()" style="font-size:16px;height:26px">Yes</button>
+</td>
 </tr>
 </table>
+
+<form action="{{url_for('confirm_obj')}}">
+
+	<div id="tag_DO" style="display:none">
+	<p style="font-size: 30px;">Which phrase is the direct object? (Click one.)</p>
+	<!-- 
+
+	<div style="display:none">
+	<button type="button" id="DO" style="outline: 0;" value="active">hiding!</button>
+	</div> -->
+
+
+	{% for i in range(phrases|count) %}
+	<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+	{% endfor %}
+
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+
+
+	<br>
+	<button type="submit" name="dobject" onClick="submitClick(event)" value="">Submit</button>
+	</div>
+</form>
+
 
 
 {% endblock %}

@@ -12,7 +12,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
-from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Gram_function
+from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
 conn.set_session(autocommit=True)
@@ -43,7 +43,7 @@ def login():
 	#g global is set up by flask as a place to store and share data during the life
 	#of a request - this stores the logged in user
 	if g.user is not None and g.user.is_authenticated():
-		return redirect(url_for('user', username=g.user.username))
+		return redirect(url_for('user', userID=g.user.id))
 	#instantiated object from LoginForm()
 	form = LoginForm()
 	if form.validate_on_submit():
@@ -103,7 +103,9 @@ def after_login(resp): #resp argument contains information returned by openid pr
 	#next, meaning the page the user wants to see after logging in (e.g., they tried
 	#to visit a user-specific page, but were stopped b/c they need to be logged in; 
 	#after logging in, this page should appear)
-	return redirect(request.args.get('next') or url_for('user', username=g.user.username))
+	print "\ng.user.username: ", g.user.username, type(g.user.username)
+	print "\ng.user.id: ", g.user.id, type(g.user.id)
+	return redirect(request.args.get('next') or url_for('user', userID=g.user.id))
 
 @app.route('/logout')
 def logout():
@@ -111,36 +113,38 @@ def logout():
 	return redirect(url_for('home'))
 
 
-@app.route('/user/<username>')
-@login_required #ensures this page is only seen by logged in users
-def user(username): #'username' gets passed from after_login(), =g.user.username
-	#this is SQLalchemy version
-	#user = User.query.filter_by(username=username).first()
+@app.route('/user/<userID>')
+@login_required 
+def user(userID): #'userID' gets passed from after_login(), =g.user.id
+	print "\nthis is user function"
+	# dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
+	# userID = dict_cur.fetchone()[0]
+	userID = int(userID)
+	print "userID: ", userID, type(userID)
 	
-	dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
-	userID = dict_cur.fetchone()
-	#returns list containing users.id as the only element
-	
-	dict_cur.execute("SELECT username FROM users WHERE username = %s;", (username,))
-	user = dict_cur.fetchone()
-	#returns list containing users.username as the only element
+	dict_cur.execute("SELECT username FROM users u WHERE u.id = %s;", (userID,))
+	user = dict_cur.fetchone()[0]
+	print "user: ", user, type(user)
 	
 	if user == None:
-		flash('User %s not found.', (username))
+		flash('User %s not found.', (user))
 		return redirect(url_for('login'))
 
 	else:
 		try:
-			dict_cur.execute("SELECT * FROM sentences INNER JOIN users ON users.id = sentences.id_user WHERE users.id = %s;", (userID[0],))
+			dict_cur.execute("SELECT * FROM sentences s WHERE s.id_user = %s;", (userID,))
 			sentences = dict_cur.fetchall()
-			print sentences[0]
+			print "\nsentences: "
+			for record in sentences:
+				print record, type(record)
 		except Exception as e:
 			print e
 
 		return render_template('usertwo.html',
-								user=user[0],
-								sentences=sentences,
-								userID=userID[0])
+								user=user,
+								userID=userID,
+								sentences=sentences
+								)
 
 @app.route("/input")
 @login_required
@@ -183,7 +187,7 @@ def confirm_sentence():
 	#continued_session=request.args.get("continued_session")
 	print "done confirm_sentence"
 	return redirect(url_for('user',
-							username=g.user.username))
+							userID=g.user.id))
 
 
 @app.route('/delete_sent/<int:sent_id>')
@@ -198,7 +202,7 @@ def delete_sent(sent_id):
 	if sentence is None:
 		flash('Sentence not found!')
 		return redirect(url_for('user', 
-								username=g.user.username))
+								userID=g.user.id))
 	# if userID != g.user.id:
 	# 	flash('You cannot delete this sentence!')
 	# 	return redirect(url_for('user', 
@@ -206,7 +210,7 @@ def delete_sent(sent_id):
 
 	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s;", (sent_id,))	
 	return redirect(url_for('user', 
-							username=g.user.username))
+							userID=g.user.id))
 
 
 @app.route("/tagPOS")
@@ -762,55 +766,56 @@ def confirm_obj():
 @app.route("/analyzed_sent")
 @login_required
 def analyzed_sent():
-	print "analyzed_sent function"
+	print "\nanalyzed_sent function"
 	error= request.args.get("error")	
 	userID = int(request.args.get("userID"))
 	print "userID: ", userID
 	sentence = str(request.args.get("sentence"))
-	print "analyzed_sent", sentence, type(sentence)
+	print "analyzed_sent: ", sentence, type(sentence)
 	sentenceID = int(request.args.get("sentenceID"))
-	print "sentenceID: ", sentenceID
+	print "sentenceID: ", sentenceID, type(sentenceID)
 
 
 	try:
-		#need to have sentence ID passed from template - if the user inputs the same sentence twice, searching the db
-		#by sentence will be a problem - the above sentenceID isn't passing the right number
-		dict_cur.execute("SELECT id FROM sentences WHERE sentence = %s;", (sentence,))
-		sentenceID = dict_cur.fetchone()[0]
-		print "analyzed, real sent id: ", sentenceID
-
+		#get sentence language
 		dict_cur.execute("SELECT sentence_language sl FROM sentences s WHERE s.id=%s;", (sentenceID,))
 		language = dict_cur.fetchone()[0].title()
-		print "analyzed lang: ", language, type(language)
+		print "lang: ", language, type(language)
 
+		#get list of parts of speech in sentence
 		dict_cur.execute("SELECT word, pos FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id=%s ORDER BY w.id ASC;", (sentenceID,))
 		POSlist = dict_cur.fetchall()
+		# for i in POSlist:
+		# 	print i
 
-
+		#get username for sentence
 		dict_cur.execute("SELECT username FROM users WHERE id=%s;", (userID,))
 		username = dict_cur.fetchone()[0]
+		# print "username: ", username, type(username)
 
-
+		#get sentene type for sentence
 		dict_cur.execute("SELECT sentence_type FROM sentences WHERE id = %s;", (sentenceID,))
 		sent_type = dict_cur.fetchone()[0]
 
-
+		#get gloss for sentence
 		dict_cur.execute("SELECT english_gloss FROM sentences WHERE id = %s;", (sentenceID,))
 		english_gloss = dict_cur.fetchone()[0]
 
-
+		#get notes for sentence
 		dict_cur.execute("SELECT notes FROM sentences WHERE id = %s;", (sentenceID,))
 		notes = dict_cur.fetchone()[0]
 
-
+		#get collection date for sentence
 		dict_cur.execute("SELECT collection_date FROM sentences WHERE id = %s;", (sentenceID,))
 		collection_date = dict_cur.fetchone()[0].date()
-		print "analyzed collection date: ", collection_date, type(collection_date)
+		# print "collection date: ", collection_date, type(collection_date)
 
+#not sure why this is needed 6/29/16 - IP
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
-		phrases = list(dict_cur.fetchall())
+		phrases = dict_cur.fetchall()
 		print "phrases: ", phrases, type(phrases)
 
+		#get distinct phrase types present in sentence
 		dict_cur.execute("SELECT DISTINCT phrase_type FROM phrases p INNER JOIN sentences s ON p.id_sentence = s.id WHERE s.id = %s;", (sentenceID,))
 		phrase_types = dict_cur.fetchall()
 
@@ -856,22 +861,34 @@ def analyzed_sent():
 		#get object value
 		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
 		dobj = dict_cur.fetchone()[10]
-		print "subject: ", dobj, type(dobj)
+		print "dobj: ", dobj, type(dobj)
 
-
-		#get linear position of verb
-		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
-		verblinpos = dict_cur.fetchone()[5]
-		print "verblinpos: ", verblinpos, type(verblinpos)
-		
 		#get verb value
-		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
-		verb = dict_cur.fetchone()[1]
+		try:
+			dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
+			record = dict_cur.fetchone()
+			if record != []:
+				verb = record[1]
+				verbid = record[0]
+
+				#get linear position of verb
+				dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.id = %s;", (sentenceID, userID, verbid))
+				verblinpos = dict_cur.fetchone()[5]
+		except:
+			verb = "no verb"
+			verbid = "no verbid"
+			verblinpos = "no verblinpos"
+
 		print "verb: ", verb, type(verb)
+		print "verbid: ", verbid, type(verbid)
+		print "verblinpos: ", verblinpos, type(verblinpos)
 
 
 		#determine basic word order based on above info
-		if verblinpos < subjectlinpos and subjectlinpos < dobjlinpos:
+		if verb == "no verb":
+			bwo = []
+
+		elif verblinpos < subjectlinpos and subjectlinpos < dobjlinpos:
 			bwo = [["Verb", verb], ["Subject", subject], ["Object", dobj], ["(VSO)"]]
 
 		elif verblinpos > subjectlinpos and subjectlinpos > dobjlinpos:
@@ -892,11 +909,9 @@ def analyzed_sent():
 		elif subjectlinpos < verblinpos:
 			bwo = [["Subject", subject], ["Verb", verb], ["(SV)"]]
 
-		elif subjectlinpos > verblinpos: 
+		else: 
 			bwo = [["Verb", verb], ["Subject", subject], ["(VS)"]]
-
-		else:
-			bwo = ["This sentence is missing a subject and/or verb."]
+			
 
 		print "bwo: ", bwo, type(bwo)
 

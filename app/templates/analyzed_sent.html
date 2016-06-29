@@ -46,6 +46,8 @@
 
 <hr>
 <h2>Basic word order:</h2>
+
+{% if bwo!=[] %}
 <table class="center">
 	<tr>
 	{% for i in bwo[:-1] %}
@@ -66,6 +68,12 @@
 	</tr>
 
 </table>
+
+{% else %}
+<p style="color:red;"> This sentence is missing a verb. Can't determine basic word order.
+</p>
+
+{% endif %}
 
 <hr>
 <h2>Syntactic phrases:</h2>
@@ -116,7 +124,7 @@
 	<p align="left"><b>Meaning:</b> {{gloss}}</p>
 	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
 	<p align="left"><b>Notes:</b> {{notes}}</p>
-	<form name="analysis" action="{{url_for('user', username=username)}}" method="GET">
+	<form name="analysis" action="{{url_for('user', userID=userID)}}" method="GET">
         <button type="submit" style="font-size:16px;height:26px">See all sentences
         </button>
         <input type="hidden" name="userID" value="{{userID}}">

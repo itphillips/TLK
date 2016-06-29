@@ -17,72 +17,75 @@
 
 <body>
 
+{% block instruction %}
+    <h1>Identify the part of speech for each word</h1>
+{% endblock %}
+
 {% block content %}
           
-<!--This is the workspace box-->
-<!--    <div id="workspace"> -->
-        {% if error != None %}
-        <h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
-        {% endif %}
-<!--         <p><font size=6> {{ sentence }} </font></p>
-        <div> -->
-		<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
-       
-        <table class="center">
-        <tr>
-		{% for word in sentence.split() %}
-		<th> {{word}} </th>
-        {% endfor %}
-        </tr>
+    {% if error != None %}
+    <h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
+    {% endif %}
 
-        {% set count = 0 %}
-        <tr>
-        {% for word in sentence.split() %}
-        <th>
-      <select name="{{count}}" style="width:130px; font-size:16px;height:26px;">
-        <option value="adjective">adjective</option>
-        <option value="adverb">adverb</option>
-        <option value="conjunction">conjunction</option>
-        <option value="complementizer">complementizer</option>
-        <option value="determiner">determiner</option>
-        <option value="noun">noun</option>
-        <option value="preposition">preposition</option>
-        <option value="pronoun">pronoun</option>
-        <option value="verb">verb</option>
-        <option value="verb-auxiliary">verb-auxiliary</option>
-      </select>
-				
-        {% set count = count+1 %}
-		{% endfor %}
-        </th>
-        </tr>
+	<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
+   
+        <table class="center">
+            <tr>
+            	{% for word in sentence.split() %}
+            	   <th> {{word}} </th>
+                {% endfor %}
+            </tr>
+
+            {% set count = 0 %}
+            <tr>
+                {% for word in sentence.split() %}
+                    <th>
+                      <select name="{{count}}" style="width:130px; font-size:16px;height:26px;">
+                        <option value="adjective">adjective</option>
+                        <option value="adverb">adverb</option>
+                        <option value="conjunction">conjunction</option>
+                        <option value="complementizer">complementizer</option>
+                        <option value="determiner">determiner</option>
+                        <option value="interjection">interjection</option>
+                        <option value="noun">noun</option>
+                        <option value="preposition">preposition</option>
+                        <option value="pronoun">pronoun</option>
+                        <option value="verb">verb</option>
+                        <option value="verb-auxiliary">verb-auxiliary</option>
+                      </select>
+                			
+                    {% set count = count+1 %}
+                {% endfor %}
+                    </th>
+            </tr>
         </table>
-				
+    			
         <input type="hidden" name= "sentenceID" value ="{{sentenceID}}">
-		<input type="hidden" name= "userID" value ="{{userID}}">
+    	<input type="hidden" name= "userID" value ="{{userID}}">
         <input type="hidden" name= "sentence" value= "{{sentence}}">
         <input type= "hidden" name="language" value= "{{language}}">
-				<br>
+    	<br>
         <input type="submit" value="Next" style="background-color: #66ff66;">
 
 
-			</form> 
-    	</div>
-<!--    </div> -->
+	</form> 
+
 {% endblock %}
 
 <!--content for the guidebox-->
 {% block guide %}
-    <h2>Identify the part of speech for each word</h2>
-	<p align="left"> <b>Step 1:</b> Label each word in your sentence with the appropriate <i  style="color:blue">part of speech</i>.
-    <br><br> <b>Step 2:</b> Click "Next"
+    <h2>Guide</h2>
+	<p align="left"> <b>Step 1:</b> Identify the <a target="_blank" href="https://en.wikipedia.org/wiki/Part_of_speech">part of speech</a> for each word in your sentence.
+    <br>
+    <br> 
+    <b>Step 2:</b> Click "Next"
 	<!-- <br><br> For help in identifying parts of speech, please check these resources:</p>
 	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a>  -->
 	        
 {% endblock %}
 
 {% block helpbox %}
-<h2 style="align:center;">How to identify parts of speech</h2>
+<h2 style="align:center;">Resources</h2>
 <iframe src="http://partofspeech.org/" style="border:none;" width="100%" height="80%">
 </iframe>
 {% endblock %}

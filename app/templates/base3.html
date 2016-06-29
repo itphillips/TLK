@@ -124,7 +124,7 @@ table.center {
     <ul>
         <li><a href={{ url_for('home') }}>About TLK</a></li>
         {% if g.user.is_authenticated() %}
-        <li><a href="{{ url_for('user', username=g.user.username) }}">Home</a></li>
+        <li><a href="{{ url_for('user', userID=g.user.id) }}">Home</a></li>
         <li><a target="_blank" href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
         <!-- <li><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing Conventions</a></li> -->
         <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
