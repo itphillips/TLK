@@ -28,6 +28,16 @@ p {
         	float:left;
         	padding:20px;
         }
+
+    #footer {
+        position:static;
+        background-color:#FFF;
+        text-align:center;
+        width:100%;
+        clear:both;
+        padding-top:100px;
+        padding-bottom:20px;
+        }
     </style>
 </head>
 
@@ -47,12 +57,12 @@ linguistics courses in dissecting their own language(s).
 The Linguist's Kitchen provides a workspace where you can transcribe language samples recorded 
 at home or in the community and the tools to work through three levels of guided syntactic analysis.
 
-<p>The first level of analysis focuses on identifying parts of speech (noun, verb, adjective, 
+<p>The first level guides the user through identifying <b>parts of speech</b> (noun, verb, adjective, 
 pronoun, etc.)
 
-<br>The second level focuses on phrase structure (noun phrase, verb phrase, adjectival phrase, etc.)
+<br><br>The second level guides the user through identifying <b>phrase structure</b> (noun phrase, verb phrase, adjectival phrase, etc.)
 
-<br>The third level focuses on grammatical function (grammatical subject, grammatical direct object, etc.)
+<br><br>The third level guides the user through identifying <b>grammatical function</b> (grammatical subject, grammatical direct object, etc.)
 
 <p>Once you have tagged some sentences with these three levels of info, the app will generate a phrase structure (PS) grammar based on the input.
 </p>
@@ -67,11 +77,21 @@ pronoun, etc.)
 			</p>
 			
 <div id="login" style="text-align:center; font-size:200%">		
-<p><a href="{{url_for('login')}}" style="font-size:30px">Log in</a></p>
+    <form name="login" action="{{url_for('login')}}" >
+        <button type="submit" autofocus style="font-size:30px;height:46px">Log in
+        </button>
 </div>
+
+<!--This is the footer-->
+    <footer id="footer">
+        The Linguist's Kitchen by <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
+    </footer>
  
         </div>
+
     </div> 
+
+
 	
 </body>
 </html>

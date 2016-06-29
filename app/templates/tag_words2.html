@@ -39,7 +39,7 @@
         <tr>
         {% for word in sentence.split() %}
         <th>
-      <select name="{{count}}" style="width:80px;">
+      <select name="{{count}}" style="width:130px; font-size:16px;height:26px;">
         <option value="adjective">adjective</option>
         <option value="adverb">adverb</option>
         <option value="conjunction">conjunction</option>
@@ -63,7 +63,7 @@
         <input type="hidden" name= "sentence" value= "{{sentence}}">
         <input type= "hidden" name="language" value= "{{language}}">
 				<br>
-        <input type="submit" value="Check my work">
+        <input type="submit" value="Next" style="background-color: #66ff66;">
 
 
 			</form> 
@@ -75,7 +75,7 @@
 {% block guide %}
     <h2>Identify the part of speech for each word</h2>
 	<p align="left"> <b>Step 1:</b> Label each word in your sentence with the appropriate <i  style="color:blue">part of speech</i>.
-    <br><br> <b>Step 2:</b> Click the "check my work" button
+    <br><br> <b>Step 2:</b> Click "Next"
 	<!-- <br><br> For help in identifying parts of speech, please check these resources:</p>
 	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a>  -->
 	        

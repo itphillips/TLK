@@ -64,13 +64,13 @@ table.center {
             border-left:solid 1px black;
         }
         		
-        #guide	{
+        #workspace	{
         	display:inline-block;
             position:relative;
         	/*background-color:#FFFFCC;*/
-            background-color:#99ffeb;
+            background-color:#FFF;
             border-radius:25px;
-        	width:40%;
+        	width:54%;
         	float:left;
         	padding:10px;
             padding-bottom:20px;
@@ -80,11 +80,11 @@ table.center {
         	border:solid 2px gray;
         }
 
-        #helpbox {
+        #guide {
             display:inline-block;
             position:relative;
-            background-color:#FFF;
-            width:54%;
+            background-color:#99ffeb;
+            width:40%;
             height:400px;
             float:right;
             padding:10px;
@@ -94,25 +94,7 @@ table.center {
             border:solid 2px gray;
             border-radius:25px;
             text-align:center;
-        }
-        	
-        #workspace  {
-            display:inline-block;
-            position:relative;
-            background-color:#FFF;
-            width:97%;
-            float:left;
-            padding:10px;
-            padding-left:20px;
-            padding-bottom:20px;
-            border-radius:25px;
-            margin-top:20px;
-/*            margin-left:5px;*/
-            margin-left:auto;
-            margin-right:auto;
-            border:solid 2px gray;
-            text-align:center;
-        }    	
+        }   	
 
         #footer	{
         	position:static;
@@ -148,6 +130,16 @@ table.center {
         {% endif %}
         <!-- <p><a href="/help">Help</a></p> -->
     </ul> 
+<!--This is the left guide box-->
+    <div id="guide">
+       <!--  <h3>Guide</h3> -->
+    {% block guide %}{% endblock %}
+    </div>
+
+<!--This is the right helper box-->
+    <div id="helpbox">
+    {% block helpbox %}{% endblock %}
+    </div>
 
 <!--This is the workspace box-->
     <div id="workspace">
@@ -163,18 +155,6 @@ table.center {
     {% endwith %}
     {% block content %}{% endblock %}
     </div>
-
-<!--This is the left guide box-->
-    <div id="guide">
-       <!--  <h3>Guide</h3> -->
-    {% block guide %}{% endblock %}
-    </div>
-
-<!--This is the right helper box-->
-    <div id="helpbox">
-    {% block helpbox %}{% endblock %}
-    </div>
-
             
 <!--This is the footer-->
     <footer id="footer">

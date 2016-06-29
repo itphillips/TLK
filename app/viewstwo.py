@@ -449,9 +449,10 @@ def put_phrase_in_database():
 		print e
 
 
-	#insert phrase into phrases table
 	#this gets the word id for the first word in the phrase
 	firstwordid = words_in_phrase[0][0]
+	print "firstwordid: ", firstwordid, type(firstwordid)
+
 	try:
 		dict_cur.execute("SELECT * FROM phrases p INNER JOIN word_phrase_positions wpp ON p.id = wpp.id_phrase WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s AND wpp.id_word = %s;", (phrase, sentenceID, userID, firstwordid))
 		dup_phrase = list(dict_cur.fetchall())
@@ -465,7 +466,7 @@ def put_phrase_in_database():
 	except Exception as e:
 		print e
 
-
+	#insert phrase into phrases table
 	try: 
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
@@ -475,14 +476,14 @@ def put_phrase_in_database():
 
 	#get phrase ID
 	try:
-		dict_cur.execute("SELECT * FROM phrases p WHERE p.phrase = %s;", (phrase,))
+		dict_cur.execute("SELECT * FROM phrases p WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s;", (phrase, sentenceID, userID))
 		phraseID = dict_cur.fetchone()[0]
-		print phraseID
+		print "phraseID: ", phraseID, type(phraseID)
 	except Exception as e:
 		print e
 
 
-	#check word_phrase_positions table 
+	#check word_phrase_positions table for existing duplicate entries
 	try:
 		for word in words_in_phrase:
 			wordid = word[0]
@@ -491,15 +492,45 @@ def put_phrase_in_database():
 			found_wpp_match = list(dict_cur.fetchall())
 			print "found_wpp_match=", found_wpp_match, type(found_wpp_match)
 
+			#delete wpp entries and their dependencies
 			if found_wpp_match != []: 
-
-				#delete wpp entries and their dependencies
 				dict_cur.execute("DELETE FROM word_phrase_positions wpp WHERE wp_linear_position = %s AND wpp.id_word = %s AND s.id = %s AND s.id_user = %s;", (wordpos, wordid, sentenceID, userID))
 				print "deleted wpp entry!"
 
 			#insert record into word_phrase_positions
 			dict_cur.execute("INSERT INTO word_phrase_positions (wp_linear_position, id_word, id_sentence, id_phrase) VALUES (%s, %s, %s, %s);", (wordpos, wordid, sentenceID, phraseID))
 			print "sent wpp to db= ", word[1]
+	except Exception as e:
+		print e
+
+	#get linear position in sentence of first word in phrase
+	try:
+		dict_cur.execute("SELECT * FROM words w WHERE w.id = %s;", (firstwordid,))
+		phrasefirstwordlinpos = dict_cur.fetchone()[5]
+		print "phrasefirstwordlinpos: ", phrasefirstwordlinpos, type(phrasefirstwordlinpos)
+
+	except Exception as e:
+		print e
+
+	#check phrase_sentence_positions table for existing duplicate entries
+	try:
+		dict_cur.execute("SELECT * FROM phrase_sentence_positions psp INNER JOIN phrases p ON psp.id_phrase = p.id WHERE psp.id_phrase = %s AND psp.id_sentence = %s AND p.id_user = %s;", (phraseID, sentenceID, userID))
+		pspdup = dict_cur.fetchall()
+		print "pspdup: ", pspdup, type(pspdup)
+
+		#delete duplicate entries in psp
+		if pspdup != []:
+			dict_cur.execute("DELETE FROM phrase_sentence_positions psp WHERE psp.ps_linear_position = %s AND psp.id_phrase = %s AND psp.id_sentence = %s;", (phrasefirstwordlinpos, phraseID, sentenceID))
+			print "deleted from psp: ", phraseID
+
+	except Exception as e:
+		print e
+
+	#insert into psp table
+	try:
+		dict_cur.execute("INSERT INTO phrase_sentence_positions (ps_linear_position, id_phrase, id_sentence) VALUES (%s, %s, %s);", (phrasefirstwordlinpos, phraseID, sentenceID))
+		print "sent to phrase_sentence_positions: ", phraseID
+
 	except Exception as e:
 		print e
 
@@ -542,27 +573,17 @@ def tag_subj():
 	sentenceID=request.args.get("sentenceID")
 	userID = request.args.get("userID")
 	phrases = []
+	
+	#get list of phrases for this sentence
 	try:
 		dict_cur.execute("SELECT id, phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
 		phrases= dict_cur.fetchall()
 	except Exception as e:
 		print e
-	# wordIDs.sort(key=lambda x: int(x[1]))
-	# wordIDs=[wordID[1] for wordID in wordIDs]
-	# wordIDString=""
+
 	for phrase in phrases:
 		print "id", phrase[0], "phrase: ", phrase[1]
-	# 	try:
-	# 		dict_cur.execute("SELECT word from words WHERE id ='{}';".format(wordID))
-	# 	except Exception as e:
-	# 		print e
-	# 	word=dict_cur.fetchall()
-	# 	print word
-	# 	words.append(word[0][0])
-	# 	print words
-	# 	wordIDString=wordIDString+str(wordID)+" "
-	# 	print wordIDString
-	# print words
+
 	return render_template("tag_subj.html", 
 							phrases=phrases, 
 							sentence=sentence,
@@ -577,24 +598,45 @@ def tag_subj():
 def confirm_subj():
 	print "confirm_subj"
 	gramfunc="subject"
-	userID=request.args.get("userID")
-	sentence=request.args.get("sentence")
-	sentenceID=request.args.get("sentenceID")
+	userID=int(request.args.get("userID"))
+	sentence=str(request.args.get("sentence"))
+	sentenceID=int(request.args.get("sentenceID"))
 	subject=request.args.get("subject")
 	subject_li=ast.literal_eval(subject)
 	phraseID = subject_li[0]
-	print userID
-	print sentence
-	print sentenceID
+	print userID, type(userID)
+	print sentence, type(sentence)
+	print sentenceID, type(sentenceID)
 	print type(subject), subject
-	print type(subject_li), subject_li, "subject id: ", phraseID
+	print type(subject_li), subject_li, "subject id: ", phraseID, type(phraseID)
 
+	#this checks the gram_functions table for existing subjects for that sentence
+	try:
+		dict_cur.execute("SELECT * FROM gram_functions gf WHERE gf.gram_function = %s AND gf.id_sentence = %s;", (gramfunc, sentenceID))
+		dup_sub = list(dict_cur.fetchall())
+		print "found duplicate subject: ", dup_sub, type(dup_sub)
 
+		if dup_sub != []:
+			for record in dup_sub:
+				dict_cur.execute("DELETE FROM gram_functions gf WHERE gf.id = %s;", (record[0],))
+				print "deleted duplicate subject entry: ", record
+	except Exception as e:
+		print e
+
+	#insert subject into gram_functions table
 	try:
 		dict_cur.execute("INSERT INTO gram_functions (gram_function, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (gramfunc, phraseID, userID, sentenceID))
 	except Exception as e:
 		print e
-	print "inserted grammmatical function"
+	print "inserted into gram_functions table: ", gramfunc
+
+	#get subject ID
+	try:
+		dict_cur.execute("SELECT * FROM gram_functions gf WHERE gf.id_phrase = %s AND gf.id_user = %s;", (phraseID, userID))
+		subjectID = dict_cur.fetchone()[0]
+		print "subjectID: ", subjectID
+	except Exception as e:
+		print e
 
 	return redirect(url_for('tag_obj',
 							userID=userID,
@@ -608,7 +650,7 @@ def confirm_subj():
 def tag_obj(userID, sentence, sentenceID):
 	phrases = []
 	try:
-		dict_cur.execute("SELECT id, phrase FROM phrases WHERE id_sentence = %s;", (sentenceID,))
+		dict_cur.execute("SELECT id, phrase FROM phrases p WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
 		phrases= dict_cur.fetchall()
 	except Exception as e:
 		print e
@@ -637,64 +679,85 @@ def confirm_obj():
 	print type(dobject), dobject
 	dobject_li=ast.literal_eval(dobject)
 	phraseID = dobject_li[0]
-	print userID
-	print sentence
-	print sentenceID
+	print "userID: ", userID, type(userID)
+	print "sentence: ", sentence, type(sentence)
+	print "sentenceID: ", sentenceID, type(sentenceID)
 	print type(dobject), dobject
 	print type(dobject_li), dobject_li, "direct object id: ", phraseID
 
+	#this checks the gram_functions table for existing objects for that sentence
+	try:
+		dict_cur.execute("SELECT * FROM gram_functions gf WHERE gf.gram_function = %s AND gf.id_sentence = %s;", (gramfunc, sentenceID))
+		dup_obj = list(dict_cur.fetchall())
+		print "found duplicate direct object: ", dup_obj, type(dup_obj)
 
+		if dup_obj != []:
+			for record in dup_obj:
+				dict_cur.execute("DELETE FROM gram_functions gf WHERE gf.id = %s;", (record[0],))
+				print "deleted duplicate direct object entry: ", record
+	except Exception as e:
+		print e
+
+	#insert direct object into gram_functions table
 	try:
 		dict_cur.execute("INSERT INTO gram_functions (gram_function, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (gramfunc, phraseID, userID, sentenceID))
 	except Exception as e:
 		print e
-	print "inserted grammmatical function"
+	print "inserted into gram_functions table: ", gramfunc
 
-	return render_template('analyzed_sent.html',
+	#get direct object ID
+	try:
+		dict_cur.execute("SELECT * FROM gram_functions gf WHERE gf.id_phrase = %s AND gf.id_user = %s;", (phraseID, userID))
+		dobjID = dict_cur.fetchone()[0]
+		print "dobjID: ", dobjID
+	except Exception as e:
+		print e
+
+	return redirect(url_for('analyzed_sent',
 							userID=userID,
 							sentence=sentence,
 							sentenceID=sentenceID
-							)
+							))
 
 
-@app.route("/end")
-@login_required
-def prompt_new_sentence():
-	DO=request.args.get("DO")
-	IO=request.args.get("IO")
-	wordIDs=request.args.get("wordIDString").split()
-	if DO:
-		for wordID in DO.split():
-			try:
-				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='ACC';".format(wordID))
-				words_in_words_cases = dict_cur.fetchall()
-			except Exception as e:
-				print e
-			print wordID
-			print words_in_words_cases
-			if words_in_words_cases == []:
-				try:
-					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "ACC"))
-				except Exception as e:
-					print e
-			print wordID		
-	if IO:
-		for wordID in IO.split():
-			try:
-				dict_cur.execute("SELECT * FROM words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
-				words_in_words_cases = dict_cur.fetchall()
-			except Exception as e:
-				print e
-			print wordID
-			print words_in_words_cases
-			if words_in_words_cases == []:
-				try:
-					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "DAT"))
-				except Exception as e:
-					print e
-			print wordID		
+# @app.route("/end")
+# @login_required
+# def prompt_new_sentence():
+# 	DO=request.args.get("DO")
+# 	IO=request.args.get("IO")
+# 	wordIDs=request.args.get("wordIDString").split()
+# 	if DO:
+# 		for wordID in DO.split():
+# 			try:
+# 				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='ACC';".format(wordID))
+# 				words_in_words_cases = dict_cur.fetchall()
+# 			except Exception as e:
+# 				print e
+# 			print wordID
+# 			print words_in_words_cases
+# 			if words_in_words_cases == []:
+# 				try:
+# 					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "ACC"))
+# 				except Exception as e:
+# 					print e
+# 			print wordID		
+# 	if IO:
+# 		for wordID in IO.split():
+# 			try:
+# 				dict_cur.execute("SELECT * FROM words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
+# 				words_in_words_cases = dict_cur.fetchall()
+# 			except Exception as e:
+# 				print e
+# 			print wordID
+# 			print words_in_words_cases
+# 			if words_in_words_cases == []:
+# 				try:
+# 					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "DAT"))
+# 				except Exception as e:
+# 					print e
+# 			print wordID		
 
-	return render_template("prompt_new_sentence.html")
+# 	return render_template("prompt_new_sentence.html")
 
 @app.route("/analyzed_sent")
 @login_required
@@ -707,7 +770,6 @@ def analyzed_sent():
 	print "analyzed_sent", sentence, type(sentence)
 	sentenceID = int(request.args.get("sentenceID"))
 	print "sentenceID: ", sentenceID
-	language = str(request.args.get("sentence_language"))
 
 
 	try:
@@ -715,7 +777,11 @@ def analyzed_sent():
 		#by sentence will be a problem - the above sentenceID isn't passing the right number
 		dict_cur.execute("SELECT id FROM sentences WHERE sentence = %s;", (sentence,))
 		sentenceID = dict_cur.fetchone()[0]
+		print "analyzed, real sent id: ", sentenceID
 
+		dict_cur.execute("SELECT sentence_language sl FROM sentences s WHERE s.id=%s;", (sentenceID,))
+		language = dict_cur.fetchone()[0].title()
+		print "analyzed lang: ", language, type(language)
 
 		dict_cur.execute("SELECT word, pos FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id=%s ORDER BY w.id ASC;", (sentenceID,))
 		POSlist = dict_cur.fetchall()
@@ -738,7 +804,8 @@ def analyzed_sent():
 
 
 		dict_cur.execute("SELECT collection_date FROM sentences WHERE id = %s;", (sentenceID,))
-		collection_date = dict_cur.fetchone()[0]
+		collection_date = dict_cur.fetchone()[0].date()
+		print "analyzed collection date: ", collection_date, type(collection_date)
 
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
 		phrases = list(dict_cur.fetchall())
@@ -768,6 +835,71 @@ def analyzed_sent():
 
 		print "phrase groups: ", phrase_groups
 
+		#get linear position of first word in subject
+		gramfunc = "subject"
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		subjectlinpos = dict_cur.fetchone()[6]
+		print "subjectlinpos: ", subjectlinpos, type(subjectlinpos)
+		
+		#get subject value
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		subject = dict_cur.fetchone()[10]
+		print "subject: ", subject, type(subject)
+
+
+		#get linear position of first word in object
+		gramfunc = "direct object"
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		dobjlinpos = dict_cur.fetchone()[6]
+		print "dobjlinpos: ", dobjlinpos, type(dobjlinpos)
+		
+		#get object value
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		dobj = dict_cur.fetchone()[10]
+		print "subject: ", dobj, type(dobj)
+
+
+		#get linear position of verb
+		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
+		verblinpos = dict_cur.fetchone()[5]
+		print "verblinpos: ", verblinpos, type(verblinpos)
+		
+		#get verb value
+		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
+		verb = dict_cur.fetchone()[1]
+		print "verb: ", verb, type(verb)
+
+
+		#determine basic word order based on above info
+		if verblinpos < subjectlinpos and subjectlinpos < dobjlinpos:
+			bwo = [["Verb", verb], ["Subject", subject], ["Object", dobj], ["(VSO)"]]
+
+		elif verblinpos > subjectlinpos and subjectlinpos > dobjlinpos:
+			bwo = [["Object", dobj], ["Subject", subject], ["Verb", verb], ["(OSV)"]]
+
+		elif verblinpos < dobjlinpos and dobjlinpos < subjectlinpos:
+			bwo = [["Verb", verb], ["Object", dobj], ["Subject", subject], ["(VOS)"]]
+
+		elif verblinpos > dobjlinpos and dobjlinpos > subjectlinpos:
+			bwo = [["Subject", subject], ["Object", dobj], ["Verb", verb], ["(SOV)"]]
+
+		elif subjectlinpos < verblinpos and verblinpos < dobjlinpos:
+			bwo = [["Subject", subject], ["Verb", verb], ["Object", dobj], ["(SVO)"]]
+
+		elif subjectlinpos > verblinpos and verblinpos > dobjlinpos: 
+			bwo = [["Object", dobj], ["Verb", verb], ["Subject", subject], ["(OVS)"]]
+
+		elif subjectlinpos < verblinpos:
+			bwo = [["Subject", subject], ["Verb", verb], ["(SV)"]]
+
+		elif subjectlinpos > verblinpos: 
+			bwo = [["Verb", verb], ["Subject", subject], ["(VS)"]]
+
+		else:
+			bwo = ["This sentence is missing a subject and/or verb."]
+
+		print "bwo: ", bwo, type(bwo)
+
 	except Exception as e:
 		print e
 
@@ -784,6 +916,7 @@ def analyzed_sent():
 							POSlist=POSlist,
 							phrase_types=ptlist,
 							phrase_groups=phrase_groups,
-							phrases=phrases
+							phrases=phrases,
+							bwo=bwo
 							)
 

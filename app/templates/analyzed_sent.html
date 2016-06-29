@@ -13,7 +13,7 @@
 	</style>
 </head>
 <!-- extend base layout -->
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 <body>
 {% block content %}
@@ -42,15 +42,34 @@
 	{% endfor %}
 	</tr>
 </table>
-<!-- </p>  -->
+
 
 <hr>
 <h2>Basic word order:</h2>
-<p>basic word order</p>
+<table class="center">
+	<tr>
+	{% for i in bwo[:-1] %}
+		<th>{{i[1]}}</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in bwo[:-1] %}
+		<th>|</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in bwo %}
+		<th style="padding-left: 15px;padding-right: 15px;">{{i[0]}}</th>
+	{% endfor %}
+	</tr>
+
+</table>
 
 <hr>
 <h2>Syntactic phrases:</h2>
-<table class="center" >
+<table class="center" style="border-spacing: 0px; border-collapse: collapse;">
 
 	<tr>
 	{% for i in phrase_groups %}
@@ -60,7 +79,7 @@
 
 	<tr>
 	{% for group in phrase_groups %}
-		<td style="vertical-align: top;padding-left: 15px;padding-right: 15px;text-align: left;border-left: 1px solid; border-right: 1px solid;">
+		<td style="vertical-align:top; padding-left:15px; padding-right:15px; text-align: left;border-left: 1px solid; border-right: 1px solid; ">
 		{% for item in group[1:] %}
 			<p>{{item}}</p>
 		{% endfor %}
@@ -68,7 +87,7 @@
 	{% endfor %}
 	</tr>
 </table>
-
+<br>
 <hr>
 <h2>Syntactic structure:</h2>
 <p>syntactic structure</p>
@@ -104,6 +123,7 @@
 
 	</form> 
 {% endblock %}
+
 
 </body>
 </html>
