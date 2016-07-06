@@ -1002,8 +1002,8 @@ def analyzed_sent():
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
 		wppwrecords = dict_cur.fetchall()
 
-		# for record in wppwrecords:
-		# 	print record, type(record)
+		for record in wppwrecords:
+			print record, type(record)
 
 		for key in psdict:
 			#if the phrase key corresponds to an empty list, then add the pos for the phrase to the list
@@ -1013,37 +1013,72 @@ def analyzed_sent():
 						psdict[key].append(record[7])
 
 			else:
-				#create list of content of daughters for each mother
-				dcontent = []
-				for record in precords:
-					for daughter in psdict[key]:
-						if daughter == record[0]:
-							dcontent.append(record[1]) 
-				# print key, dcontent
+				#create dictionary made of a word list for each daughter in each mother
+				dcontent = {}
+				for value in psdict[key]:
+					wordlist = []
+					for record in wppwrecords:
+						if record[4] == value:
+							wordlist.append(record[2])
+					dcontent[value] = wordlist 
+				print "dcontent: ", key, dcontent
 
-				#remove daughter content if it is in another larger daughter
-				for i in dcontent:
-					for j in dcontent:
-						if j in i and j!=i:
-							dcontent.remove(j)
-				# print key, dcontent
+				#remove daughter content if it is subset of another daughter
+				for i, a in dcontent.items():
+					# print "i: ", i, a
+					for j, b in dcontent.items():
+						# print "j: ", j, b
+						if i != j:
+							if all(x in a for x in b):
+								del dcontent[j]
+				print "dcontent: ", key, dcontent
 
 				#compare concatenated daughters to mother 
-				#as is, this only works for languages written left to right
-				remainder = []
-				for record in precords:
-					if record[0] == key:
-						mother  = record[1].split()
-						daughter = dcontent[0].split()
-						# print key, mother, daughter
-						for i in mother:
-							if i not in daughter:
-								remainder.append(i)
-				print key, remainder
+				#make a dict of words that are in the mother but not the daughter
+				mother = []
+				daughter = []
+				remainderdict = {}				
+				for item in dcontent:
+					for item in dcontent[item]:
+						daughter.append(item)
+				print "daughter: ", key, daughter
 
-			#append remainder to value list in correct position relative to phrase daughters
-			
+				for record in wppwrecords:
+					if record[4] == key:
+						mother.append(record[2])
+				print "mother: ", key, mother
+				
+				remainder = []		
+				for i in mother:
+					if i not in daughter:
+						remainder.append(i)
+					remainderdict[key] = remainder
+				print "remainderdict: ", key, remainderdict
 
+				# find POS and linear position in phrase for each remainder in remainderdict
+				for remainder in remainderdict[key]:
+					for record in wppwrecords:
+						if record[2] == remainder and record[4] == key:
+							remainderlinpos = record[1]
+							remainderpos = record[7]
+							print remainderlinpos, remainderpos
+
+				#append remainder to value list in correct position relative to phrase daughters
+				#as is, the appends the remainder first, rather than checking to see where it belongs
+				#relative to other daughter phrases
+				pscontent = [remainderpos]
+				for value in psdict[key]:
+					for record in precords:
+						if value == record[0]:
+							pscontent.append(record[2])
+				print pscontent
+				psdict[key] = pscontent
+
+		print psdict
+		for item in psdict.keys():
+			for record in precords:
+				if item == record[0]:
+					psdict[record[2]] = psdict.pop(item)
 		print psdict
 
 
@@ -1064,6 +1099,7 @@ def analyzed_sent():
 							phrase_types=ptlist,
 							phrase_groups=phrase_groups,
 							phrases=phrases,
-							bwo=bwo
+							bwo=bwo,
+							psdict=psdict
 							)
 
