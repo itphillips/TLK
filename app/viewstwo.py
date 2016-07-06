@@ -231,8 +231,9 @@ def tag_pos():
 							sentence=sentence, 
 							userID=userID, 
 							sentenceID=sentenceID, 
-							error=error, 
-							language=language)
+							error=error,
+							language=language
+							)
 
 @app.route("/confirmPOS")
 @login_required
@@ -309,6 +310,14 @@ def pos_to_db():
 			except Exception as e:
 				print e
 
+			try:
+				#delete existing entries for this sentence in phrases table
+				dict_cur.execute("DELETE FROM phrases p WHERE p.id_user = %s AND p.id_sentence = %s;", (userID, sentenceID))
+				print "deleted existing record in phrases table"
+
+			except Exception as e:
+				print e
+
 		return redirect(url_for('group',
 								userID=userID,
 								sentenceID=sentenceID
@@ -327,6 +336,7 @@ def group(userID, sentenceID):
 		sentenceID = int(sentenceID)
 		print "group - sentenceID= ", sentenceID, type(sentenceID)
 
+		#find existing records in phrases table for this sentence
 		dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s;", (sentenceID,))
 		identified_phrases = dict_cur.fetchall()
 		if identified_phrases != []:
@@ -336,6 +346,7 @@ def group(userID, sentenceID):
 		dict_cur.execute("SELECT w.id, w.word, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id = %s AND w.id_user = %s;", (sentenceID, userID))
 		wordlist = dict_cur.fetchall()
 		print "group - wordlist: ", wordlist
+
 
 		return render_template("grouptwo.html", 
 				sentence=sentence, 
@@ -810,7 +821,7 @@ def analyzed_sent():
 		collection_date = dict_cur.fetchone()[0].date()
 		# print "collection date: ", collection_date, type(collection_date)
 
-#not sure why this is needed 6/29/16 - IP
+
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
 		phrases = dict_cur.fetchall()
 		print "phrases: ", phrases, type(phrases)
@@ -840,28 +851,38 @@ def analyzed_sent():
 
 		print "phrase groups: ", phrase_groups
 
-		#get linear position of first word in subject
-		gramfunc = "subject"
-		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-		subjectlinpos = dict_cur.fetchone()[6]
-		print "subjectlinpos: ", subjectlinpos, type(subjectlinpos)
-		
 		#get subject value
-		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-		subject = dict_cur.fetchone()[10]
-		print "subject: ", subject, type(subject)
-
-
-		#get linear position of first word in object
-		gramfunc = "direct object"
-		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-		dobjlinpos = dict_cur.fetchone()[6]
-		print "dobjlinpos: ", dobjlinpos, type(dobjlinpos)
+		try:
+			gramfunc = "subject"
+			dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+			record = dict_cur.fetchone()
+			subject = record[10]
+			#get linear position of first word in subject
+			subjectlinpos = record[6]
+		except:
+			subject = "no subject"
+			subjectlinpos = "no subjectlinpos"
 		
+		print "subject: ", subject, type(subject)
+		print "subjectlinpos: ", subjectlinpos, type(subjectlinpos)
+
+
 		#get object value
-		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-		dobj = dict_cur.fetchone()[10]
+		try:
+			gramfunc = "direct object"
+			dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+			record = dict_cur.fetchone()
+			dobj = record[10]
+
+			#get linear position of first word in object
+			dobjlinpos = record[6]
+		except:
+			dobj = "no object"
+			dobjlinpos = "no dobjlinpos"
+
 		print "dobj: ", dobj, type(dobj)
+		print "dobjlinpos: ", dobjlinpos, type(dobjlinpos)
+
 
 		#get verb value
 		try:
@@ -888,6 +909,12 @@ def analyzed_sent():
 		if verb == "no verb":
 			bwo = []
 
+		elif subjectlinpos < verblinpos and dobj == "no object":
+			bwo = [["Subject", subject], ["Verb", verb], ["(SV)"]]
+
+		elif subjectlinpos > verblinpos and dobj == "no object": 
+			bwo = [["Verb", verb], ["Subject", subject], ["(VS)"]]
+
 		elif verblinpos < subjectlinpos and subjectlinpos < dobjlinpos:
 			bwo = [["Verb", verb], ["Subject", subject], ["Object", dobj], ["(VSO)"]]
 
@@ -903,17 +930,122 @@ def analyzed_sent():
 		elif subjectlinpos < verblinpos and verblinpos < dobjlinpos:
 			bwo = [["Subject", subject], ["Verb", verb], ["Object", dobj], ["(SVO)"]]
 
-		elif subjectlinpos > verblinpos and verblinpos > dobjlinpos: 
+		else: 
 			bwo = [["Object", dobj], ["Verb", verb], ["Subject", subject], ["(OVS)"]]
 
-		elif subjectlinpos < verblinpos:
-			bwo = [["Subject", subject], ["Verb", verb], ["(SV)"]]
+		print "bwo: ", bwo, type(bwo)
 
-		else: 
-			bwo = [["Verb", verb], ["Subject", subject], ["(VS)"]]
+	except Exception as e:
+		print e
+
+	#this is for the syntactic structure section of the analyzed sent page
+	try:
+		#create a list of words for the sentence
+		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s;", (sentenceID, userID))
+		wrecords = dict_cur.fetchall()
+		print "word_sent records: ", wrecords, type(wrecords)
+
+		sent_word_list = []
+		for record in wrecords:
+			word = record[1]
+			wordID = record[0]
+			sent_word_list.append(wordID)
+			# print "word and ID: ", word, wordID, type(word), type(wordID)
+
+		print sent_word_list
+
+		sent_phrase_list = []
+		for wordID in sent_word_list:
+			phrase_list = []
+			dict_cur.execute("SELECT id_phrase FROM word_phrase_positions wpp WHERE wpp.id_sentence = %s AND wpp.id_word = %s;", (sentenceID, wordID))
+			pwrecords = dict_cur.fetchall()
+
+			for record in pwrecords:
+				phrase_list.append(record[0])
+			print "\nphrases containing wordID %s: %s" % (wordID, phrase_list) 
+
+			sent_phrase_list.append(phrase_list)
+		print "\nsent_phrase_list: %s" % (sent_phrase_list) 
+
+
+		#create a phrase structure dictionary where the key:value pair is phrase ID: list of daughter phraseIDs 
+		psdict = {}
+		dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
+		precords = dict_cur.fetchall()
+
+		#for each phrase in the dictionary, look at each other phrase and append it to the value list if it is a daughter
+		for record in precords:
+			const = []
+			phraseID = record[0]
+			print "phraseID: ", phraseID, type(phraseID)
+			psdict[phraseID] = const
+
+
+			for i in precords:
+				#the and statement excludes the phraseID itself from the list
+				if i[1] in record[1] and i[1] != record[1]:
+					psdict[phraseID].append(i[0])
+
+		print "psdict: ", psdict
+
+		# for i in psdict:
+		# 	mother = i
+		# 	daughters = []
+
+		# 	for i in psdict[i]:
+		# 		daughters.append(i)
+
+		# 	print mother, " = ", daughters[1:]
+
+		#this will look at each mother (key), subtract the content of the daughters (value list), and append
+		#what remains in the correct position in the list
+		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
+		wppwrecords = dict_cur.fetchall()
+
+		# for record in wppwrecords:
+		# 	print record, type(record)
+
+		for key in psdict:
+			#if the phrase key corresponds to an empty list, then add the pos for the phrase to the list
+			if psdict[key] == []:
+				for record in wppwrecords:
+					if record[4] == key:
+						psdict[key].append(record[7])
+
+			else:
+				#create list of content of daughters for each mother
+				dcontent = []
+				for record in precords:
+					for daughter in psdict[key]:
+						if daughter == record[0]:
+							dcontent.append(record[1]) 
+				# print key, dcontent
+
+				#remove daughter content if it is in another larger daughter
+				for i in dcontent:
+					for j in dcontent:
+						if j in i and j!=i:
+							dcontent.remove(j)
+				# print key, dcontent
+
+				#compare concatenated daughters to mother 
+				#as is, this only works for languages written left to right
+				remainder = []
+				for record in precords:
+					if record[0] == key:
+						mother  = record[1].split()
+						daughter = dcontent[0].split()
+						# print key, mother, daughter
+						for i in mother:
+							if i not in daughter:
+								remainder.append(i)
+				print key, remainder
+
+			#append remainder to value list in correct position relative to phrase daughters
 			
 
-		print "bwo: ", bwo, type(bwo)
+		print psdict
+
 
 	except Exception as e:
 		print e

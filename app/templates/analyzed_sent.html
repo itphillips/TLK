@@ -23,6 +23,7 @@
 <h2>Parts of speech:</h2>
 <!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
 
+{% if POSlist!=[] %}
 <table class="center">
 	<tr>
 	{% for i in POSlist %}
@@ -42,6 +43,12 @@
 	{% endfor %}
 	</tr>
 </table>
+
+{% else %}
+<p style="color:red;"> You didn't identify any parts of speech for this sentence.
+</p>
+
+{% endif %}
 
 
 <hr>
@@ -70,15 +77,18 @@
 </table>
 
 {% else %}
-<p style="color:red;"> This sentence is missing a verb. Can't determine basic word order.
+<p style="color:red;"> You didn't identify the verb in this sentence. <br>Can't determine basic word order.
 </p>
 
 {% endif %}
 
 <hr>
 <h2>Syntactic phrases:</h2>
-<table class="center" style="border-spacing: 0px; border-collapse: collapse;">
 
+{% if phrase_groups!=[] %}
+{% set group = phrase_groups[0] %}
+{% if group[1:]!=[] %}
+<table class="center" style="border-spacing: 0px; border-collapse: collapse;">
 	<tr>
 	{% for i in phrase_groups %}
 		<th style="font-weight:bold;font-size:30px;">{{i[0]}}</th>
@@ -95,10 +105,25 @@
 	{% endfor %}
 	</tr>
 </table>
+{% else %}
+
+<p style="color:red;"> You didn't finish analyzing the phrases in this sentence.
+</p>
+{% endif %}
+
+{% else %}
+<p style="color:red;"> You didn't finish analyzing any phrases in this sentence.
+</p>
+{% endif %}
+
+
+
 <br>
 <hr>
 <h2>Syntactic structure:</h2>
 <p>syntactic structure</p>
+
+
 
 
 <hr><br>
