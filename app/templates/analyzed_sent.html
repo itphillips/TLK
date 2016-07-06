@@ -77,7 +77,7 @@
 </table>
 
 {% else %}
-<p style="color:red;"> You didn't identify the verb in this sentence. <br>Can't determine basic word order.
+<p style="color:red;"> You didn't identify the verb or subject in this sentence. <br>Can't determine basic word order.
 </p>
 
 {% endif %}
@@ -121,7 +121,25 @@
 <br>
 <hr>
 <h2>Syntactic structure:</h2>
-<p>syntactic structure</p>
+{% if uniquepslist!=[] %}
+<table class="center">
+	<tr>
+		<td>S = NP VP</td>
+	</tr>
+
+	{% for i in uniquepslist %}
+	<tr>
+		<td>{{i}}</td>
+	</tr>
+	{% endfor %}
+
+</table>
+
+{% else %}
+<p style="color:red;"> You didn't finish analyzing any phrases in this sentence.
+</p>
+
+{% endif %}
 
 
 

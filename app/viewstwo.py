@@ -12,7 +12,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
-from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function
+from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function, Phrase_structure_rule
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
 conn.set_session(autocommit=True)
@@ -906,7 +906,7 @@ def analyzed_sent():
 
 
 		#determine basic word order based on above info
-		if verb == "no verb":
+		if verb == "no verb" or subject == "no subject":
 			bwo = []
 
 		elif subjectlinpos < verblinpos and dobj == "no object":
@@ -939,6 +939,7 @@ def analyzed_sent():
 		print e
 
 	#this is for the syntactic structure section of the analyzed sent page
+
 	try:
 		#create a list of words for the sentence
 		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s;", (sentenceID, userID))
@@ -1002,8 +1003,8 @@ def analyzed_sent():
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
 		wppwrecords = dict_cur.fetchall()
 
-		for record in wppwrecords:
-			print record, type(record)
+		# for record in wppwrecords:
+		# 	print record, type(record)
 
 		for key in psdict:
 			#if the phrase key corresponds to an empty list, then add the pos for the phrase to the list
@@ -1032,6 +1033,14 @@ def analyzed_sent():
 							if all(x in a for x in b):
 								del dcontent[j]
 				print "dcontent: ", key, dcontent
+
+				#this updates psdict by removing phrases that are subsets of othe phrases
+				dcontentlist = []
+				for k in dcontent:
+					dcontentlist.append(k)
+				print "dcontentlist: ", dcontentlist
+				psdict[key] = dcontentlist
+				print "psdict: ", psdict
 
 				#compare concatenated daughters to mother 
 				#make a dict of words that are in the mother but not the daughter
@@ -1075,15 +1084,56 @@ def analyzed_sent():
 				psdict[key] = pscontent
 
 		print psdict
-		for item in psdict.keys():
-			for record in precords:
-				if item == record[0]:
-					psdict[record[2]] = psdict.pop(item)
-		print psdict
+		for item in psdict:
+			rule = ""
+			for value in psdict[item]:
+				rule = rule + " " + value
+			print rule
+			psdict[item] = rule.strip()
+			
+			#this checks the phrase structure rule table for duplicate entries
+			try:
+				dict_cur.execute("SELECT * FROM phrase_structure_rules psr WHERE psr.id_phrase = %s AND psr.id_sentence = %s;", (item, sentenceID))
+				dup_psr = list(dict_cur.fetchall())
+
+				if dup_psr != []:
+					print "found duplicate psr: ", dup_psr, type(dup_psr)
+					for record in dup_psr:
+						dict_cur.execute("DELETE FROM phrase_structure_rules psr WHERE psr.id = %s;", (record[0],))
+						print "deleted duplicate psr entry: ", record
+			except Exception as e:
+				print e
+
+			#insert rule into psr table
+			try:
+				dict_cur.execute("INSERT INTO phrase_structure_rules (phrase_structure, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (psdict[item], item, userID, sentenceID))
+			except Exception as e:
+				print e
+			print "inserted into psr table: ", psdict[item]
+
+		dict_cur.execute("SELECT * FROM phrase_structure_rules psr INNER JOIN phrases p ON psr.id_phrase = p.id WHERE psr.id_sentence = %s AND psr.id_user = %s ORDER BY p.phrase;", (sentenceID, userID))
+		psr_records = dict_cur.fetchall()
+		pslist = []
+		for record in psr_records:
+			psrule = record[7] + " = " + record[1]
+			# print "ps rule: ", psrule
+			pslist.append(psrule)
+		for rule in pslist:
+			print rule
+
+		uniquepslist = []
+		exists = set()
+		for rule in pslist:
+			if rule not in exists:
+				uniquepslist.append(rule)
+				exists.add(rule)
+		print "\nunique psr list:"
+		for uniquerule in uniquepslist:
+			print uniquerule
 
 
 	except Exception as e:
-		print e
+				print e
 
 	return render_template("analyzed_sent.html",
 							username=userID,
@@ -1100,6 +1150,6 @@ def analyzed_sent():
 							phrase_groups=phrase_groups,
 							phrases=phrases,
 							bwo=bwo,
-							psdict=psdict
+							uniquepslist=uniquepslist
 							)
 

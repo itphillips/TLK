@@ -147,4 +147,15 @@ class Gram_function(db.Model):
 		return '<Gram_function %r>' % (self.gram_function)
 
 
+class Phrase_structure_rule(db.Model):
+	__tablename__ = 'phrase_structure_rules'
+	id = db.Column(db.Integer, primary_key = True)
+	phrase_structure = db.Column(db.String(60))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id', ondelete="CASCADE"))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
+
+	def __repr__(self):
+		return '<Phrase_structure_rule %r>' % (self.phrase_structure_rule)
+
 
