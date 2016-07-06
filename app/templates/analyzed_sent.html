@@ -124,12 +124,12 @@
 {% if uniquepslist!=[] %}
 <table class="center">
 	<tr>
-		<td>S = NP VP</td>
+		<td>S &#8594; NP VP</td>
 	</tr>
 
 	{% for i in uniquepslist %}
 	<tr>
-		<td>{{i}}</td>
+		<td>{{i[0]}} &#8594; {{i[1]}}</td>
 	</tr>
 	{% endfor %}
 

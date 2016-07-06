@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Input Sentence</title>
+	<title>input_sentence</title>
+	<style>
+		table, th, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 18px;
+			font-weight: normal;
+			font-family: arial;
+		}
+	</style>
 </head>
 
 {% extends "base.html" %}
@@ -9,56 +18,43 @@
 <body>
 
 {% block content %}
-<h1>Step 1: Enter a sentence</h1>
+<!-- <h1>Step 1: Enter a sentence</h1> -->
 
-<form name="entersentence" action="" method="POST" >
-	{{form.hidden_tag()}}
+	<form action="{{url_for ('confirm_sentence')}}">
 
-Please enter a sentence:<br> 
-{{ form.sentence(size=24)}}<br><br>
+	<p>Please enter a sentence:<br>
+	(Enter multi-word proper nouns without spaces - for example, enter "New York" as "NewYork")<br>
+	<input type="text" name="sentence" size=40> <br><br>
+	What language is this sentence? <br>
+	<input type="text" name="language" size=25><br><br>
+	What kind of sentence is this?<br>
+	<input type="radio" name="sentence_type" value="declarative">declarative
+	<input type="radio" name="sentence_type" value="interrogative">interrogative
+	<input type="radio" name="sentence_type" value="imperative">imperative
+    <br><br>
+	What does this sentence mean? (say it in other words)<br>
+	<input type="text" name="paraphrase" size=40><br><br>
+	When was this sentence collected? <br>
+	(Please enter the date in MM/DD/YYYY format:)<br>
+	<input type="text" name="date" size=15><br><br>
 
-{%for error in form.sentence.errors %}
-<span style="color: red;">[{{ error }}]</span><br><br>
-{% endfor %}
-
-Please paraphrase this sentence in standard English:<br>
-{{ form.english_gloss(size=24)}}<br><br>
-
-{%for error in form.english_gloss.errors %}
-<span style="color: red;">[{{ error }}]</span><br><br>
-{% endfor %}
-
-What language is this sentence? <br>
-{{ form.language(size=24)}}<br><br>
-
-{%for error in form.language.errors %}
-<span style="color: red;">[{{ error }}]</span><br><br>
-{% endfor %}
-
-
-
-<!-- <input type="radio" name="language" value="E">English <br>
-<input type="radio" name="language" value="S">Spanish <br> -->
-
-When was this sample collected? Please enter the date in YYYYMMDD format <br>
-<input type="text" name="date"> 
-<br> <br>
-<!-- <input type="hidden" name="userID" value="{{userID}}">
-<br> -->
-
+	<input type="hidden" name="userID" value="{{userID}}">
+	</p>
 <!-- 	Have you previously input other sentences from this same recording session?
 <input type="radio" name="continued_session" value="yes">Yes<br>
 <input type="radio" name="continued_session" value="no">No -->
 
-<button type="submit">OK
-</form>
+	<button type="submit"> Continue
 	
 {% endblock %}
 
 {% block guide %}
-	<p> <b>Step 1:</b> Enter a sentence that you would like to analyze. </br><br>
-		<b>Step 2:</b> Paraphrase the sentence in 'standard' English.</br><br>
-		<b>Step 3:</b> Enter the language that this sentence belongs to.</br><br>
+	<h2>Start here!</h2>
+	<p align="left"> 
+		<b>Step 1:</b> <br>Enter a sentence that you would like to analyze. </br><br>
+		<b>Step 2:</b> <br>Enter the language that this sentence belongs to.</br><br>
+		<b>Step 3:</b> <br>Paraphrase the sentence in 'standard' English.</br><br>
+		<b>Step 4:</b> <br>Enter the date when this sentence was collected.</br><br>
 	<p>        
 {% endblock %}
 

@@ -24,6 +24,7 @@ class User(db.Model):
 	words = db.relationship('Word', backref='users', cascade='delete')
 	phrases = db.relationship('Phrase', backref='users', cascade='delete')
 	gram_functions = db.relationship('Gram_function', backref='users', cascade='delete')
+	phrase_structure_rules = db.relationship('Phrase_structure_rule', backref='users', cascade='delete')
 
 	
 	#this should just return true unless the object represents a user that should not

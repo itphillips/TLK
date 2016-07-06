@@ -12,9 +12,9 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
 #from .models import User, Sentence, Word
-from .modelstwo import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function, Phrase_structure_rule
+from .models import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function, Phrase_structure_rule
 
-conn = psycopg2.connect('postgresql://ianphillips@localhost/tlktwo')
+conn = psycopg2.connect('postgresql://ianphillips@localhost/tlk')
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -140,7 +140,7 @@ def user(userID): #'userID' gets passed from after_login(), =g.user.id
 		except Exception as e:
 			print e
 
-		return render_template('usertwo.html',
+		return render_template('user.html',
 								user=user,
 								userID=userID,
 								sentences=sentences
@@ -150,7 +150,7 @@ def user(userID): #'userID' gets passed from after_login(), =g.user.id
 @login_required
 def input_sentence():
 	userID=request.args.get("userID")
-	return render_template("input_sentencetwo.html", 
+	return render_template("input_sentence.html", 
 							userID=userID)
 
 @app.route("/sentence")
@@ -158,7 +158,7 @@ def input_sentence():
 def confirm_sentence():
 	try:
 		userID=request.args.get("userID")
-		sentence=request.args.get("sentence")
+		sentence=request.args.get("sentence").lower()
 		language=request.args.get("language")
 		date=request.args.get("date")
 		paraphrase=request.args.get("paraphrase")
@@ -166,6 +166,13 @@ def confirm_sentence():
 		sessionID=date+language
 	except Exception as e:
 		print e
+
+		#strip out some punctuation
+	punc = [".", ",", ";", "(", ")", "!", "\"", ":", "?"]
+	for i in punc:
+		sentence = sentence.replace(i, "")
+
+	# print "sentence w/o punc: ", sentence
 
 	try:
 		dict_cur.execute("SELECT sessionnumber FROM sentences INNER JOIN users ON users.id=sentences.id_user WHERE users.id = %s AND sessionid = %s;", (userID, sessionID))
@@ -227,7 +234,7 @@ def tag_pos():
 	print "sentenceID for tagPOS = ", sentenceID
 
 	print "all done tag pos"
-	return render_template("tag_words2.html", 
+	return render_template("tag_words.html", 
 							sentence=sentence, 
 							userID=userID, 
 							sentenceID=sentenceID, 
@@ -260,7 +267,7 @@ def pos_confirm():
 									error= 1, 
 									language=language))
 	print "done pos confirm"
-	return render_template("POS_confirmtwo.html", 
+	return render_template("POS_confirm.html", 
 							sentence=sentence, 
 							userID=userID, 
 							sentenceID=sentenceID, 
@@ -348,7 +355,7 @@ def group(userID, sentenceID):
 		print "group - wordlist: ", wordlist
 
 
-		return render_template("grouptwo.html", 
+		return render_template("group.html", 
 				sentence=sentence, 
 				userID=userID, 
 				sentenceID=sentenceID,
@@ -471,10 +478,10 @@ def put_phrase_in_database():
 	try:
 		dict_cur.execute("SELECT * FROM phrases p INNER JOIN word_phrase_positions wpp ON p.id = wpp.id_phrase WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s AND wpp.id_word = %s;", (phrase, sentenceID, userID, firstwordid))
 		dup_phrase = list(dict_cur.fetchall())
-		print "found duplicate phrase: ", dup_phrase, type(dup_phrase)
 
 		#delete duplicate phrase and its dependencies
 		if dup_phrase != []:
+			print "found duplicate phrase: ", dup_phrase, type(dup_phrase)
 			for record in dup_phrase:
 				dict_cur.execute("DELETE FROM phrases p WHERE p.id = %s;", (record[0],))
 				print "deleted duplicate phrase entry: ", record
@@ -486,7 +493,7 @@ def put_phrase_in_database():
 		dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (phrase, phrase_type, sentenceID, userID))
 	except Exception as e:
 		print e
-	print "inserted phrase into phrases table"
+	print "inserted '%s' into phrases table" % (phrase)
 
 
 	#get phrase ID
@@ -497,7 +504,6 @@ def put_phrase_in_database():
 	except Exception as e:
 		print e
 
-
 	#check word_phrase_positions table for existing duplicate entries
 	try:
 		for word in words_in_phrase:
@@ -505,10 +511,10 @@ def put_phrase_in_database():
 			wordpos = words_in_phrase.index(word)
 			dict_cur.execute("SELECT wpp.id, w.word, wpp.id_phrase FROM word_phrase_positions wpp INNER JOIN words w ON w.id = wpp.id_word INNER JOIN sentences s ON wpp.id_sentence = s.id WHERE wp_linear_position = %s AND wpp.id_word = %s AND wpp.id_phrase = %s AND s.id = %s AND s.id_user = %s;", (wordpos, wordid, phraseID, sentenceID, userID))
 			found_wpp_match = list(dict_cur.fetchall())
-			print "found_wpp_match=", found_wpp_match, type(found_wpp_match)
 
 			#delete wpp entries and their dependencies
 			if found_wpp_match != []: 
+				print "found_wpp_match=", found_wpp_match, type(found_wpp_match)
 				dict_cur.execute("DELETE FROM word_phrase_positions wpp WHERE wp_linear_position = %s AND wpp.id_word = %s AND s.id = %s AND s.id_user = %s;", (wordpos, wordid, sentenceID, userID))
 				print "deleted wpp entry!"
 
@@ -521,7 +527,7 @@ def put_phrase_in_database():
 	#get linear position in sentence of first word in phrase
 	try:
 		dict_cur.execute("SELECT * FROM words w WHERE w.id = %s;", (firstwordid,))
-		phrasefirstwordlinpos = dict_cur.fetchone()[5]
+		phrasefirstwordlinpos = dict_cur.fetchone()[3]
 		print "phrasefirstwordlinpos: ", phrasefirstwordlinpos, type(phrasefirstwordlinpos)
 
 	except Exception as e:
@@ -531,9 +537,9 @@ def put_phrase_in_database():
 	try:
 		dict_cur.execute("SELECT * FROM phrase_sentence_positions psp INNER JOIN phrases p ON psp.id_phrase = p.id WHERE psp.id_phrase = %s AND psp.id_sentence = %s AND p.id_user = %s;", (phraseID, sentenceID, userID))
 		pspdup = dict_cur.fetchall()
-		print "pspdup: ", pspdup, type(pspdup)
 
 		#delete duplicate entries in psp
+		print "pspdup: ", pspdup, type(pspdup)		
 		if pspdup != []:
 			dict_cur.execute("DELETE FROM phrase_sentence_positions psp WHERE psp.ps_linear_position = %s AND psp.id_phrase = %s AND psp.id_sentence = %s;", (phrasefirstwordlinpos, phraseID, sentenceID))
 			print "deleted from psp: ", phraseID
@@ -1115,17 +1121,23 @@ def analyzed_sent():
 		psr_records = dict_cur.fetchall()
 		pslist = []
 		for record in psr_records:
-			psrule = record[7] + " = " + record[1]
+			mdlist = []
+			mother = record[7]
+			mdlist.append(mother)
+			daughter = record[1]
+			mdlist.append(daughter)
 			# print "ps rule: ", psrule
-			pslist.append(psrule)
+			pslist.append(mdlist)
 		for rule in pslist:
 			print rule
 
 		uniquepslist = []
 		exists = set()
-		for rule in pslist:
+		for item in pslist:
+			rule = item[0] + " = " + item[1]
+			print rule
 			if rule not in exists:
-				uniquepslist.append(rule)
+				uniquepslist.append(item)
 				exists.add(rule)
 		print "\nunique psr list:"
 		for uniquerule in uniquepslist:
