@@ -66,7 +66,7 @@
 	<br>
 	<h3>What kind of phrase is this?</h3>
 	<!-- <p><input type="radio" name = "phrase_type" value="S">Sentence -->
-	<p><input type="radio" name = "phrase_type" value="NP">Noun Phrase
+	<p><input type="radio" required name = "phrase_type" value="NP">Noun Phrase
 	<br> <input type="radio" name = "phrase_type" value="VP">Verb Phrase
 	<br> <input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
 	<br> <input type="radio" name = "phrase_type" value="AP">Adjective/Adverbial Phrase
@@ -142,11 +142,13 @@
 	        
 {% endblock %}
 
+
 {% block helpbox %}
 <h2 style="align:center;">Syntactic phrases (aka constituents)</h2>
 <iframe src="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" name="helpbox_iframe" style="border:none;" width="100%" height="80%">
 </iframe>
 {% endblock %}
+
 
 </body>
 </html>

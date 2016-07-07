@@ -472,18 +472,15 @@ def put_phrase_in_database():
 	print "phrase: ", phrase, type(phrase)
 	words_in_phrase = ast.literal_eval(request.args.get("words_in_phrase"))
 	print "words in phrase: ", words_in_phrase, type(words_in_phrase)
+	userID = int(request.args.get("userID"))
+	print "userID: ", userID, type(userID)
 
 	try:
-		dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
-		userID = dict_cur.fetchone()[0]
-		print "userID: ", userID, type(userID)
+		#this gets the word id for the first word in the phrase
+		firstwordid = words_in_phrase[0][0]
+		print "firstwordid: ", firstwordid, type(firstwordid)
 	except Exception as e:
 		print e
-
-
-	#this gets the word id for the first word in the phrase
-	firstwordid = words_in_phrase[0][0]
-	print "firstwordid: ", firstwordid, type(firstwordid)
 
 	try:
 		dict_cur.execute("SELECT * FROM phrases p INNER JOIN word_phrase_positions wpp ON p.id = wpp.id_phrase WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s AND wpp.id_word = %s;", (phrase, sentenceID, userID, firstwordid))
@@ -633,21 +630,25 @@ def confirm_subj():
 	sentence=str(request.args.get("sentence"))
 	sentenceID=int(request.args.get("sentenceID"))
 	subject=request.args.get("subject")
-	subject_li=ast.literal_eval(subject)
-	phraseID = subject_li[0]
+	try:
+		subject_li=ast.literal_eval(subject)
+		phraseID = subject_li[0]
+		print type(subject_li), subject_li, "subject id: ", phraseID, type(phraseID)
+	except Exception as e:
+		print e
 	print userID, type(userID)
 	print sentence, type(sentence)
 	print sentenceID, type(sentenceID)
 	print type(subject), subject
-	print type(subject_li), subject_li, "subject id: ", phraseID, type(phraseID)
+
 
 	#this checks the gram_functions table for existing subjects for that sentence
 	try:
 		dict_cur.execute("SELECT * FROM gram_functions gf WHERE gf.gram_function = %s AND gf.id_sentence = %s;", (gramfunc, sentenceID))
 		dup_sub = list(dict_cur.fetchall())
-		print "found duplicate subject: ", dup_sub, type(dup_sub)
 
 		if dup_sub != []:
+			print "found duplicate subject: ", dup_sub, type(dup_sub)
 			for record in dup_sub:
 				dict_cur.execute("DELETE FROM gram_functions gf WHERE gf.id = %s;", (record[0],))
 				print "deleted duplicate subject entry: ", record
@@ -708,13 +709,17 @@ def confirm_obj():
 	sentenceID=request.args.get("sentenceID")
 	dobject=request.args.get("dobject")
 	print type(dobject), dobject
-	dobject_li=ast.literal_eval(dobject)
-	phraseID = dobject_li[0]
+	try:
+		dobject_li=ast.literal_eval(dobject)
+		phraseID = dobject_li[0]
+		print type(dobject_li), dobject_li, "direct object id: ", phraseID
+	except Exception as e:
+		print e
 	print "userID: ", userID, type(userID)
 	print "sentence: ", sentence, type(sentence)
 	print "sentenceID: ", sentenceID, type(sentenceID)
 	print type(dobject), dobject
-	print type(dobject_li), dobject_li, "direct object id: ", phraseID
+
 
 	#this checks the gram_functions table for existing objects for that sentence
 	try:
@@ -1147,7 +1152,7 @@ def analyzed_sent():
 				print e
 			print "inserted into psr table: ", psdict[item]
 
-		dict_cur.execute("SELECT * FROM phrase_structure_rules psr INNER JOIN phrases p ON psr.id_phrase = p.id WHERE psr.id_sentence = %s AND psr.id_user = %s ORDER BY p.phrase;", (sentenceID, userID))
+		dict_cur.execute("SELECT * FROM phrase_structure_rules psr INNER JOIN phrases p ON psr.id_phrase = p.id WHERE psr.id_sentence = %s AND psr.id_user = %s ORDER BY p.phrase_type;", (sentenceID, userID))
 		psr_records = dict_cur.fetchall()
 		pslist = []
 		for record in psr_records:

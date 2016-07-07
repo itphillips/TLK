@@ -67,7 +67,7 @@ What is the grammatical subject of "{{sentence}}"? <br><br>(Pick one.)
 <form action="{{url_for('confirm_subj')}}">
 
 {% for i in range(phrases|count) %}
-<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+<button type="button" required id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
 {% endfor %}
 
 <input type="hidden" name="sentence" value="{{sentence}}">
