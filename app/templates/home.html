@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>TLK Home</title>
+	<title>About TLK</title>
 	<style>
 
 p {
@@ -46,36 +46,38 @@ p {
     <div id="container">
         <div id="header">
             <!-- <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210"> -->
-            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="900" height="210">    
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="900" height="190">    
         </div>
         
         <div id="welcome" >
         	
-<p>The Linguist's Kitchen is a web-based app, designed to help guide students in introductory
-linguistics courses in dissecting their own language(s). 
+<p>The Linguist's Kitchen is a teaching and learning tool designed for 
+introductory linguistics and language courses. It is meant to support classroom 
+instruction by guiding students in dissecting their own language(s). 
 
-The Linguist's Kitchen provides a workspace where you can transcribe language samples recorded 
-at home or in the community and the tools to work through three levels of guided syntactic analysis.
+<br><br>The Linguist's Kitchen will not give you any answers. It is designed only to 
+guide you in your own thinking, by providing a workspace where you can transcribe language 
+samples that you record at home or in your community, and guiding you through three levels 
+of syntactic analysis, including identifying:
 
-<p>The first level guides the user through identifying <b>parts of speech</b> (noun, verb, adjective, 
+<br><br><b>parts of speech</b> (noun, verb, adjective, 
 pronoun, etc.)
 
-<br><br>The second level guides the user through identifying <b>phrase structure</b> (noun phrase, verb phrase, adjectival phrase, etc.)
+<br><b>phrase structure</b> (noun phrase, verb phrase, adjectival 
+phrase, etc.)
 
-<br><br>The third level guides the user through identifying <b>grammatical function</b> (grammatical subject, grammatical direct object, etc.)
+<br><b>grammatical function</b> (grammatical subject, grammatical 
+direct object, etc.)
 
-<p>Once you have tagged some sentences with these three levels of info, the app will generate a phrase structure (PS) grammar based on the input.
-</p>
-</p>
-<p>A PS grammar is a list of transformation rules like: 
-<br>S = NP VP
-<br>NP = (Det) N
-<br>VP = V (NP)
-<br>etc.
+<br><br>For each sentence, the app will generate a phrase structure grammar 
+based on your input, like the following: 
+<b><br><br>S &#8594; NP VP
+<br>NP &#8594; (Det) N
+<br>VP &#8594; V (NP)</b>
+
+<br><br>Bon app&eacute;tit!
 </p>
 
-			</p>
-			
 <div id="login" style="text-align:center; font-size:200%">		
     <form name="login" action="{{url_for('login')}}" >
         <button type="submit" autofocus style="font-size:30px;height:46px">Log in
@@ -87,11 +89,7 @@ pronoun, etc.)
         The Linguist's Kitchen by <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
     </footer>
  
-        </div>
-
-    </div> 
-
-
-	
+</div>
+</div> 
 </body>
 </html>

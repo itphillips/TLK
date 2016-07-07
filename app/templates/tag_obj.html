@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Tag Object</title>
+	<title>Identify direct object</title>
 </head>
 
 {% extends "base.html" %}
 
 <body>
+{% block instruction %}
+    <h1>Identify the <a href="https://en.wikipedia.org/wiki/Object_(grammar)" target="helpbox_iframe">direct object</a> in the sentence.</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -35,7 +38,7 @@ var tag_DO=document.getElementById("tag_DO");
 		}
 		else{
 			target.setAttribute("value", "active");
-			target.style.backgroundColor="lightgreen";
+			target.style.backgroundColor="#00ff40";
 		}
 	}
 
@@ -66,7 +69,7 @@ Does "{{sentence}}" have a direct object?
 <td style="padding-left:5px">
 	<form name="no_obj" action="{{url_for('analyzed_sent')}}">
 		<!-- <button type="button" id="no" name="no_DO" onClick="hideTagObj()" style="font-size:16px;height:26px">No</button> -->
-		<button type="submit" style="font-size:16px;height:26px">No</button>
+		<button type="submitr" id="submitr">No</button>
 
 		<input type="hidden" name="sentence" value="{{sentence}}">
 		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
@@ -78,7 +81,7 @@ Does "{{sentence}}" have a direct object?
 </td>
 
 <td style="padding-right:5px">
-	<button type="button" id="yes" name="yes_DO" onClick="showTagDO()" style="font-size:16px;height:26px">Yes</button>
+	<button type="submitg" id="submitg" name="yes_DO" onClick="showTagDO()">Yes</button>
 </td>
 </tr>
 </table>
@@ -104,7 +107,7 @@ Does "{{sentence}}" have a direct object?
 
 
 	<br>
-	<button type="submit" name="dobject" onClick="submitClick(event)" value="">Submit</button>
+	<button type="submitg" id="submitg" name="dobject" onClick="submitClick(event)" value="">Next</button>
 	</div>
 </form>
 
@@ -115,17 +118,17 @@ Does "{{sentence}}" have a direct object?
 
 <!--content for the guidebox-->
 {% block guide %}
-
-	<p style="font-size:100%">
-    Now, it's time to identify the <i  style="color:blue">direct object</i> for your sentence.
+	<h2>Identify the direct object</h2>
+	<p align="left"> <b>Step 1:</b> Click on the phrase that acts as the <a href="https://en.wikipedia.org/wiki/Object_(grammar)" target="helpbox_iframe">direct object</a> in the sentence
 	
-	<br><br> Not sure what a "direct object" is? Check the box on the right</p>
+	<br><br> <b>Tip: </b> Check the box on the right for help 
+	</p>
 	        
 {% endblock %}
 
 {% block helpbox %}
-<h2 style="align:center;">Grammatical functions</h2>
-<iframe src="http://www.englicious.org/lesson/grammatical-functions-clause" style="border:none;" width="100%" height="80%">
+<h2 style="align:center;">Direct object</h2>
+<iframe name="helpbox_iframe" src="https://en.wikipedia.org/wiki/Object_(grammar)" style="border:none;" width="100%" height="85%">
 </iframe>
 {% endblock %}
 

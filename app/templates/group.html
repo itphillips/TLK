@@ -7,6 +7,9 @@
 {% extends "base.html" %}
 
 <body onload="refreshpage()">
+{% block instruction %}
+    <h1>Identify all of the <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" target="helpbox_iframe">syntactic phrases</a> in this sentence.</h1>
+{% endblock %}
 
 {% block content %} 
 
@@ -29,7 +32,7 @@
 		}
 		else{
 			target.setAttribute("value", "active");
-			target.style.backgroundColor="lightgreen";
+			target.style.backgroundColor="#00ff40";
 		}
 	}
 	function submitClick(e){
@@ -66,11 +69,11 @@
 	<p><input type="radio" name = "phrase_type" value="NP">Noun Phrase
 	<br> <input type="radio" name = "phrase_type" value="VP">Verb Phrase
 	<br> <input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
-	<br> <input type="radio" name = "phrase_type" value="AP">Adjective Phrase
+	<br> <input type="radio" name = "phrase_type" value="AP">Adjective/Adverbial Phrase
 	<br> <input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
 	</p>
 
-	<button type="submit" name = "words_in_phrase" onClick = "submitClick(event)" value = "">Submit</button>
+	<button type="submitg" id="submitg" name = "words_in_phrase" onClick = "submitClick(event)" value = "">Confirm this phrase and identify another</button>
  </form> 
 
  <br>
@@ -78,7 +81,7 @@
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
 	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-	<button type="submit" name= "done">I'm done tagging phrases</button>
+	<button type="submitw" id="submitw" name= "done">I finished identifying all phrases - go to the next step </button>
 </form>
 </td>
 
@@ -100,7 +103,7 @@
 			<form name="delete" action="{{url_for('delete_phr', phr_id=phrase[0])}}" method="GET">
 				<input type="hidden" name="userID" value="{{userID}}">
 				<input type="hidden" name="sentenceID" value="{{sentenceID}}">
-				<button type="submit" style="font-size:16px;height:26px; background-color:white; color:red;">Delete</button>
+				<button type="submitr" id="submitr">Delete</button>
 			</form>
 			</td>
 		{% endif %}
@@ -123,9 +126,10 @@
 
 <!--content for the guidebox-->
 {% block guide %}
-	<h2>Group words into syntactic constituents</h2>
-	<p align="left"> <b>Step 1:</b> Click on a group of words that forms a <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" target="helpbox_iframe">syntactic constituent</a> (aka <i>syntactic phrase</i>)</a>
-	<br><br> <b>Step 2:</b> Indicate what kind of constituent the words form - use these tests to determine if a group of words forms a constituent:</p>
+	<h2>Identify syntactic phrases</h2>
+	<p align="left"> <b>Step 1:</b> Click on words that form a <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" target="helpbox_iframe">syntactic phrase</a> (aka <i>syntactic constituent</i>)</a>
+	<br><br> <b>Step 2:</b> Identify the kind of phrase that the words form.
+	<br><br> <b>Tip: </b> Use these tests to determine if a group of words forms a constituent:</p>
 	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px" target="helpbox_iframe">Substitution</a> 
 	 <br><br>
 	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px" target="helpbox_iframe">Movement</a>
@@ -133,12 +137,13 @@
 	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px" target="helpbox_iframe">Question answer</a>
 	 <br><br>
 	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px" target="helpbox_iframe">Clefting</a>
-	 <p align="left"><b>Step 3:</b> Click "submit" to continue tagging more phrases in this sentence. Click "I'm done tagging phrases" when you finish labelling all syntactic constituents in this sentence</p>
+	 <p align="left"><b>Step 3:</b> Make sure to identify <i>all</i> of the phrases in the sentence. 
+	 <br><br>When you finish identifying all syntactic constituents in the sentence click "I'm done tagging phrases"</p>
 	        
 {% endblock %}
 
 {% block helpbox %}
-<h2 style="align:center;">How to identify syntactic constituents</h2>
+<h2 style="align:center;">Syntactic phrases (aka constituents)</h2>
 <iframe src="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" name="helpbox_iframe" style="border:none;" width="100%" height="80%">
 </iframe>
 {% endblock %}

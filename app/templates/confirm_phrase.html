@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Check phrase</title>
+	<title>Confirm phrase: {{phrase}}</title>
 	<style>
 	sent {
 	font-family: "arial", Times, sans-serif;
@@ -15,25 +15,26 @@
 <body>
 
 {% block content %}
-<p style="font-size:30px;">{{sentence}}</p>
+<!-- <p style="font-size:30px;">{{sentence}}</p>
 
-<p>You said that <b>"{{phrase}}"</b> is a(n) <b>{{phrase_type}}</b>.</p>
+<p>You said that <b>"{{phrase}}"</b> is a(n) <b>{{phrase_type}}</b>.</p> -->
+<p style="font-size:30px;">Added: <b>{{phrase_type}} - {{phrase}}</b>
 
-
+<!-- 
 <table class="center">
 <tr>
 
 <td style="padding-right:5px">
 	<form name="phrase_problem" action="{{url_for('group', userID=userID, sentenceID=sentenceID)}}">
-<!-- 	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
-	<input type="hidden" name="sentenceID" value="{{sentenceID}}"> -->
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
 	<input type="hidden" name="firstTime" value="False">
 	<br><button type="submit" style="font-size:16px;height:26px; background-color:red">Whoops! Go back</button>
 	</form>
-</td>
+</td> -->
 
-<td style="padding-left:5px">
+<!-- <td style="padding-left:5px"> -->
 <form name="all_ok" action="{{url_for('put_phrase_in_database')}}">
 	<input type="hidden" name="userID" value="{{userID}}">
 	<input type="hidden" name="sentence" value="{{sentence}}">
@@ -42,12 +43,13 @@
 	<input type="hidden" name="phrase_type" value="{{phrase_type}}">
 	<input type="hidden" name="phrase_structure" value="{{phrase_structure}}">
 	<input type="hidden" name="words_in_phrase" value="{{words_in_phrase}}">
-	<br><button type="submit" style="font-size:16px;height:26px; background-color:lightgreen">Correct! Next step</button>
+<!-- 	<br><button type="submit" style="font-size:16px;height:26px; background-color:lightgreen">Next</button> -->
+	<br><button type="submitg" id="submitg">Next</button>
 	</form>
-</td>
+<!-- </td>
 
 </tr>
-</table>
+</table> -->
 {% endblock %}
 
 {% block guide %}

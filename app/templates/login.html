@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>login</title>
+	<title>Login</title>
 	<style>
 p {
     font-family: "arial", Times, sans-serif;
@@ -50,15 +50,9 @@ p {
 <!--This is the container and title image header-->
     <div id="container">
         <div id="header">
-            <img src="/static/LinguistsKitchen.jpg" alt="The Linguist's Kitchen" width="700" height="210">    
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="900" height="190">    
     	</div> 
 
-<!--this is the left menu box-->
-<!--     <div id="menu">
-        <h3>Menu</h3>
-        <p><a href="/home">Home</a></p>
-        <p><a href="/help">Help</a></p>
-    </div> --> 
             
 <!--This is the workspace box-->
     <div id="login"> 
@@ -92,9 +86,9 @@ p {
         CSRF prevention we implemented in config.py - this needs to be in all forms if CSRF is enabled -->
         {{ form.hidden_tag() }}
         <p>
-            Please enter your OpenID, or click on the link below:<br>
+            Please enter your OpenID, or click on the link below to login through Yahoo:<br>
             <!--this field object renders the field 'openid' from loginform subclass-->
-            {{ form.openid(size=80) }}<br>
+            {{ form.openid(size=90) }}<br>
             <!--this for loop renders any messages that are added by the validators under the openid field-->
             {% for error in form.openid.errors %}
                 <span style="color: red;">[{{ error }}]</span>
@@ -108,10 +102,11 @@ p {
     </form>
     </div>
             
+
 <!--This is the footer-->
-	<div id="footer">
-        The Linguist's Kitchen
-    </div>
+    <footer id="footer">
+        The Linguist's Kitchen by <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
+    </footer>
 	
     </div>
 </body>

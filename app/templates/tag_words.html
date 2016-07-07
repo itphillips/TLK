@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Tag POS</title>
+	<title>Identify parts of speech</title>
     <style>
         table, th, td, tr {
             /*border: 1px solid black; */
@@ -18,16 +18,16 @@
 <body>
 
 {% block instruction %}
-    <h1>Identify the part of speech for each word</h1>
+    <h1>Identify the <a href="https://en.wikipedia.org/wiki/Part_of_speech" target="resources">part of speech</a> for each word.</h1>
 {% endblock %}
 
 {% block content %}
           
     {% if error != None %}
-    <h4 style="color:red"> Please make sure you select a part of speech for each word! </h4>
+    <h4 style="color:red"> Please make sure you select a part of speech for each word!</h4>
     {% endif %}
 
-	<form name="pos" action="{{url_for('pos_confirm', sentence=sentence)}}" method="GET">
+	<form name="pos" action="{{url_for('pos_to_db')}}" method="GET">
    
         <table class="center">
             <tr>
@@ -51,7 +51,7 @@
                         <option value="preposition">preposition</option>
                         <option value="pronoun">pronoun</option>
                         <option value="verb">verb</option>
-                        <option value="verb-auxiliary">verb-auxiliary</option>
+                        <!-- <option value="verb-auxiliary">verb-auxiliary</option> -->
                       </select>
                 			
                     {% set count = count+1 %}
@@ -65,7 +65,8 @@
         <input type="hidden" name= "sentence" value= "{{sentence}}">
         <input type= "hidden" name="language" value= "{{language}}">
     	<br>
-        <input type="submit" value="Next" style="background-color: #66ff66;">
+        <!-- <input type="submitg" id="submitg" value="Next" style="background-color: #66ff66;"> -->
+        <button type="submitg" id="submitg">Next</button>
 
 
 	</form> 
@@ -75,18 +76,20 @@
 <!--content for the guidebox-->
 {% block guide %}
     <h2>Guide</h2>
-	<p align="left"> <b>Step 1:</b> Identify the <a target="_blank" href="https://en.wikipedia.org/wiki/Part_of_speech">part of speech</a> for each word in your sentence.
+	<p align="left"> <b>Step 1:</b> Identify the <a href="https://en.wikipedia.org/wiki/Part_of_speech" target="resources">part of speech</a> for each word in your sentence.
     <br>
     <br> 
-    <b>Step 2:</b> Click "Next"
+    <b>Tip: </b>Look for help in the box on the right.
+
+    <br><br>Click "Next" to go to the next step.
 	<!-- <br><br> For help in identifying parts of speech, please check these resources:</p>
 	 <a href="http://partofspeech.org/" style="font-size:24px">partofspeech.org</a>  -->
 	        
 {% endblock %}
 
 {% block helpbox %}
-<h2 style="align:center;">Resources</h2>
-<iframe src="http://partofspeech.org/" style="border:none;" width="100%" height="80%">
+<h2 style="align:center;">Parts of speech</h2>
+<iframe name="resources" src="https://en.wikipedia.org/wiki/Part_of_speech" style="border:none;" width="100%" height="85%">
 </iframe>
 {% endblock %}
 

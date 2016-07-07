@@ -28,16 +28,16 @@ def before_request():
 	g.user = current_user
 
 @app.route('/')
-@app.route('/home')
+@app.route('/aboutTLK')
 def home():
-	return render_template("home.html",
-							title='Home')
+	return render_template("home.html"
+							)
 
 #view function that renders the login template by passing the form object LoginForm(Form)
 #to the template login.html
 #methods arguments tell Flask that this view function accespts GET and POST requests
 @app.route('/login', methods=['GET', 'POST'])
-@oid.loginhandler #tells flask-openid that htis is our login view function
+@oid.loginhandler #tells flask-openid that this is our login view function
 def login():
 	#this sees if the user is logged in, if so it won't do a second login
 	#g global is set up by flask as a place to store and share data during the life
@@ -64,7 +64,6 @@ def login():
 		# return redirect('/home')
 
 	return render_template('login.html',
-							title='Sign In',
 							form=form,
 							#grabs configuration by looking it up in app.config with 
 							#its key, then adds array to render_template call as a 
@@ -227,7 +226,7 @@ def tag_pos():
 	sentence = request.args.get("sentence")
 	print sentence
 	userID = request.args.get("userID")
-	language=request.args.get("sentence_language")
+	# language=request.args.get("sentence_language")
 	
 	dict_cur.execute("SELECT id from sentences WHERE sentence = %s;", (sentence,))
 	sentenceID = dict_cur.fetchone()[0]
@@ -238,41 +237,42 @@ def tag_pos():
 							sentence=sentence, 
 							userID=userID, 
 							sentenceID=sentenceID, 
-							error=error,
-							language=language
+							error=error
+							# language=language
 							)
 
-@app.route("/confirmPOS")
-@login_required
-def pos_confirm():
-	sentence=request.args.get("sentence")
-	userID = request.args.get("userID")
-	sentenceID = request.args.get("sentenceID")
-	print "sentenceID for confirmPOS = ", sentenceID
-	language = request.args.get("language")
-	pos = ""
+# @app.route("/confirmPOS")
+# @login_required
+# def pos_confirm():
+# 	sentence=request.args.get("sentence")
+# 	userID = request.args.get("userID")
+# 	sentenceID = request.args.get("sentenceID")
+# 	print "sentenceID for confirmPOS = ", sentenceID
+# 	language = request.args.get("language")
+# 	pos = ""
 	
-	for i in range(len(sentence.split())):
-		if request.args.get(str(i)):
-			try:
-				pos=pos+(request.args.get(str(i)))+" "
-			except Exception as e:
-				print e
-		else:
-			print "error"
-			return redirect(url_for('tag_pos', 
-									sentence=sentence, 
-									userID=userID, 
-									sentenceID=sentenceID, 
-									error= 1, 
-									language=language))
-	print "done pos confirm"
-	return render_template("POS_confirm.html", 
-							sentence=sentence, 
-							userID=userID, 
-							sentenceID=sentenceID, 
-							pos=pos, 
-							language=language)
+# 	for i in range(len(sentence.split())):
+# 		if request.args.get(str(i)):
+# 			try:
+# 				pos=pos+(request.args.get(str(i)))+" "
+# 			except Exception as e:
+# 				print e
+# 			print "pos: ", pos, type(pos)
+# 		else:
+# 			print "error"
+# 			return redirect(url_for('tag_pos', 
+# 									sentence=sentence, 
+# 									userID=userID, 
+# 									sentenceID=sentenceID, 
+# 									error= 1, 
+# 									language=language))
+# 	print "done pos confirm"
+# 	return render_template("POS_confirm.html", 
+# 							sentence=sentence, 
+# 							userID=userID, 
+# 							sentenceID=sentenceID, 
+# 							pos=pos, 
+# 							language=language)
 
 @app.route("/pos_to_db")
 @login_required
@@ -285,11 +285,22 @@ def pos_to_db():
 	sentenceID = int(request.args.get("sentenceID"))
 	print "this is sentenceID", sentenceID
 	sentence = str(request.args.get("sentence"))
+	pos = ""
+	print "pos: ", pos
+	
+	for i in range(len(sentence.split())):
+		if request.args.get(str(i)):
+			try:
+				pos=pos+(request.args.get(str(i)))+" "
+			except Exception as e:
+				print e
+			print "pos: ", pos, type(pos)
 	
 	if redo == None:
-		language=request.args.get("language") #this is not getting passed
-		print language, type(language)
-		pos_array = str(request.args.get("pos")).split()
+		# language=request.args.get("language") #this is not getting passed
+		# print language, type(language)
+		# pos_array = str(request.args.get("pos")).split()
+		pos_array = pos.split()
 		print pos_array, type(pos_array)
 		words = sentence.split()
 		print words, type(words)
@@ -302,10 +313,9 @@ def pos_to_db():
 
 				dict_cur.execute("SELECT w.id, w.word, s.id, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence = s.id WHERE s.id = %s AND w.ws_linear_position = %s AND w.id_user = %s ORDER BY w.id ASC;", (sentenceID, i, userID))
 				found_word = list(dict_cur.fetchall())
-				print "found_word=", found_word, type(found_word)
 
 				if found_word != []: 
-
+					print "found_word=", found_word, type(found_word)
 					#delete words and their dependencies
 					dict_cur.execute("DELETE FROM words w WHERE w.word = %s AND w.id_sentence = %s AND w.ws_linear_position = %s AND w.id_user = %s;", (word, sentenceID, i, userID))
 					print "deleted word!"
@@ -892,19 +902,39 @@ def analyzed_sent():
 
 		#get verb value
 		try:
-			dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s;", (sentenceID, userID, "verb"))
-			record = dict_cur.fetchone()
-			if record != []:
-				verb = record[1]
-				verbid = record[0]
+			dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s ORDER BY w.ws_linear_position ASC;", (sentenceID, userID, "verb"))
+			records = dict_cur.fetchall()
+			print "records: ", records
+			
+			if records == []:
+				verb = "no verb"
+				verbid = "no verbid"
+				verblinpos = "no verblinpos"
 
-				#get linear position of verb
-				dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.id = %s;", (sentenceID, userID, verbid))
-				verblinpos = dict_cur.fetchone()[5]
-		except:
-			verb = "no verb"
-			verbid = "no verbid"
-			verblinpos = "no verblinpos"
+			else:
+				verblist = []
+				for record in records:
+					verb = record[1]
+					verbid = record[0]
+					verblinpos = record[5]
+					print "verb record: ", record, type(record)
+					verblist.append(record[1])
+				
+				verb = ""
+				for i in verblist:
+					verb = verb + " " + i
+				verb = verb.strip()
+				# print "verb: ", verb
+
+				verblinpos = records[0][3]
+				# print "verblinpos: ", verblinpos, type(verblinpos)
+
+				verbid = records[0][0]
+					#get linear position of verb
+				# dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.id = %s;", (sentenceID, userID, verbid))
+				# verblinpos = dict_cur.fetchone()[5]
+		except Exception as e:
+			print e
 
 		print "verb: ", verb, type(verb)
 		print "verbid: ", verbid, type(verbid)

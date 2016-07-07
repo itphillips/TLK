@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>{{user}}'s TLK Homepage</title>
+	<title>{{user}}'s TLK homepage</title>
 	<style>
 	td {
 	font-family: "arial", Times, sans-serif;
@@ -15,8 +15,12 @@
 
 <body>
 {% block helpbox %}
-
-<!-- <h2>Hello {{ user.username }}!</h2> -->
+<br>
+<form name="NewSentence" action="{{url_for('input_sentence')}}">
+	<button type="submitg" id="submitg">Add a new sentence</button>
+	<input type="hidden" name="userID" value="{{userID}}">
+</form>
+</br><hr>
 
 {% if sentences!=[] %}
 <h2 align="left">Your sentences:</h2>
@@ -36,7 +40,7 @@
 <tr>
 <td>
 	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">Start new analysis
+        <button type="submitw" id="submitw">Start new analysis
         </button>
         <input type="hidden" name="userID" value="{{userID}}">  
         <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
@@ -49,7 +53,7 @@
 
 <td>
     <form name="{{sentence['sentence']}}" action="{{url_for('analyzed_sent')}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">Check old analysis
+        <button type="submit" id="submitw">Check old analysis
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
         <input type="hidden" name="sentence" value="{{sentence['sentence']}}">
@@ -62,8 +66,9 @@
 <td>
 	{% if userID == g.user.id %}
 	<form name="delete" action="{{url_for('delete_sent', sent_id=sentence[0])}}">
-		<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete
-        </button>
+		<button type="submitr" id="submitr">Delete</button>
+<!-- 		<button type="submit" style="font-size:16px;height:26px; background-color:red">Delete
+        </button> -->
     </form>
 	{% endif %}
 </td>
@@ -71,19 +76,16 @@
 </table>
 <br>
 {% endfor %}
-</br><hr></br>
-	<form name="NewSentence" action="{{url_for('input_sentence')}}">
- 		<button type="submit" style="font-size:16px;height:28px;background-color:lightgreen"><b>Add a new sentence</b>
- 		 	<input type="hidden" name="userID" value="{{userID}}">
-	</form>
+
 {% endblock %}
 
 {% block guide %}
-	<h2>Hello {{ user.username }}!</h2>
-	<p> Welcome to The Linguist's Kitchen! This app will guide you through performing a syntactic analysis on a sentence.</p>
-	<p> Just follow the steps in this guide.</p>
+	<h2>Hello {{ user }}!</h2>
+	<p> Welcome to The Linguist's Kitchen! <br><br>This app will guide you through performing a syntactic analysis on sentences that you add here.</p>
 	<p> To get started, add a new sentence or click to analyze a sentence that you've already entered. <p>        
 {% endblock %}
+
+
 
 
 </body>

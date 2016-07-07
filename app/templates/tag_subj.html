@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>Tag Subject</title>
+	<title>Identify subject</title>
 </head>
 
 {% extends "base.html" %}
 
 <body>
+{% block instruction %}
+    <h1>Identify the <a href="https://en.wikipedia.org/wiki/Subject_(grammar)" target="helpbox_iframe">grammatical subject</a> in the sentence.</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -54,9 +57,9 @@
 
 <!--This is the workspace box-->
 <p style="font-size: 30px;">
-{{sentence}}
+What is the grammatical subject of "{{sentence}}"? <br><br>(Pick one.)
 </p>
-<p>Which phrase from the last step is the grammatical subject?</p>
+<!-- <p>(Pick one phrase.)</p> -->
 {% if error != None %}
 <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
 {% endif %}
@@ -72,7 +75,7 @@
 <input type="hidden" name="userID" value="{{userID}}">
 
 <br>
-<button type="submit" name="subject" onClick="submitClick(event)" value="">Submit</button>
+<button type="submitg" id="submitg" name="subject" onClick="submitClick(event)" value="">Next</button>
 
 </form>
 {% endblock %}
@@ -80,17 +83,17 @@
 
 <!--content for the guidebox-->
 {% block guide %}
-
-	<p style="font-size:100%">
-    Now, it's time to identify the <i  style="color:blue">grammatical subject</i> for your sentence.
+	<h2>Identify the grammatical subject</h2>
+	<p align="left"> <b>Step 1:</b> Click on the phrase that acts as the <a href="https://en.wikipedia.org/wiki/Subject_(grammar)" target="helpbox_iframe">grammatical subject</a> in the sentence
 	
-	<br><br> Not sure what a "grammatical subject" is? Check the box on the right</p>
+	<br><br> <b>Tip: </b> Check the box on the right for help 
+	</p>
 	        
 {% endblock %}
 
 {% block helpbox %}
-<h2 style="align:center;">Grammatical functions</h2>
-<iframe src="http://www.englicious.org/lesson/grammatical-functions-clause" style="border:none;" width="100%" height="80%">
+<h2 style="align:center;">Grammatical subject</h2>
+<iframe name="helpbox_iframe" src="https://en.wikipedia.org/wiki/Subject_(grammar)" style="border:none;" width="100%" height="85%">
 </iframe>
 {% endblock %}
 
