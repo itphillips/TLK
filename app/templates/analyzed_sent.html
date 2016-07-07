@@ -146,7 +146,7 @@
 
 <hr><br>
 <form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
-    <button type="submit" style="font-size:16px;height:26px">Reanalyze this sentence
+    <button type="submitg" id="submitg">Reanalyze this sentence
     </button>
     <input type="hidden" name="userID" value="{{userID}}">
     <input type="hidden" name="sentence" value="{{sentence}}">
@@ -168,7 +168,7 @@
 	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
 	<p align="left"><b>Notes:</b> {{notes}}</p>
 	<form name="analysis" action="{{url_for('user', userID=userID)}}" method="GET">
-        <button type="submit" style="font-size:16px;height:26px">See all sentences
+        <button type="submitw" id="submitw">See all sentences
         </button>
         <input type="hidden" name="userID" value="{{userID}}">
 
