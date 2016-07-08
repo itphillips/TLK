@@ -28,10 +28,13 @@ def before_request():
 	g.user = current_user
 
 @app.route('/')
-@app.route('/aboutTLK')
+@app.route('/TLK')
 def home():
-	return render_template("home.html"
-							)
+	return render_template("home.html")
+
+@app.route('/about')
+def about():
+	return render_template("about.html")
 
 #view function that renders the login template by passing the form object LoginForm(Form)
 #to the template login.html

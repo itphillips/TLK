@@ -35,6 +35,16 @@ p {
 
 }
 
+h1 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 36px;
+}
+
+h2 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 24px;    
+}
+
 a {
     text-decoration: none;
 }
@@ -68,13 +78,13 @@ table.center {
             border-left:solid 1px black;
         }
         		
-        #workspace	{
+        #guide	{
         	display:inline-block;
             position:relative;
         	/*background-color:#FFFFCC;*/
-            background-color:#FFF;
+            background-color:#99ffeb;
             border-radius:25px;
-        	width:54%;
+        	width:40%;
         	float:left;
         	padding:10px;
             padding-bottom:20px;
@@ -84,11 +94,11 @@ table.center {
         	border:solid 2px gray;
         }
 
-        #guide {
+        #helpbox {
             display:inline-block;
             position:relative;
-            background-color:#99ffeb;
-            width:40%;
+            background-color:#FFF;
+            width:54%;
             height:400px;
             float:right;
             padding:10px;
@@ -98,7 +108,45 @@ table.center {
             border:solid 2px gray;
             border-radius:25px;
             text-align:center;
-        }   	
+        }
+        	
+        #workspace  {
+            display:inline-block;
+            position:relative;
+            background-color:#FFF;
+            width:97%;
+            float:left;
+            padding:10px;
+            padding-left:20px;
+            padding-bottom:20px;
+            border-radius:25px;
+            margin-top:20px;
+/*            margin-left:5px;*/
+            margin-left:auto;
+            margin-right:auto;
+            border:solid 2px gray;
+            text-align:center;
+        }    	
+
+        #instruction  {
+            display:inline-block;
+            position:relative;
+            background-color:#FFF;
+            width:97%;
+            float:left;
+            padding:5px;
+            padding-left:20px;
+            padding-bottom:0px;
+            border-radius:25px;
+            margin-top:20px;
+/*            margin-left:5px;*/
+            margin-left:auto;
+            margin-right:auto;
+            /*border:solid 2px gray;*/
+            text-align:center;
+            /*color:#ff0099;*/
+            color:#00e6b8;
+        }  
 
         #footer	{
         	position:static;
@@ -109,7 +157,6 @@ table.center {
         	padding-top:100px;
         	padding-bottom:20px;
         }
-        
         #submitg {
             -moz-box-shadow: 3px 4px 0px 0px #3dc21b;
             -webkit-box-shadow: 3px 4px 0px 0px #3dc21b;
@@ -188,6 +235,7 @@ table.center {
             position:relative;
             top:1px;
         }
+
         </style>
 	</head>
 
@@ -214,15 +262,10 @@ table.center {
         {% endif %}
         <!-- <p><a href="/help">Help</a></p> -->
     </ul> 
-<!--This is the left guide box-->
-    <div id="guide">
-       <!--  <h3>Guide</h3> -->
-    {% block guide %}{% endblock %}
-    </div>
 
-<!--This is the right helper box-->
-    <div id="helpbox">
-    {% block helpbox %}{% endblock %}
+<!--This is the instruction box-->
+    <div id="instruction">
+    {% block instruction %}{% endblock %}
     </div>
 
 <!--This is the workspace box-->
@@ -239,6 +282,7 @@ table.center {
     {% endwith %}
     {% block content %}{% endblock %}
     </div>
+
             
 <!--This is the footer-->
     <footer id="footer">
