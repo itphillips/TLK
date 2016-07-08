@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Identify direct object</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+{% block instruction %}
+    <h1>Identify the <a href="https://en.wikipedia.org/wiki/Object_(grammar)" target="helpbox_iframe">direct object</a> in the sentence.</h1>
+{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+window.onload = function () {
+var tag_DO=document.getElementById("tag_DO");
+// var tag_IO=document.getElementById("tag_IO");
+}
+
+	function showTagDO(){
+		tag_DO.style.display="block";
+	}
+	function hideTagObj(){
+		tag_DO.style.display="None";
+		tag_IO.style.display="None";
+	}
+
+	var prev= null;
+
+	function changeColor(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="#00ff40";
+		}
+	}
+
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		target.value.concat("_")
+		}
+	}
+</script>
+
+<!--This is the workspace box-->
+<p style="font-size: 30px;">
+Does "{{sentence}}" have a direct object?
+</p>
+<!-- {% if error != None %}
+<h4 style="color:red"> Click "yes" or "no"! </h4>
+{% endif %} -->
+
+<table class="center">
+<tr>
+
+<td style="padding-left:5px">
+	<form name="no_obj" action="{{url_for('analyzed_sent')}}">
+		<!-- <button type="button" id="no" name="no_DO" onClick="hideTagObj()" style="font-size:16px;height:26px">No</button> -->
+		<button type="submitr" id="submitr">No</button>
+
+		<input type="hidden" name="sentence" value="{{sentence}}">
+		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+		<input type="hidden" name="userID" value="{{userID}}">
+	</form>
+
+
+
+</td>
+
+<td style="padding-right:5px">
+	<button type="submitg" id="submitg" name="yes_DO" onClick="showTagDO()">Yes</button>
+</td>
+</tr>
+</table>
+
+<form action="{{url_for('confirm_obj')}}">
+
+	<div id="tag_DO" style="display:none">
+	<p style="font-size: 30px;">Which phrase is the direct object? (Click one.)</p>
+	<!-- 
+
+	<div style="display:none">
+	<button type="button" id="DO" style="outline: 0;" value="active">hiding!</button>
+	</div> -->
+
+
+	{% for i in range(phrases|count) %}
+	<button type="button" id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+	{% endfor %}
+
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+
+
+	<br>
+	<button type="submitg" id="submitg" name="dobject" onClick="submitClick(event)" value="">Next</button>
+	</div>
+</form>
+
+
+
+{% endblock %}
+
+
+<!--content for the guidebox-->
+{% block guide %}
+	<h2>Identify the direct object</h2>
+	<p align="left"> <b>Step 1:</b> Click on the phrase that acts as the <a href="https://en.wikipedia.org/wiki/Object_(grammar)" target="helpbox_iframe">direct object</a> in the sentence
+	
+	<br><br> <b>Tip: </b> Check the box on the right for help 
+	</p>
+	        
+{% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">Direct object</h2>
+<iframe name="helpbox_iframe" src="https://en.wikipedia.org/wiki/Object_(grammar)" style="border:none;" width="100%" height="85%">
+</iframe>
+{% endblock %}
+
+</body>
+</html>

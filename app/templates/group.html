@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Identify phrases</title>
+</head>
+
+{% extends "base.html" %}
+
+<body onload="refreshpage()">
+{% block instruction %}
+    <h1>Identify all of the <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" target="helpbox_iframe">syntactic phrases</a> in this sentence.</h1>
+{% endblock %}
+
+{% block content %} 
+
+	<script type="text/javascript">
+	function refreshpage() {
+	// var e = document.getElementById("refreshed");
+	// if(e.value=="no")e.value="yes";
+	// else{e.value="no";
+	location.reload(true);
+	}
+	// }
+	var prev= null;
+
+	function wordClick(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="#00ff40";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat("|");
+		}
+		}
+	}
+	</script>
+ 
+
+<br>
+<table class="center" style="width: 100%;">
+<tr>
+<td style="vertical-align:top;padding:auto;text-align: center;padding-top: 20px;">
+<form name="group" action="{{url_for('confirm_phrase')}}" autocomplete="off">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<!-- <input type="hidden" id="refreshed" value="no"> -->
+
+	{% for word in wordlist %}
+	<button type = "button" id = "{{word}}" onClick="wordClick(event)" style="font-size:16px;height:26px">{{word[1]}}</button>
+	{% endfor %}
+<!--- dropdown for type -->
+
+	<br>
+	<h3>What kind of phrase is this?</h3>
+	<!-- <p><input type="radio" name = "phrase_type" value="S">Sentence -->
+	<p><input type="radio" required name = "phrase_type" value="NP">Noun Phrase
+	<br> <input type="radio" name = "phrase_type" value="VP">Verb Phrase
+	<br> <input type="radio" name = "phrase_type" value="PP">Prepositional Phrase
+	<br> <input type="radio" name = "phrase_type" value="AP">Adjective/Adverbial Phrase
+	<br> <input type="radio" name = "phrase_type" value="CP">Complementizer Phrase
+	</p>
+
+	<button type="submitg" id="submitg" name = "words_in_phrase" onClick = "submitClick(event)" value = "">Confirm this phrase and identify another</button>
+ </form> 
+
+ <br>
+<form action="{{url_for('tag_subj')}}">
+	<input type="hidden" name="userID" value="{{userID}}">
+	<input type="hidden" name="sentence" value="{{sentence}}">
+	<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+	<button type="submitw" id="submitw" name= "done">I finished identifying all phrases - go to the next step </button>
+</form>
+</td>
+
+<td>
+</td>
+
+<td style="vertical-align:top;padding:auto;text-align: center">
+<h2>These are the phrases you've identified</h2>
+
+{% if identified_phrases != [] %}
+	<table class="center">
+
+	{% for phrase in identified_phrases %}
+		<tr>
+		<td><p>{{phrase[2]}} - {{phrase[1]}}</p></td>
+
+		{% if userID == g.user.id %}
+			<td>
+			<form name="delete" action="{{url_for('delete_phr', phr_id=phrase[0])}}" method="GET">
+				<input type="hidden" name="userID" value="{{userID}}">
+				<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+				<button type="submitr" id="submitr">Delete</button>
+			</form>
+			</td>
+		{% endif %}
+
+		</tr>
+	{% endfor %}
+
+	</table>
+
+{% else %}
+	<p style="color:red;">None yet! <br> Click on the buttons to the left to get started.</p>
+
+{% endif %}
+
+</td>
+</tr>
+</table>
+
+{% endblock %}
+
+<!--content for the guidebox-->
+{% block guide %}
+	<h2>Identify syntactic phrases</h2>
+	<p align="left"> <b>Step 1:</b> Click on words that form a <a href="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" target="helpbox_iframe">syntactic phrase</a> (aka <i>syntactic constituent</i>)</a>
+	<br><br> <b>Step 2:</b> Identify the kind of phrase that the words form.
+	<br><br> <b>Tip: </b> Use these tests to determine if a group of words forms a constituent:</p>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#tests" style="font-size:24px" target="helpbox_iframe">Substitution</a> 
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#movement" style="font-size:24px" target="helpbox_iframe">Movement</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#questions" style="font-size:24px" target="helpbox_iframe">Question answer</a>
+	 <br><br>
+	 <a href="http://www.ling.upenn.edu/~beatrice/syntax-textbook/ch2.html#it-cleft" style="font-size:24px" target="helpbox_iframe">Clefting</a>
+	 <p align="left"><b>Step 3:</b> Make sure to identify <i>all</i> of the phrases in the sentence. 
+	 <br><br>When you finish identifying all syntactic constituents in the sentence click "I finished - go to the next step"</p>
+	        
+{% endblock %}
+
+
+{% block helpbox %}
+<h2 style="align:center;">Syntactic phrases (aka constituents)</h2>
+<iframe src="https://en.wikipedia.org/wiki/Constituent_%28linguistics%29" name="helpbox_iframe" style="border:none;" width="100%" height="80%">
+</iframe>
+{% endblock %}
+
+
+</body>
+</html>

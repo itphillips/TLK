@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Identify subject</title>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+{% block instruction %}
+    <h1>Identify the <a href="https://en.wikipedia.org/wiki/Subject_(grammar)" target="helpbox_iframe">grammatical subject</a> in the sentence.</h1>
+{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+	var prev= null;
+	function changeColor(e){
+		var target = e.target;
+		console.log(target);
+		if (target.value === "active"){
+			target.setAttribute("value", "inactive");
+			target.style.backgroundColor="white";
+		}
+		else{
+			target.setAttribute("value", "active");
+			target.style.backgroundColor="orange";
+		}
+	}
+	function submitClick(e){
+		var elements = document.querySelectorAll("button")
+		var target = e.target;
+		for (var i = 0, element; element = elements[i++];) {
+			console.log(element);
+    	if (element.value === "active"){
+    		target.value = target.value.concat(element.id).concat(" ");
+		}
+		}
+	}
+
+	{% for element in phrase_structure_options %}
+	console.log("{{element}}")
+	console.log("{{element[0]}}")
+	console.log("{{element[1]}}")
+	{% if element[1] == "necessary" %}
+	var button=document.forms.getElementById("{{element[0]}}");
+	
+	console.log(button)
+	console.log("hi")
+	console.log("{{element[0]}}")
+
+	button.style.background='orange';
+	{% endif %}
+	{% endfor %}
+	</script>
+
+
+<!--This is the workspace box-->
+<p style="font-size: 30px;">
+What is the grammatical subject of "{{sentence}}"? <br><br>(Pick one.)
+</p>
+<!-- <p>(Pick one phrase.)</p> -->
+{% if error != None %}
+<h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
+{% endif %}
+
+<form action="{{url_for('confirm_subj')}}">
+
+{% for i in range(phrases|count) %}
+<button type="button" required id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
+{% endfor %}
+
+<input type="hidden" name="sentence" value="{{sentence}}">
+<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+<input type="hidden" name="userID" value="{{userID}}">
+
+<br>
+<button type="submitg" id="submitg" name="subject" onClick="submitClick(event)" value="">Next</button>
+
+</form>
+{% endblock %}
+
+
+<!--content for the guidebox-->
+{% block guide %}
+	<h2>Identify the grammatical subject</h2>
+	<p align="left"> <b>Step 1:</b> Click on the phrase that acts as the <a href="https://en.wikipedia.org/wiki/Subject_(grammar)" target="helpbox_iframe">grammatical subject</a> in the sentence
+	
+	<br><br> <b>Tip: </b> Check the box on the right for help 
+	</p>
+	        
+{% endblock %}
+
+{% block helpbox %}
+<h2 style="align:center;">Grammatical subject</h2>
+<iframe name="helpbox_iframe" src="https://en.wikipedia.org/wiki/Subject_(grammar)" style="border:none;" width="100%" height="85%">
+</iframe>
+{% endblock %}
+
+</body>
+</html>

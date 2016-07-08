@@ -1,0 +1,6 @@
+privateconfig.py
+privateconfigtwo.py
+tmp/*
+tlkenv
+*.pyc
+.DS_Store

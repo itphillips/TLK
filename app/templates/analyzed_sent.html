@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Analysis: {{sentence}}</title>
+	<style>
+		table, th, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 18px;
+			font-weight: normal;
+			font-family: arial;
+		}
+	</style>
+</head>
+<!-- extend base layout -->
+{% extends "base2.html" %}
+
+<body>
+{% block content %}
+
+{% if sentences!=[] %}
+	
+<h2>Parts of speech:</h2>
+<!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
+
+{% if POSlist!=[] %}
+<table class="center">
+	<tr>
+	{% for i in POSlist %}
+		<th>{{i[0]}}</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in POSlist %}
+		<th>|</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in POSlist %}
+		<th style="padding-left: 15px;padding-right: 15px;">{{i[1]}}</th>
+	{% endfor %}
+	</tr>
+</table>
+
+{% else %}
+<p style="color:red;"> You didn't identify any parts of speech for this sentence.
+</p>
+
+{% endif %}
+
+
+<hr>
+<h2>Basic word order:</h2>
+
+{% if bwo!=[] %}
+<table class="center">
+	<tr>
+	{% for i in bwo[:-1] %}
+		<th>{{i[1]}}</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in bwo[:-1] %}
+		<th>|</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for i in bwo %}
+		<th style="padding-left: 15px;padding-right: 15px;">{{i[0]}}</th>
+	{% endfor %}
+	</tr>
+
+</table>
+
+{% else %}
+<p style="color:red;"> You didn't identify the verb or subject in this sentence. <br>Can't determine basic word order.
+</p>
+
+{% endif %}
+
+<hr>
+<h2>Syntactic phrases:</h2>
+
+{% if phrase_groups!=[] %}
+{% set group = phrase_groups[0] %}
+{% if group[1:]!=[] %}
+<table class="center" style="border-spacing: 0px; border-collapse: collapse;">
+	<tr>
+	{% for i in phrase_groups %}
+		<th style="font-weight:bold;font-size:30px;">{{i[0]}}</th>
+	{% endfor %}
+	</tr>
+
+	<tr>
+	{% for group in phrase_groups %}
+		<td style="vertical-align:top; padding-left:15px; padding-right:15px; text-align: left;border-left: 1px solid; border-right: 1px solid; ">
+		{% for item in group[1:] %}
+			<p>{{item}}</p>
+		{% endfor %}
+		</td>
+	{% endfor %}
+	</tr>
+</table>
+{% else %}
+
+<p style="color:red;"> You didn't finish analyzing the phrases in this sentence.
+</p>
+{% endif %}
+
+{% else %}
+<p style="color:red;"> You didn't finish analyzing any phrases in this sentence.
+</p>
+{% endif %}
+
+
+
+<br>
+<hr>
+<h2>Phrase structure:</h2>
+{% if uniquepslist!=[] %}
+<table class="center">
+	<tr>
+		<td>S &#8594; NP VP</td>
+	</tr>
+
+	{% for i in uniquepslist %}
+	<tr>
+		<td>{{i[0]}} &#8594; {{i[1]}}</td>
+	</tr>
+	{% endfor %}
+
+</table>
+
+{% else %}
+<p style="color:red;"> You didn't finish analyzing any phrases in this sentence.
+</p>
+
+{% endif %}
+
+
+
+
+<hr><br>
+<form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
+    <button type="submitg" id="submitg">Reanalyze this sentence
+    </button>
+    <input type="hidden" name="userID" value="{{userID}}">
+    <input type="hidden" name="sentence" value="{{sentence}}">
+    <input type="hidden" name="language" value="{{language}}">
+    <input type="hidden" name="date" value="{{collection_date}}">
+    <input type="hidden" name="sentenceID" value="{{sentenceID}}">
+
+</form> 
+{% endif %}
+
+{% endblock %}
+
+{% block guide %}
+	<h2 align="left" style="font-family:arial">Sentence info: </h2>
+	<p align="left" style="font-size:20px;color:#47476b">{{sentence}}</p>
+	<p align="left"><b>Language:</b> {{language}}</p>
+	<p align="left"><b>Sentence type:</b> {{sent_type}}</p>
+	<p align="left"><b>Meaning:</b> {{gloss}}</p>
+	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
+	<p align="left"><b>Notes:</b> {{notes}}</p>
+	<form name="analysis" action="{{url_for('user', userID=userID)}}" method="GET">
+        <br>
+        <button type="submitw" id="submitw">See all sentences
+        </button>
+        <input type="hidden" name="userID" value="{{userID}}">
+
+	</form> 
+{% endblock %}
+
+
+</body>
+</html>

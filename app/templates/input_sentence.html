@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Enter new sentence</title>
+	<style>
+		table, th, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 18px;
+			font-weight: normal;
+			font-family: arial;
+		}
+	</style>
+</head>
+
+{% extends "base.html" %}
+
+<body>
+{% block instruction %}
+    <h1>Enter a <a href="https://en.wikipedia.org/wiki/Sentence_(linguistics)" target="resources">sentence</a> for analysis.</h1>
+{% endblock %}
+
+{% block content %}
+<!-- <h1>Step 1: Enter a sentence</h1> -->
+
+	<form action="{{url_for ('confirm_sentence')}}">
+	<p style="color:#ff0099;"><b>Tip: </b>Check the <a href="#guide">help windows</a> below for guidance.</p>
+	<p><b>Please enter a sentence:</b><br>
+	(Enter multi-word <a href="https://en.wikipedia.org/wiki/Proper_noun" target="resources">proper nouns</a> without spaces - for example, enter "New York" as "NewYork")<br>
+	<input type="text" name="sentence" required size=40> <br><br>
+	<b>What language is this sentence?</b> <br>
+	<input type="text" name="language" required size=25><br><br>
+	<b>What <a href="https://en.wikipedia.org/wiki/Sentence_(linguistics)#Classification" target="resources">type of sentence</a> is this?</b><br>
+	<input type="radio" required name="sentence_type" value="declarative">declarative
+	<input type="radio" name="sentence_type" value="interrogative">interrogative
+	<input type="radio" name="sentence_type" value="imperative">imperative
+    <br><br>
+	<b>What does this sentence mean?</b> (say it in other words)<br>
+	<input type="text" name="paraphrase" required size=40><br><br>
+	<b>When was this sentence recorded?</b> <br>
+	(Please enter the date in MM/DD/YYYY format:)<br>
+	<input type="text" name="date" required size=15><br><br>
+
+	<input type="hidden" name="userID" value="{{userID}}">
+	</p>
+<!-- 	Have you previously input other sentences from this same recording session?
+<input type="radio" name="continued_session" value="yes">Yes<br>
+<input type="radio" name="continued_session" value="no">No -->
+
+	<button type="submitg" id="submitg">Next</button>
+	
+{% endblock %}
+
+<a id="guide">
+{% block guide %}
+	<h2>Guide</h2>
+	<p align="left"> 
+		<b>Step 1:</b> <br>Enter a <a href="https://en.wikipedia.org/wiki/Sentence_(linguistics)" target="resources">sentence</a> that you would like to analyze. <br><br>
+		<b>Step 2:</b> <br>Enter the language that this sentence belongs to.<br><br>
+		<b>Step 3:</b> <br>Identify the <a href="https://en.wikipedia.org/wiki/Sentence_(linguistics)#Classification" target="resources">type of sentence</a>.<br><br>
+		<b>Step 4:</b> <br>Restate the sentence in other words.<br><br>
+		<b>Step 5:</b> <br>Enter the date when this sentence was recorded.<br><br>
+	<br>        
+{% endblock %}
+</a>
+
+{% block helpbox %}
+<h2 style="align:center;">Sentences</h2>
+<iframe name="resources" src="https://en.wikipedia.org/wiki/Sentence_(linguistics)" style="border:none;" width="100%" height="85%">
+</iframe>
+{% endblock %}
+
+</body>
+</html>

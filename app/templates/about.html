@@ -1,0 +1,218 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>About The Linguist's Kitchen</title>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #FFF;
+    border-bottom:solid 1px black;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;
+}
+
+p {
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;
+
+}
+
+
+h1 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 24px;
+}
+
+h2 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;    
+}
+
+a {
+    text-decoration: none;
+}
+
+        #container	{
+        	width:1100px;
+        	margin-left:auto;
+        	margin-right:auto;
+        }
+        
+        #header {
+        	position:relative;
+        	background-color:#FFF;
+        	width:100%;
+        	height:120px;
+    	}
+        		
+        #menu	{
+        	display:inline;
+            list-style-type:none;
+            position:relative;
+        	background-color:#FFF;
+        	width:10%;
+        	float:left;
+        	text-align:left;
+        	padding:10px;
+            border-left:solid 1px black;
+        }
+	
+
+        #footer	{
+        	position:static;
+        	background-color:#FFF;
+        	text-align:center;
+        	width:100%;
+        	clear:both;
+        	padding-top:100px;
+        	padding-bottom:20px;
+        }
+
+         </style>
+</head>
+
+<body>
+
+<!--This is the container-->
+<div id="container">
+
+<!--This is the title image header-->
+    <div id="header">
+    		<a href="{{ url_for('home') }}">
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="550" height="105"> 
+            </a>
+    </div>
+
+<!--this is the menu box-->
+    <ul>
+        <li><a href="{{ url_for('about') }}">About TLK</a></li>
+        {% if g.user.is_authenticated() %}
+        <li><a href="{{ url_for('user', userID=g.user.id) }}">Home</a></li>
+        <li><a target="_blank" href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
+        <!-- <li><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing Conventions</a></li> -->
+        <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% endif %}
+
+        {% if not g.user.is_authenticated() %}
+        <li style="float:right"><a href="{{ url_for('login') }}">Log in</a></li>
+        {% endif %}
+
+        <!-- <p><a href="/help">Help</a></p> -->
+    </ul> 
+
+
+<!--This is the workspace box-->
+    <div id="workspace">
+    <h1>About</h1>
+    	<p>
+    	The Linguist's Kitchen is a teaching and learning tool designed for 
+		introductory linguistics and language courses. It is meant to support classroom 
+		instruction by guiding students in dissecting their own language(s). 
+
+		<br><br>The Linguist's Kitchen will not give you any answers. It is designed only to 
+		guide you in your own thinking, by providing a workspace where you can transcribe language 
+		samples that you provide, and guiding you through three levels 
+		of syntactic analysis, including identifying:
+
+		<br><br><b>parts of speech</b> (noun, verb, adjective, 
+		pronoun, etc.)
+
+		<br><b>phrase structure</b> (noun phrase, verb phrase, adjectival 
+		phrase, etc.)
+
+		<br><b>grammatical function</b> (grammatical subject, direct object, etc.)
+
+		<br><br>For each sentence, The Linguist's Kitchen will generate a phrase structure grammar 
+		based on your input, like the following: 
+		<b><br><br>S &#8594; NP VP
+		<br>NP &#8594; (Det) N
+		<br>VP &#8594; V (NP)</b>
+
+		<br><br>The purpose of The Linguist's Kitchen is to support learning. The first aim is to provide a user-friendly interface that supports students in objectifying languages they interact with at home or in their daily lives, by creating a space where each language sample is treated as an object to be analyzed and is separated from the historical, social, and political views associated with the language and its speakers that may impede objective thinking about the language as a whole. The second aim is to  provide detailed guidance during each step of the analysis process to help beginning students sort out fundamental  ideas and develop the conceptual framework that form the basis of learning in linguistics. Lastly, this tool is designed to promote a student-centered learning experience where students study linguistic principles by analyzing content that they generate. The idea is to strengthen student engagement with the subject matter by making it relevant to their lives outside of the classroom and by granting power to students as authorities on the subject and creators of knowledge.
+		</p>
+
+	<br>
+    <h1>License</h1>
+    	<p>
+    	Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
+        <br><br>
+        The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br><br>
+        Source code is available at <a href="https://github.com/itphillips/TLK" target="_blank">https://github.com/itphillips/TLK</a>.
+    	</p>
+
+    <br>
+    <h1>Credits</h1>
+    <p>
+    	Concept, design, and programming by <a href="http://ianphillips.commons.gc.cuny.edu/" target="_blank">Ian Phillips</a>.
+    	<br><br> Special thank you to <a href="http://michelleajohnson.com/" target="_blank">Michelle McSweeney</a> for the snippet of Python code that launched this project into existence.
+    	<br><br> Thank you to Susan Steinman for providing guidance during the early stages of development, writing code, and teaching me how a web framework works.
+    	<br><br> Thank you to Joe Kirchhof at the <a href="http://newmedialab.cuny.edu/" target="_blank">New Media Lab</a> for support deploying TLK and to the New Media Lab for hosting TLK.
+    	<br><br> This project was inspired by conversations that took place in the <a href="https://gc.cuny.edu/Page-Elements/Academics-Research-Centers-Initiatives/Certificate-Programs/Interactive-Technology-and-Pedagogy" target="_blank">Interactive Technology &amp; Pedagogy Certificate Program</a> at <a href="https://gc.cuny.edu/home" target="_blank">CUNY Graduate Center</a>. 
+    	<br><br> Funding for The Linguist's Kitchen was provided by awards from <a href="https://gcdi.commons.gc.cuny.edu/category/provosts-digital-innovation-grants/" target="_blank">GC Digital Initiatives Provost's Digital Innovation Grants</a> during the 2014-2015 and 2015-2016 cycles and a stipend from the <a href="http://newmedialab.cuny.edu/" target="_blank">New Media Lab</a> during the 2015-2016 academic year.
+    </p>
+
+    <br>
+    <h1>Contact</h1>
+    	<p>
+    	Please send all inquiries and comments about The Linguist's Kitchen to: thelinguistskitchen (at) yahoo (dot) com.
+    	<br><br>
+    	If you are on GitHub, please use the <a href="https://github.com/itphillips/TLK" target="_blank">TLK GitHub page</a> if you would like to report an issue or submit a pull request to fix one yourself.
+    	</p>
+
+    <br>
+    <h1>The Future</h1>
+    	<p>
+    	The Linguist's Kitchen is an experiment in pedagogy, so I'd like to know how people are using it. Your feedback is appreciated! 
+    	<br><br>
+    	As The Linguist's Kitchen is an experiment in pedagogy, not an exercise in writing elegant code, and I am a linguist, not a programmer, there are a number of bugs and hacky fixes in the program. Please excuse these issues; I'll work on cleaning them up in the next round of development, which should happen after I collect enough feedback on how people are using The Linguist's Kitchen, and work out some ideas on how it can be improved.
+    	</p>
+
+    </div>
+            
+<!--This is the footer-->
+    <footer id="footer">
+        Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
+        <br><a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html"><img src="/static/gplv3-88x31.png" alt="(GPLv3)"></a> The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+    </footer>
+
+</div>
+
+</body>
+</html>
