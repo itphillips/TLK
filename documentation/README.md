@@ -11,14 +11,19 @@ of syntactic analysis, including identifying:
 
 **parts of speech** (noun, verb, adjective, 
 pronoun, etc.)
+
 **phrase structure** (noun phrase, verb phrase, adjectival 
 phrase, etc.)
+
 **grammatical function** (grammatical subject, direct object, etc.)
 
 For each sentence, The Linguist's Kitchen will generate a phrase structure grammar 
 based on your input, like the following: 
-**S --> NP VP**
+
+**S = NP VP**
+
 **NP --> (Det) N**
+
 **VP --> V (NP)**
 
 The purpose of The Linguist's Kitchen is to support learning. The first aim is to provide a user-friendly interface that supports students in objectifying languages they interact with at home or in their daily lives, by creating a space where each language sample is treated as an object to be analyzed and is separated from the historical, social, and political views associated with the language and its speakers that may impede objective thinking about the language as a whole. The second aim is to  provide detailed guidance during each step of the analysis process to help beginning students sort out fundamental  ideas and develop the conceptual framework that form the basis of learning in linguistics. Lastly, this tool is designed to promote a student-centered learning experience where students study linguistic principles by analyzing content that they generate. The idea is to strengthen student engagement with the subject matter by making it relevant to their lives outside of the classroom and by granting power to students as authorities on the subject and creators of knowledge.
@@ -28,8 +33,6 @@ The purpose of The Linguist's Kitchen is to support learning. The first aim is t
 Copyright (C) 2016 [Ian Phillips](http://ianphillips.commons.gc.cuny.edu/)
 
 The Linguist's Kitchen is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0-standalone.html).
-
-Source code is available at https://github.com/itphillips/TLK.
 
 
 # Credits
@@ -47,7 +50,7 @@ Funding for The Linguist's Kitchen was provided by awards from [GC Digital Initi
 
 
 # Contact
-Please send all inquiries and comments about The Linguist's Kitchen to: thelinguistskitchen (at) yahoo (dot) com.
+Please send all inquiries and comments about The Linguist's Kitchen to: thelinguistskitchen (at) yahoo (dot) com or submit a new issue.
 
 
 # The Future
