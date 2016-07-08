@@ -20,7 +20,7 @@ phrase, etc.)
 For each sentence, The Linguist's Kitchen will generate a phrase structure grammar 
 based on your input, like the following: 
 
-**S = NP VP**
+**S --> NP VP**
 
 **NP --> (Det) N**
 
