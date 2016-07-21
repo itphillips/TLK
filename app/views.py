@@ -134,7 +134,7 @@ def user(userID): #'userID' gets passed from after_login(), =g.user.id
 
 	else:
 		try:
-			dict_cur.execute("SELECT * FROM sentences s WHERE s.id_user = %s;", (userID,))
+			dict_cur.execute("SELECT * FROM sentences s WHERE s.id_user = %s ORDER BY s.id DESC;", (userID,))
 			sentences = dict_cur.fetchall()
 			print "\nsentences: "
 			for record in sentences:
@@ -1015,11 +1015,12 @@ def analyzed_sent():
 
 		#create a phrase structure dictionary where the key:value pair is phrase ID: list of daughter phraseIDs 
 		psdict = {}
-		dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
+		dict_cur.execute("SELECT * FROM phrases p INNER JOIN phrase_sentence_positions psp ON p.id=psp.id_phrase WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
 		precords = dict_cur.fetchall()
 
 		#for each phrase in the dictionary, look at each other phrase and append it to the value list if it is a daughter
 		for record in precords:
+			print "precord: ", record, type(record)
 			const = []
 			phraseID = record[0]
 			print "phraseID: ", phraseID, type(phraseID)
@@ -1047,8 +1048,8 @@ def analyzed_sent():
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
 		wppwrecords = dict_cur.fetchall()
 
-		# for record in wppwrecords:
-		# 	print record, type(record)
+		for record in wppwrecords:
+			print record, type(record)
 
 		for key in psdict:
 			#if the phrase key corresponds to an empty list, then add the pos for the phrase to the list
@@ -1060,6 +1061,7 @@ def analyzed_sent():
 			else:
 				#create dictionary made of a word list for each daughter in each mother
 				dcontent = {}
+				pruledict = {} #this is where daughter phrases and remainders will go as linpos:p-type or pos
 				for value in psdict[key]:
 					wordlist = []
 					for record in wppwrecords:
@@ -1078,13 +1080,21 @@ def analyzed_sent():
 								del dcontent[j]
 				print "dcontent: ", key, dcontent
 
-				#this updates psdict by removing phrases that are subsets of othe phrases
+				#this updates psdict by removing phrases that are subsets of other phrases
 				dcontentlist = []
 				for k in dcontent:
 					dcontentlist.append(k)
 				print "dcontentlist: ", dcontentlist
 				psdict[key] = dcontentlist
 				print "psdict: ", psdict
+
+				#for each item in dcontentlist, this adds to pruledict the linpos:p-type as a key:value pair
+				for i in dcontentlist:
+					for record in precords:
+						if i == record[0]:
+							pruledict[record[6]] = record[2]
+
+				print "pruledict: ", pruledict
 
 				#compare concatenated daughters to mother 
 				#make a dict of words that are in the mother but not the daughter
@@ -1109,6 +1119,7 @@ def analyzed_sent():
 				print "remainderdict: ", key, remainderdict
 
 				# find POS and linear position in phrase for each remainder in remainderdict
+				pscontent = []
 				for remainder in remainderdict[key]:
 					for record in wppwrecords:
 						if record[2] == remainder and record[4] == key:
@@ -1116,14 +1127,21 @@ def analyzed_sent():
 							remainderpos = record[7]
 							print remainderlinpos, remainderpos
 
-				#append remainder to value list in correct position relative to phrase daughters
-				#as is, the appends the remainder first, rather than checking to see where it belongs
-				#relative to other daughter phrases
-				pscontent = [remainderpos]
-				for value in psdict[key]:
-					for record in precords:
-						if value == record[0]:
-							pscontent.append(record[2])
+							#add remainderlinpos:remainderpos to pruledict as key:value pair
+							pruledict[remainderlinpos] = remainderpos
+
+				print "complete pruledict: ", pruledict
+
+				#create a list from the pruledict, where the order of items is determined by the key value
+				#this will create a list that is made of remainderpos and p-types in the right linear order
+				sentlen = len(wrecords)
+				print "sentlen: ", sentlen
+
+				for i in range(sentlen):
+					if i in pruledict.keys():
+						pscontent.append(pruledict[i])
+
+
 				print pscontent
 				psdict[key] = pscontent
 
