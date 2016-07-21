@@ -65,7 +65,7 @@ class Sentence(db.Model):
 	english_gloss = db.Column(db.String)
 	collection_date = db.Column(db.DateTime)
 	collection_location = db.Column(db.String(70))
-	notes = db.Column(db.String(140))
+	notes = db.Column(db.String)
 	timestamp = db.Column(db.DateTime)
 	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
 	# words = db.relationship('Word', backref='sentences', cascade='delete')

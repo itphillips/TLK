@@ -11,7 +11,6 @@ from psycopg2 import extras
 from flask.ext.login import login_user, logout_user, current_user, login_required
 #imports class 'LoginForm' from forms.py
 from .forms import LoginForm, EnterSentenceForm, TagPOSForm
-#from .models import User, Sentence, Word
 from .models import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function, Phrase_structure_rule
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlk')
@@ -165,6 +164,7 @@ def confirm_sentence():
 		date=request.args.get("date")
 		paraphrase=request.args.get("paraphrase")
 		sentence_type=request.args.get("sentence_type")
+		notes=request.args.get("notes")
 		sessionID=date+language
 	except Exception as e:
 		print e
@@ -187,7 +187,7 @@ def confirm_sentence():
 		sessionnumber=1	
 	try:
 		#make sure that this sentence isn't already in the database
-		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, collection_date, sessionnumber, sessionid, english_gloss, id_user, sentence_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase, userID, sentence_type))
+		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, collection_date, sessionnumber, sessionid, english_gloss, id_user, sentence_type, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase, userID, sentence_type, notes))
 		# dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
 		# sentenceID = dict_cur.fetchone()[0]
 	except Exception as e:
@@ -983,7 +983,7 @@ def analyzed_sent():
 		print e
 
 	#this is for the syntactic structure section of the analyzed sent page
-
+	uniquepslist = []
 	try:
 		#create a list of words for the sentence
 		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s;", (sentenceID, userID))
@@ -1012,7 +1012,11 @@ def analyzed_sent():
 			sent_phrase_list.append(phrase_list)
 		print "\nsent_phrase_list: %s" % (sent_phrase_list) 
 
+	except Exception as e:
+		print e
 
+
+	try:
 		#create a phrase structure dictionary where the key:value pair is phrase ID: list of daughter phraseIDs 
 		psdict = {}
 		dict_cur.execute("SELECT * FROM phrases p INNER JOIN phrase_sentence_positions psp ON p.id=psp.id_phrase WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
@@ -1020,7 +1024,7 @@ def analyzed_sent():
 
 		#for each phrase in the dictionary, look at each other phrase and append it to the value list if it is a daughter
 		for record in precords:
-			print "precord: ", record, type(record)
+			print "\nprecord: ", record, type(record)
 			const = []
 			phraseID = record[0]
 			print "phraseID: ", phraseID, type(phraseID)
@@ -1028,21 +1032,29 @@ def analyzed_sent():
 
 
 			for i in precords:
+				#need these variables to make i equal to one or more words
+				#without this, the phrase corresponding to the pronoun "i"
+				#will get added to const for any phrase containing the just letter "i"
+				imidsent = " " + i[1] + " "
+				isentonset = i[1] + " "
+				isentoffset = " " + i[1]
+
 				#the and statement excludes the phraseID itself from the list
-				if i[1] in record[1] and i[1] != record[1]:
+				if imidsent in record[1] and i[1] != record[1]:
 					psdict[phraseID].append(i[0])
 
-		print "psdict: ", psdict
+				elif isentonset in record[1] and i[1] != record[1]:
+					psdict[phraseID].append(i[0])
 
-		# for i in psdict:
-		# 	mother = i
-		# 	daughters = []
+				elif isentoffset in record[1] and i[1] != record[1]:
+					psdict[phraseID].append(i[0])
 
-		# 	for i in psdict[i]:
-		# 		daughters.append(i)
+		print "\npsdict: ", psdict
 
-		# 	print mother, " = ", daughters[1:]
+	except Exception as e:
+		print e
 
+	try:
 		#this will look at each mother (key), subtract the content of the daughters (value list), and append
 		#what remains in the correct position in the list
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
@@ -1068,7 +1080,7 @@ def analyzed_sent():
 						if record[4] == value:
 							wordlist.append(record[2])
 					dcontent[value] = wordlist 
-				print "dcontent: ", key, dcontent
+				print "\ndcontent (all daughter phrases w/ words): ", key, dcontent
 
 				#remove daughter content if it is subset of another daughter
 				for i, a in dcontent.items():
@@ -1078,7 +1090,7 @@ def analyzed_sent():
 						if i != j:
 							if all(x in a for x in b):
 								del dcontent[j]
-				print "dcontent: ", key, dcontent
+				print "\ndcontent (subsets removed): ", key, dcontent
 
 				#this updates psdict by removing phrases that are subsets of other phrases
 				dcontentlist = []
@@ -1123,14 +1135,14 @@ def analyzed_sent():
 				for remainder in remainderdict[key]:
 					for record in wppwrecords:
 						if record[2] == remainder and record[4] == key:
-							remainderlinpos = record[1]
+							remainderlinpos = record[8]
 							remainderpos = record[7]
 							print remainderlinpos, remainderpos
 
 							#add remainderlinpos:remainderpos to pruledict as key:value pair
 							pruledict[remainderlinpos] = remainderpos
 
-				print "complete pruledict: ", pruledict
+				print "pruledict entries for key: ", key, pruledict
 
 				#create a list from the pruledict, where the order of items is determined by the key value
 				#this will create a list that is made of remainderpos and p-types in the right linear order
@@ -1145,7 +1157,9 @@ def analyzed_sent():
 				print pscontent
 				psdict[key] = pscontent
 
+		print pruledict
 		print psdict
+
 		for item in psdict:
 			rule = ""
 			for value in psdict[item]:
@@ -1187,7 +1201,7 @@ def analyzed_sent():
 		for rule in pslist:
 			print rule
 
-		uniquepslist = []
+
 		exists = set()
 		for item in pslist:
 			rule = item[0] + " = " + item[1]
@@ -1201,7 +1215,7 @@ def analyzed_sent():
 
 
 	except Exception as e:
-				print e
+		print e
 
 	return render_template("analyzed_sent.html",
 							username=userID,
