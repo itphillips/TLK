@@ -9,16 +9,14 @@ import urlparse
 import ast
 from psycopg2 import extras
 from flask.ext.login import login_user, logout_user, current_user, login_required
-#imports class 'LoginForm' from forms.py
-from .forms import LoginForm, EnterSentenceForm, TagPOSForm
+from .forms import LoginForm
 from .models import User, Sentence, Word, Phrase, Word_phrase_position, Phrase_sentence_position, Gram_function, Phrase_structure_rule
 
 conn = psycopg2.connect('postgresql://ianphillips@localhost/tlk')
 conn.set_session(autocommit=True)
 dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-#this function loads a user from the db and is used by flask-login
-@lm.user_loader #this decorator registers the function with flask-login
+@lm.user_loader
 def load_user(id):
 	return User.query.get(int(id))
 
@@ -35,48 +33,27 @@ def home():
 def about():
 	return render_template("about.html")
 
-#view function that renders the login template by passing the form object LoginForm(Form)
-#to the template login.html
-#methods arguments tell Flask that this view function accespts GET and POST requests
 @app.route('/login', methods=['GET', 'POST'])
-@oid.loginhandler #tells flask-openid that this is our login view function
+@oid.loginhandler 
 def login():
-	#this sees if the user is logged in, if so it won't do a second login
-	#g global is set up by flask as a place to store and share data during the life
-	#of a request - this stores the logged in user
+	print "\nthis is login:"
 	if g.user is not None and g.user.is_authenticated():
 		return redirect(url_for('user', userID=g.user.id))
-	#instantiated object from LoginForm()
+
 	form = LoginForm()
 	if form.validate_on_submit():
-		session['remember_me'] = form.remember_me.data #stores the value of 
-		#remember_me boolean in flask session (not db.session!)
-		#once data is stored in the session object, it will be avaialble during 
-		#that request and any future requests made by the same client
-		#data remains there until explicitly removed - flask keeps a different
-		#session container for each client of the app
-
-		#this triggers user authentication through flask-openid
-		#takes 2 arguments: openid given by user in web form and a list of 
-		#data items we want from openid provider
+		session['remember_me'] = form.remember_me.data 
 		return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
-
-		# flash('Login requested for OpenID="%s", remember_me=%s' %
-		# 	(form.openid.data, str(form.remember_me.data)))
-		# return redirect('/home')
 
 	return render_template('login.html',
 							form=form,
-							#grabs configuration by looking it up in app.config with 
-							#its key, then adds array to render_template call as a 
-							#template argument
 							providers=app.config['OPENID_PROVIDERS'])
 
 
 @oid.after_login
-def after_login(resp): #resp argument contains information returned by openid provider
-	#this if statement is for validation
-	#user cannot login if email is not provided
+def after_login(resp):
+	print "\nthis is after_login:"
+
 	if resp.email is None or resp.email == "":
 		flash('Invalid login. Please try again.')
 		return redirect(url_for('login'))
@@ -110,6 +87,8 @@ def after_login(resp): #resp argument contains information returned by openid pr
 
 @app.route('/logout')
 def logout():
+	print "\nthis is logout:"
+
 	logout_user()
 	return redirect(url_for('home'))
 
@@ -117,9 +96,8 @@ def logout():
 @app.route('/user/<userID>')
 @login_required 
 def user(userID): #'userID' gets passed from after_login(), =g.user.id
-	print "\nthis is user function"
-	# dict_cur.execute("SELECT id FROM users WHERE username = %s;", (username,))
-	# userID = dict_cur.fetchone()[0]
+	print "\nthis is user:"
+
 	userID = int(userID)
 	print "userID: ", userID, type(userID)
 	
@@ -137,7 +115,7 @@ def user(userID): #'userID' gets passed from after_login(), =g.user.id
 			sentences = dict_cur.fetchall()
 			print "\nsentences: "
 			for record in sentences:
-				print record, type(record)
+				print record, type(record), "\n"
 		except Exception as e:
 			print e
 
@@ -150,6 +128,8 @@ def user(userID): #'userID' gets passed from after_login(), =g.user.id
 @app.route("/input")
 @login_required
 def input_sentence():
+	print "\nthis is input_sentence:"
+
 	userID=request.args.get("userID")
 	return render_template("input_sentence.html", 
 							userID=userID)
@@ -157,6 +137,8 @@ def input_sentence():
 @app.route("/sentence")
 @login_required
 def confirm_sentence():
+	print "\nthis is confirm_sentence:"
+
 	try:
 		userID=request.args.get("userID")
 		sentence=request.args.get("sentence").lower()
@@ -174,26 +156,23 @@ def confirm_sentence():
 	for i in punc:
 		sentence = sentence.replace(i, "")
 
-	# print "sentence w/o punc: ", sentence
-
 	try:
 		dict_cur.execute("SELECT sessionnumber FROM sentences INNER JOIN users ON users.id=sentences.id_user WHERE users.id = %s AND sessionid = %s;", (userID, sessionID))
 		sessionnumber = dict_cur.fetchall()	
 	except Exception as e:
 		print e
+
 	if dict_cur.fetchall() != []:
 		sessionnumber=sessionnumber+1
 	else:
 		sessionnumber=1	
+
 	try:
 		#make sure that this sentence isn't already in the database
 		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, collection_date, sessionnumber, sessionid, english_gloss, id_user, sentence_type, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase, userID, sentence_type, notes))
-		# dict_cur.execute("SELECT id FROM sentences WHERE sentence = '{}' AND collection_date = '{}' AND sessionID = '{}';".format (sentence, date, sessionID) )
-		# sentenceID = dict_cur.fetchone()[0]
 	except Exception as e:
 		print e
-		#return redirect to same page with error message==make sure you fill in all fields.
-	#continued_session=request.args.get("continued_session")
+
 	print "done confirm_sentence"
 	return redirect(url_for('user',
 							userID=g.user.id))
@@ -202,20 +181,15 @@ def confirm_sentence():
 @app.route('/delete_sent/<int:sent_id>')
 @login_required
 def delete_sent(sent_id):
-	# sentence = Sentence.query.get(sent_id)
+	print "\nthis is delete_sent:"
+
 	dict_cur.execute("SELECT * FROM sentences WHERE id = %s;", (sent_id,))
 	sentence = dict_cur.fetchone()
-	# print "this is id", sent_id
-	# print "this is sentence", sentence
 
 	if sentence is None:
 		flash('Sentence not found!')
 		return redirect(url_for('user', 
 								userID=g.user.id))
-	# if userID != g.user.id:
-	# 	flash('You cannot delete this sentence!')
-	# 	return redirect(url_for('user', 
-	# 							username=g.user.username))
 
 	dict_cur.execute("DELETE FROM sentences WHERE sentences.id = %s;", (sent_id,))	
 	return redirect(url_for('user', 
@@ -225,11 +199,12 @@ def delete_sent(sent_id):
 @app.route("/tagPOS")
 @login_required
 def tag_pos():
+	print "\nthis is tag_pos:"
+
 	error= request.args.get("error")
 	sentence = request.args.get("sentence")
 	print sentence
 	userID = request.args.get("userID")
-	# language=request.args.get("sentence_language")
 	
 	dict_cur.execute("SELECT id from sentences WHERE sentence = %s;", (sentence,))
 	sentenceID = dict_cur.fetchone()[0]
@@ -241,45 +216,14 @@ def tag_pos():
 							userID=userID, 
 							sentenceID=sentenceID, 
 							error=error
-							# language=language
 							)
 
-# @app.route("/confirmPOS")
-# @login_required
-# def pos_confirm():
-# 	sentence=request.args.get("sentence")
-# 	userID = request.args.get("userID")
-# 	sentenceID = request.args.get("sentenceID")
-# 	print "sentenceID for confirmPOS = ", sentenceID
-# 	language = request.args.get("language")
-# 	pos = ""
-	
-# 	for i in range(len(sentence.split())):
-# 		if request.args.get(str(i)):
-# 			try:
-# 				pos=pos+(request.args.get(str(i)))+" "
-# 			except Exception as e:
-# 				print e
-# 			print "pos: ", pos, type(pos)
-# 		else:
-# 			print "error"
-# 			return redirect(url_for('tag_pos', 
-# 									sentence=sentence, 
-# 									userID=userID, 
-# 									sentenceID=sentenceID, 
-# 									error= 1, 
-# 									language=language))
-# 	print "done pos confirm"
-# 	return render_template("POS_confirm.html", 
-# 							sentence=sentence, 
-# 							userID=userID, 
-# 							sentenceID=sentenceID, 
-# 							pos=pos, 
-# 							language=language)
 
 @app.route("/pos_to_db")
 @login_required
 def pos_to_db():
+	print "\nthis is pos_to_db"
+
 	print request.args
 	redo = request.args.get("redo")
 	print redo, "redo"
@@ -300,9 +244,6 @@ def pos_to_db():
 			print "pos: ", pos, type(pos)
 	
 	if redo == None:
-		# language=request.args.get("language") #this is not getting passed
-		# print language, type(language)
-		# pos_array = str(request.args.get("pos")).split()
 		pos_array = pos.split()
 		print pos_array, type(pos_array)
 		words = sentence.split()
@@ -347,39 +288,41 @@ def pos_to_db():
 @app.route("/group/<userID>/<sentenceID>")
 @login_required
 def group(userID, sentenceID):
-		dict_cur.execute("SELECT * FROM sentences s INNER JOIN users u ON s.id_user = u.id WHERE s.id = %s;", (sentenceID,))
-		s_record = dict_cur.fetchone()
-		sentence = str(s_record[3])
-		print "group - sentence= ", sentence, type(sentence)	
-		userID = int(userID)
-		print "group - userID= ", userID, type(userID)
-		sentenceID = int(sentenceID)
-		print "group - sentenceID= ", sentenceID, type(sentenceID)
+	print "\nthis is group:"
 
-		#find existing records in phrases table for this sentence
-		dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s;", (sentenceID,))
-		identified_phrases = dict_cur.fetchall()
-		if identified_phrases != []:
-			identified_phrases = identified_phrases
-		print identified_phrases, "identified_phrases"
+	dict_cur.execute("SELECT * FROM sentences s INNER JOIN users u ON s.id_user = u.id WHERE s.id = %s;", (sentenceID,))
+	s_record = dict_cur.fetchone()
+	sentence = str(s_record[3])
+	print "group - sentence= ", sentence, type(sentence)	
+	userID = int(userID)
+	print "group - userID= ", userID, type(userID)
+	sentenceID = int(sentenceID)
+	print "group - sentenceID= ", sentenceID, type(sentenceID)
 
-		dict_cur.execute("SELECT w.id, w.word, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id = %s AND w.id_user = %s;", (sentenceID, userID))
-		wordlist = dict_cur.fetchall()
-		print "group - wordlist: ", wordlist
+	#find existing records in phrases table for this sentence
+	dict_cur.execute("SELECT * FROM phrases p WHERE p.id_sentence = %s;", (sentenceID,))
+	identified_phrases = dict_cur.fetchall()
+	if identified_phrases != []:
+		identified_phrases = identified_phrases
+	print identified_phrases, "identified_phrases"
 
+	dict_cur.execute("SELECT w.id, w.word, w.ws_linear_position FROM words w INNER JOIN sentences s ON w.id_sentence=s.id WHERE s.id = %s AND w.id_user = %s;", (sentenceID, userID))
+	wordlist = dict_cur.fetchall()
+	print "group - wordlist: ", wordlist
 
-		return render_template("group.html", 
-				sentence=sentence, 
-				userID=userID, 
-				sentenceID=sentenceID,
-				identified_phrases=identified_phrases,
-				wordlist=wordlist)
-
+	return render_template("group.html", 
+			sentence=sentence, 
+			userID=userID, 
+			sentenceID=sentenceID,
+			identified_phrases=identified_phrases,
+			wordlist=wordlist)
 
 
 @app.route("/confirm_phrase")
 @login_required
 def confirm_phrase():
+	print "\nthis is confirm_phrase:"
+
 	sentence = str(request.args.get("sentence"))
 	print "tagps sentence: ", sentence, type(sentence)
 	words = sentence.split()
@@ -387,14 +330,6 @@ def confirm_phrase():
 	sentenceID = int(request.args.get("sentenceID"))
 	print "tag ps sentenceID: ", sentenceID
 	phrase_type = str(request.args.get("phrase_type"))
-	# phrase_structure=request.args.get("phrase_structure")
-	# redo = request.args.get("redo")
-	# print redo
-	
-	# if redo == "True":
-	# 	print "redo true"
-	# 	word_positions_in_phrase_string = request.args.get("word_positions_in_phrase")
-	# else:
 
 	words_in_phrase = str(request.args.get("words_in_phrase")).split("|")
 	for word in words_in_phrase:
@@ -416,57 +351,22 @@ def confirm_phrase():
 	phrase = phrase.rstrip()
 	print phrase
 
-	# " ".join([str(words[int(word_position)]) for word_position in word_positions_in_phrase])
 	print "phrase: %s - %s" % (phrase, phrase_type)
 
-	# phrase_type_dict = {"S":[("NP", "necessary"), ("VP", "necessary")], 
-	# 					"NP": [("det","optional"), ("AP", "optional"), ("N","necessary"), ("PP","optional")], 
-	# 					"VP":[("V","necessary"), ("PP","optional"), ("NP","optional"), ("NP2", "optional"), ("S","optional"), ("CP", "optional"), ("AP","optional"), ("PP2","optional")], 
-	# 					"PP":[("P","necessary"), ("NP","optional") ,("PP","optional")], 
-	# 					"AP":[("deg","optional"), ("A","necessary")], 
-	# 					"CP": [("C","necessary"), ("S","necessary")] }
-
-	# phrase_structure_options=phrase_type_dict[phrase_type]
-	# print "PS options: ", phrase_structure_options
 	return render_template("confirm_phrase.html", 
 							sentence=sentence, 
 							sentenceID=sentenceID,
 							userID=userID, 
 							phrase=phrase, 
 							phrase_type=phrase_type, 
-							# phrase_structure=phrase_structure, 
 							words_in_phrase=wplist)
 
-
-# @app.route("/confirm_phrase")
-# @login_required
-# def confirm_phrase():
-# 	phrase_structure=request.args.get("phrase_structure")
-# 	sentence= request.args.get("sentence")
-# 	sentenceID=request.args.get("sentenceID")
-# 	userID = request.args.get("userID")
-# 	phrase_type = request.args.get("phrase_type")
-# 	phrase=request.args.get("phrase")
-# 	word_positions_in_phrase=request.args.get("word_positions_in_phrase")
-# 	print word_positions_in_phrase, "word_positions_in_phrase"
-# 	print phrase, "phrase"
-# 	print phrase_structure, "phrase_structure"
-# 	return render_template("confirm_phrase.html", 
-# 							sentence=sentence, 
-# 							userID=userID, 
-# 							phrase=phrase, 
-# 							phrase_type=phrase_type, 
-# 							phrase_structure=phrase_structure, 
-# 							sentenceID=sentenceID, 
-# 							word_positions_in_phrase=word_positions_in_phrase)
 
 
 @app.route("/phr_to_database")
 @login_required
 def put_phrase_in_database():
-	print "prh in database"
-	# phrase_structure = request.args.get("phrase_structure")
-	# print "phrase structure: ", phrase_structure, type(phrase_structure)
+	print "\n this is put_phrase_in_database:"
 	sentence = str(request.args.get("sentence"))
 	sentenceID = int(request.args.get("sentenceID"))
 	username=g.user.username
@@ -571,34 +471,34 @@ def put_phrase_in_database():
 							sentenceID=sentenceID, 
 							userID=userID))
 
+
 @app.route('/delete_phr/<int:phr_id>')
 @login_required
 def delete_phr(phr_id):
+	print "\nthis is delete_phr:"
+
 	userID = int(request.args.get("userID"))
 	sentenceID = int(request.args.get("sentenceID"))
 	dict_cur.execute("SELECT * FROM phrases WHERE id = %s;", (phr_id,))
 	phrase = dict_cur.fetchone()
-	# print "this is id", sent_id
-	# print "this is sentence", sentence
 
-	#this is copied from sentence delete - need to update it later 4/29/16
 	if phrase is None:
 		flash('Phrase not found!')
 		return redirect(url_for('user', 
 								username=g.user.username))
-	# if userID != g.user.id:
-	# 	flash('You cannot delete this sentence!')
-	# 	return redirect(url_for('user', 
-	# 							username=g.user.username))
+
 
 	dict_cur.execute("DELETE FROM phrases p WHERE p.id = %s;", (phr_id,))	
 	return redirect(url_for('group',
 							userID=userID,
 							sentenceID=sentenceID))
 
+
 @app.route("/tagSubj")
 @login_required
 def tag_subj():
+	print "\nthis is tag_subj:"
+
 	error=request.args.get("error")
 	sentence=request.args.get("sentence")
 	sentenceID=request.args.get("sentenceID")
@@ -627,6 +527,8 @@ def tag_subj():
 @app.route("/confirm_subj")
 @login_required
 def confirm_subj():
+	print "\nthis is confirm_subj:"
+
 	print "confirm_subj"
 	gramfunc="subject"
 	userID=int(request.args.get("userID"))
@@ -683,6 +585,8 @@ def confirm_subj():
 @app.route('/tag_obj/<userID>/<sentence>/<sentenceID>')
 @login_required
 def tag_obj(userID, sentence, sentenceID):
+	print "\nthis is tag_obj:"
+
 	phrases = []
 	try:
 		dict_cur.execute("SELECT id, phrase FROM phrases p WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
@@ -705,7 +609,8 @@ def tag_obj(userID, sentence, sentenceID):
 @app.route("/confirm_obj")
 @login_required
 def confirm_obj():
-	print "confirm_obj"
+	print "\nthis is confirm_obj:"
+
 	gramfunc="direct object"
 	userID=request.args.get("userID")
 	sentence=request.args.get("sentence")
@@ -759,49 +664,12 @@ def confirm_obj():
 							))
 
 
-# @app.route("/end")
-# @login_required
-# def prompt_new_sentence():
-# 	DO=request.args.get("DO")
-# 	IO=request.args.get("IO")
-# 	wordIDs=request.args.get("wordIDString").split()
-# 	if DO:
-# 		for wordID in DO.split():
-# 			try:
-# 				dict_cur.execute("SELECT * from words_cases WHERE wordID ='{}' AND gram_case='ACC';".format(wordID))
-# 				words_in_words_cases = dict_cur.fetchall()
-# 			except Exception as e:
-# 				print e
-# 			print wordID
-# 			print words_in_words_cases
-# 			if words_in_words_cases == []:
-# 				try:
-# 					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "ACC"))
-# 				except Exception as e:
-# 					print e
-# 			print wordID		
-# 	if IO:
-# 		for wordID in IO.split():
-# 			try:
-# 				dict_cur.execute("SELECT * FROM words_cases WHERE wordID ='{}' AND gram_case='DAT';".format(wordID))
-# 				words_in_words_cases = dict_cur.fetchall()
-# 			except Exception as e:
-# 				print e
-# 			print wordID
-# 			print words_in_words_cases
-# 			if words_in_words_cases == []:
-# 				try:
-# 					dict_cur.execute("INSERT INTO words_cases (wordID, gram_case) VALUES (%s, %s)", (wordID, "DAT"))
-# 				except Exception as e:
-# 					print e
-# 			print wordID		
-
-# 	return render_template("prompt_new_sentence.html")
 
 @app.route("/analyzed_sent")
 @login_required
 def analyzed_sent():
-	print "\nanalyzed_sent function"
+	print "\nthis is analyzed_sent:"
+
 	error= request.args.get("error")	
 	userID = int(request.args.get("userID"))
 	print "userID: ", userID
@@ -848,9 +716,9 @@ def analyzed_sent():
 
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
 		phrases = dict_cur.fetchall()
-		print "phrases: ", phrases, type(phrases)
+		print "\nphrases: ", phrases, type(phrases)
 
-		#get distinct phrase types present in sentence
+		# get distinct phrase types present in sentence
 		dict_cur.execute("SELECT DISTINCT phrase_type FROM phrases p INNER JOIN sentences s ON p.id_sentence = s.id WHERE s.id = %s;", (sentenceID,))
 		phrase_types = dict_cur.fetchall()
 
@@ -860,96 +728,97 @@ def analyzed_sent():
 			print "li: ", li, type(li)
 			ptlist.append(li)
 
-		print "pt list: ", ptlist, type(ptlist)
-		print "phrase types in sentence '%s' : %s" % (sentence, ptlist)
+		print "\npt list: ", ptlist, type(ptlist)
 
+		# create a list of items where each item is a list consisting of a unique phrase type
+		# present in the sentence and the content of the phrases that are of that type
 		phrase_groups = []
 		for t in ptlist:
 			print "type", t, type(t)
 			print "t[0]: ", t[0], type(t[0])
 			for p in phrases:
-				print "p[7]: ", p[7], type(p[7])
 				if p[7] == t[0]:
 					t.append(p[6])
 			phrase_groups.append(t)
 
 		print "phrase groups: ", phrase_groups
 
-		#get subject value
-		try:
-			gramfunc = "subject"
-			dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-			record = dict_cur.fetchone()
-			subject = record[10]
-			#get linear position of first word in subject
-			subjectlinpos = record[6]
-		except:
-			subject = "no subject"
-			subjectlinpos = "no subjectlinpos"
+	except Exception as e:
+		print e
+
+	# get subject value
+	try:
+		gramfunc = "subject"
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		record = dict_cur.fetchone()
+		subject = record[10]
+		#get linear position of first word in subject
+		subjectlinpos = record[6]
+	except:
+		subject = "no subject"
+		subjectlinpos = "no subjectlinpos"
 		
-		print "subject: ", subject, type(subject)
-		print "subjectlinpos: ", subjectlinpos, type(subjectlinpos)
+	print "\nsubject: ", subject, type(subject)
+	print "subjectlinpos: ", subjectlinpos, type(subjectlinpos)
 
 
-		#get object value
-		try:
-			gramfunc = "direct object"
-			dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
-			record = dict_cur.fetchone()
-			dobj = record[10]
+	#get object value
+	try:
+		gramfunc = "direct object"
+		dict_cur.execute("SELECT * FROM gram_functions gf INNER JOIN phrase_sentence_positions psp ON gf.id_phrase = psp.id_phrase INNER JOIN phrases p ON gf.id_phrase = p.id WHERE gf.id_user = %s AND gf.id_sentence = %s AND gf.gram_function = %s;", (userID, sentenceID, gramfunc))
+		record = dict_cur.fetchone()
+		dobj = record[10]
 
-			#get linear position of first word in object
-			dobjlinpos = record[6]
-		except:
-			dobj = "no object"
-			dobjlinpos = "no dobjlinpos"
+		#get linear position of first word in object
+		dobjlinpos = record[6]
+	except:
+		dobj = "no object"
+		dobjlinpos = "no dobjlinpos"
 
-		print "dobj: ", dobj, type(dobj)
-		print "dobjlinpos: ", dobjlinpos, type(dobjlinpos)
+	print "\ndobj: ", dobj, type(dobj)
+	print "dobjlinpos: ", dobjlinpos, type(dobjlinpos)
 
 
-		#get verb value
-		try:
-			dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s ORDER BY w.ws_linear_position ASC;", (sentenceID, userID, "verb"))
-			records = dict_cur.fetchall()
-			print "records: ", records
+	#get verb value
+	try:
+		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.pos = %s ORDER BY w.ws_linear_position ASC;", (sentenceID, userID, "verb"))
+		records = dict_cur.fetchall()
+		print "records: ", records
+		
+		if records == []:
+			verb = "no verb"
+			verbid = "no verbid"
+			verblinpos = "no verblinpos"
+
+		else:
+			verblist = []
+			for record in records:
+				verb = record[1]
+				verbid = record[0]
+				verblinpos = record[5]
+				print "verb record: ", record, type(record)
+				verblist.append(record[1])
 			
-			if records == []:
-				verb = "no verb"
-				verbid = "no verbid"
-				verblinpos = "no verblinpos"
+			verb = ""
+			for i in verblist:
+				verb = verb + " " + i
+			verb = verb.strip()
+			# print "verb: ", verb
 
-			else:
-				verblist = []
-				for record in records:
-					verb = record[1]
-					verbid = record[0]
-					verblinpos = record[5]
-					print "verb record: ", record, type(record)
-					verblist.append(record[1])
-				
-				verb = ""
-				for i in verblist:
-					verb = verb + " " + i
-				verb = verb.strip()
-				# print "verb: ", verb
+			verblinpos = records[0][3]
+			# print "verblinpos: ", verblinpos, type(verblinpos)
 
-				verblinpos = records[0][3]
-				# print "verblinpos: ", verblinpos, type(verblinpos)
+			verbid = records[0][0]
+	except Exception as e:
+		print e
 
-				verbid = records[0][0]
-					#get linear position of verb
-				# dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s AND w.id = %s;", (sentenceID, userID, verbid))
-				# verblinpos = dict_cur.fetchone()[5]
-		except Exception as e:
-			print e
-
-		print "verb: ", verb, type(verb)
-		print "verbid: ", verbid, type(verbid)
-		print "verblinpos: ", verblinpos, type(verblinpos)
+	print "verb: ", verb, type(verb)
+	print "verbid: ", verbid, type(verbid)
+	print "verblinpos: ", verblinpos, type(verblinpos)
 
 
-		#determine basic word order based on above info
+	#determine basic word order based on above info
+	try:
 		if verb == "no verb" or subject == "no subject":
 			bwo = []
 
@@ -982,8 +851,7 @@ def analyzed_sent():
 	except Exception as e:
 		print e
 
-	#this is for the syntactic structure section of the analyzed sent page
-	uniquepslist = []
+	#this generates the syntactic structure section of the analyzed sent page
 	try:
 		#create a list of words for the sentence
 		dict_cur.execute("SELECT * FROM words w WHERE w.id_sentence = %s AND w.id_user = %s;", (sentenceID, userID))
@@ -1054,6 +922,7 @@ def analyzed_sent():
 	except Exception as e:
 		print e
 
+	uniquepslist = []
 	try:
 		#this will look at each mother (key), subtract the content of the daughters (value list), and append
 		#what remains in the correct position in the list
@@ -1090,7 +959,7 @@ def analyzed_sent():
 						if i != j:
 							if all(x in a for x in b):
 								del dcontent[j]
-				print "\ndcontent (subsets removed): ", key, dcontent
+				print "dcontent (subsets removed): ", key, dcontent
 
 				#this updates psdict by removing phrases that are subsets of other phrases
 				dcontentlist = []
@@ -1137,7 +1006,7 @@ def analyzed_sent():
 						if record[2] == remainder and record[4] == key:
 							remainderlinpos = record[8]
 							remainderpos = record[7]
-							print remainderlinpos, remainderpos
+							print "remainderlinpos & remainderpos: ", remainderlinpos, remainderpos
 
 							#add remainderlinpos:remainderpos to pruledict as key:value pair
 							pruledict[remainderlinpos] = remainderpos
@@ -1147,18 +1016,17 @@ def analyzed_sent():
 				#create a list from the pruledict, where the order of items is determined by the key value
 				#this will create a list that is made of remainderpos and p-types in the right linear order
 				sentlen = len(wrecords)
-				print "sentlen: ", sentlen
 
 				for i in range(sentlen):
 					if i in pruledict.keys():
 						pscontent.append(pruledict[i])
 
 
-				print pscontent
+				print "pscontent: ", pscontent
 				psdict[key] = pscontent
 
-		print pruledict
-		print psdict
+		print "\npruledict: ", pruledict
+		print "\npsdict: ", psdict
 
 		for item in psdict:
 			rule = ""
@@ -1173,7 +1041,7 @@ def analyzed_sent():
 				dup_psr = list(dict_cur.fetchall())
 
 				if dup_psr != []:
-					print "found duplicate psr: ", dup_psr, type(dup_psr)
+					print "\nfound duplicate psr: ", dup_psr, type(dup_psr)
 					for record in dup_psr:
 						dict_cur.execute("DELETE FROM phrase_structure_rules psr WHERE psr.id = %s;", (record[0],))
 						print "deleted duplicate psr entry: ", record
@@ -1185,7 +1053,7 @@ def analyzed_sent():
 				dict_cur.execute("INSERT INTO phrase_structure_rules (phrase_structure, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (psdict[item], item, userID, sentenceID))
 			except Exception as e:
 				print e
-			print "inserted into psr table: ", psdict[item]
+			print "\ninserted into psr table: ", psdict[item]
 
 		dict_cur.execute("SELECT * FROM phrase_structure_rules psr INNER JOIN phrases p ON psr.id_phrase = p.id WHERE psr.id_sentence = %s AND psr.id_user = %s ORDER BY p.phrase_type;", (sentenceID, userID))
 		psr_records = dict_cur.fetchall()
@@ -1196,7 +1064,6 @@ def analyzed_sent():
 			mdlist.append(mother)
 			daughter = record[1]
 			mdlist.append(daughter)
-			# print "ps rule: ", psrule
 			pslist.append(mdlist)
 		for rule in pslist:
 			print rule
@@ -1225,7 +1092,7 @@ def analyzed_sent():
 							language=language,
 							sent_type=sent_type,
 							gloss=english_gloss,
-							notes=notes, #there is no field to enter notes in the sentence input screen
+							notes=notes,
 							collection_date=collection_date,
 							POSlist=POSlist,
 							phrase_types=ptlist,

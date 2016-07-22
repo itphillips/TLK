@@ -27,7 +27,7 @@
 <table class="center">
 	<tr>
 	{% for i in POSlist %}
-		<th>{{i[0]}}</th>
+		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[0]}}</th>
 	{% endfor %}
 	</tr>
 
@@ -39,7 +39,7 @@
 
 	<tr>
 	{% for i in POSlist %}
-		<th style="padding-left: 15px;padding-right: 15px;">{{i[1]}}</th>
+		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[1]}}</th>
 	{% endfor %}
 	</tr>
 </table>
@@ -97,7 +97,7 @@
 
 	<tr>
 	{% for group in phrase_groups %}
-		<td style="vertical-align:top; padding-left:15px; padding-right:15px; text-align: left;border-left: 1px solid; border-right: 1px solid; ">
+		<td style="vertical-align:top; padding-left:10px; padding-right:10px; text-align: left;border-left: 1px solid; border-right: 1px solid; ">
 		{% for item in group[1:] %}
 			<p>{{item}}</p>
 		{% endfor %}

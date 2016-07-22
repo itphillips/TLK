@@ -2,15 +2,6 @@
 <html lang="en-US">
 <head>
 	<title>Enter new sentence</title>
-	<style>
-		table, th, td, tr {
-			/*border: 1px solid black; */
-			padding: 5px;
-			font-size: 18px;
-			font-weight: normal;
-			font-family: arial;
-		}
-	</style>
 </head>
 
 {% extends "base.html" %}
@@ -21,8 +12,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- <h1>Step 1: Enter a sentence</h1> -->
-
 	<form action="{{url_for ('confirm_sentence')}}">
 	<p style="color:#ff0099;"><b>Tip: </b>Check the <a href="#guide">help windows</a> below for guidance.</p>
 	<p><b>Please enter a sentence:</b><br>
@@ -35,19 +24,16 @@
 	<input type="radio" name="sentence_type" value="interrogative">interrogative
 	<input type="radio" name="sentence_type" value="imperative">imperative
     <br><br>
-	<b>What does this sentence mean?</b> (say it in other words)<br>
+	<b>What does this sentence mean?</b> <br>(Say it in other words)<br>
 	<input type="text" name="paraphrase" required size=40><br><br>
 	<b>When was this sentence recorded?</b> <br>
-	(Please enter the date in MM/DD/YYYY format:)<br>
+	(Please enter the date in MM/DD/YYYY format)<br>
 	<input type="text" name="date" required size=15><br><br>
 	(Optional) <b>Add notes about this sentence here:</b><br>
 	<input type="text" name="notes" size=80 maxlength="140"><br><br>
 
 	<input type="hidden" name="userID" value="{{userID}}">
 	</p>
-<!-- 	Have you previously input other sentences from this same recording session?
-<input type="radio" name="continued_session" value="yes">Yes<br>
-<input type="radio" name="continued_session" value="no">No -->
 
 	<button type="submitg" id="submitg">Next</button>
 	
