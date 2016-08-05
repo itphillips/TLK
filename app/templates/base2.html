@@ -1,3 +1,21 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
@@ -174,7 +192,8 @@ table.center {
             border:1px solid #d6bcd6;
             display:inline-block;
             cursor:pointer;
-            color:#666666;
+            /*color:#666666;*/
+            color:#000000;
             font-family:Arial;
             font-size:17px;
             padding:7px 25px;
@@ -198,8 +217,8 @@ table.center {
 
 <!--This is the title image header-->
     <div id="header">
-            <a href="{{ url_for('home') }}">
-            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="550" height="105"> 
+            <a href="{{ url_for('about') }}">
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" height="100%"> 
             </a>
     </div>
 
@@ -208,8 +227,6 @@ table.center {
         <li><a href="{{ url_for('about') }}">About TLK</a></li>
         {% if g.user.is_authenticated() %}
         <li><a href="{{ url_for('user', userID=g.user.id) }}">Home</a></li>
-        <li><a target="_blank" href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
-        <!-- <li><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing Conventions</a></li> -->
         <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
         {% endif %}
         <!-- <p><a href="/help">Help</a></p> -->
@@ -243,7 +260,8 @@ table.center {
 <!--This is the footer-->
     <footer id="footer">
         Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
-        <br><a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html"><img src="/static/gplv3-88x31.png" alt="(GPLv3)"></a> The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>The Linguist's Kitchen code is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>Content is licensed under a <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">Creative Commons Attribution-ShareAlike 2.0 Generic License</a>, except where otherwise noted.
     </footer>
 
 </div>

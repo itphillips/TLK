@@ -40,7 +40,7 @@ Concept, design, and programming by [Ian Phillips](http://ianphillips.commons.gc
 
 Special thank you to [Michelle McSweeney](http://michelleajohnson.com/) for the snippet of Python code that launched this project into existence.
 
-Thank you to Susan Steinman for providing guidance during the early stages of development, writing code, and teaching me how a web framework works.
+Thank you to [Susan Steinman](https://github.com/susinmotion) for providing guidance during the early stages of development, writing code, and teaching me how a web framework works.
 
 Thank you to Joe Kirchhof at the [New Media Lab](http://newmedialab.cuny.edu/) for support deploying TLK and to the New Media Lab for hosting TLK.
 

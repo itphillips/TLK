@@ -1,3 +1,21 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -10,6 +28,9 @@
 			font-weight: normal;
 			font-family: arial;
 		}
+
+		#pos_tab  {display: block; }
+		#pos_tab  th {display: inline-block; }
 	</style>
 </head>
 <!-- extend base layout -->
@@ -24,22 +45,25 @@
 <!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
 
 {% if POSlist!=[] %}
-<table class="center">
+<table class="center" id="pos_tab">
 	<tr>
 	{% for i in POSlist %}
-		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[0]}}</th>
-	{% endfor %}
-	</tr>
+	<th>
+		<table class="center">
+			<tr>
+			<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[0]}}</th>
+			</tr>
 
-	<tr>
-	{% for i in POSlist %}
-		<th>|</th>
-	{% endfor %}
-	</tr>
+			<tr>
+			<th>|</th>
+			</tr>
 
-	<tr>
-	{% for i in POSlist %}
-		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[1]}}</th>
+			<tr>
+			<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[1]}}</th>
+			</tr>
+
+		</table>
+	</th>
 	{% endfor %}
 	</tr>
 </table>

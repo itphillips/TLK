@@ -1,3 +1,21 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -32,13 +50,13 @@
 
 {% for sentence in sentences %}
 
-<table>
+<table style="width:100%;">
 <tr>
-<td colspan="3">{{sentence['sentence']}}</td>
+<td colspan="3" style="width:100%;">{{sentence['sentence']}}</td>
 </tr>
 
 <tr>
-<td>
+<td style="width:120px;">
 	<form name="{{sentence['sentence']}}" action="{{url_for('tag_pos')}}" method="GET">
         <button type="submitw" id="submitw">Start new analysis
         </button>
@@ -51,7 +69,7 @@
 	</form> 
 </td>
 
-<td>
+<td style="width:123px;"> 
     <form name="{{sentence['sentence']}}" action="{{url_for('analyzed_sent')}}" method="GET">
         <button type="submit" id="submitw">Check old analysis
         </button>
@@ -64,7 +82,7 @@
 	</form>
 </td>
 
-<td>
+<td style="width:60px;">
 	{% if userID == g.user.id %}
 	<form name="delete" action="{{url_for('delete_sent', sent_id=sentence[0])}}">
 		<button type="submitr" id="submitr">Delete</button>

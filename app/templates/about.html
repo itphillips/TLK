@@ -114,8 +114,8 @@ a {
 
 <!--This is the title image header-->
     <div id="header">
-    		<a href="{{ url_for('home') }}">
-            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="550" height="105"> 
+    		<a href="{{ url_for('about') }}">
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" height="100%"> 
             </a>
     </div>
 
@@ -124,8 +124,6 @@ a {
         <li><a href="{{ url_for('about') }}">About TLK</a></li>
         {% if g.user.is_authenticated() %}
         <li><a href="{{ url_for('user', userID=g.user.id) }}">Home</a></li>
-        <li><a target="_blank" href="http://www.glottopedia.org/index.php/Main_Page">Glottopedia</a></li>
-        <!-- <li><a href="http://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig Glossing Conventions</a></li> -->
         <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
         {% endif %}
 
@@ -153,8 +151,7 @@ a {
 		<br><br><b>parts of speech</b> (noun, verb, adjective, 
 		pronoun, etc.)
 
-		<br><b>phrase structure</b> (noun phrase, verb phrase, adjectival 
-		phrase, etc.)
+		<br><b>phrase structure</b> (noun phrase, verb phrase, etc.)
 
 		<br><b>grammatical function</b> (grammatical subject, direct object, etc.)
 
@@ -172,7 +169,9 @@ a {
     	<p>
     	Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
         <br><br>
-        The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        The Linguist's Kitchen code is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br><br>
+        Content is licensed under a <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">Creative Commons Attribution-ShareAlike 2.0 Generic License</a>, except where otherwise noted.
         <br><br>
         Source code is available at <a href="https://github.com/itphillips/TLK" target="_blank">https://github.com/itphillips/TLK</a>.
     	</p>
@@ -182,7 +181,7 @@ a {
     <p>
     	Concept, design, and programming by <a href="http://ianphillips.commons.gc.cuny.edu/" target="_blank">Ian Phillips</a>.
     	<br><br> Special thank you to <a href="http://michelleajohnson.com/" target="_blank">Michelle McSweeney</a> for the snippet of Python code that launched this project into existence.
-    	<br><br> Thank you to Susan Steinman for providing guidance during the early stages of development, writing code, and teaching me how a web framework works.
+    	<br><br> Thank you to <a href="https://github.com/susinmotion" target="_blank">Susan Steinman</a> for providing guidance during the early stages of development, writing code, and teaching me how a web framework works.
     	<br><br> Thank you to Joe Kirchhof at the <a href="http://newmedialab.cuny.edu/" target="_blank">New Media Lab</a> for support deploying TLK and to the New Media Lab for hosting TLK.
     	<br><br> This project was inspired by conversations that took place in the <a href="https://gc.cuny.edu/Page-Elements/Academics-Research-Centers-Initiatives/Certificate-Programs/Interactive-Technology-and-Pedagogy" target="_blank">Interactive Technology &amp; Pedagogy Certificate Program</a> at <a href="https://gc.cuny.edu/home" target="_blank">CUNY Graduate Center</a>. 
     	<br><br> Funding for The Linguist's Kitchen was provided by awards from <a href="https://gcdi.commons.gc.cuny.edu/category/provosts-digital-innovation-grants/" target="_blank">GC Digital Initiatives Provost's Digital Innovation Grants</a> during the 2014-2015 and 2015-2016 cycles and a stipend from the <a href="http://newmedialab.cuny.edu/" target="_blank">New Media Lab</a> during the 2015-2016 academic year.
@@ -209,7 +208,8 @@ a {
 <!--This is the footer-->
     <footer id="footer">
         Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
-        <br><a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html"><img src="/static/gplv3-88x31.png" alt="(GPLv3)"></a> The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>The Linguist's Kitchen code is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>Content is licensed under a <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">Creative Commons Attribution-ShareAlike 2.0 Generic License</a>, except where otherwise noted.
     </footer>
 
 </div>

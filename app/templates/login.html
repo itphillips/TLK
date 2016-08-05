@@ -1,3 +1,21 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -9,7 +27,7 @@ p {
 }
 
         #container	{
-        	width:1100px;
+        	width:900px;
         	margin-left:auto;
         	margin-right:auto;
         }
@@ -21,14 +39,6 @@ p {
         	height:250px;
     	}
         		
-        #menu	{
-        	background-color:#FFF;
-        	height:600px;
-        	width:200px;
-        	float:left;
-        	text-align:left;
-        	padding-left:20px;
-        		}
         
         #login	{
         	position:relative;
@@ -52,14 +62,13 @@ p {
 
 <body>
 <!--This is the container and title image header-->
-    <div id="container">
-        <div id="header">
-            <img src="/static/tlk.png" alt="The Linguist's Kitchen" width="900" height="180">    
-    	</div> 
+<div id="container">
+    <div id="header">
+        <img src="/static/tlk.png" alt="The Linguist's Kitchen" height="100%">    
+	</div> 
 
-            
 <!--This is the workspace box-->
-    <div id="login"> 
+<div id="login"> 
     <script type="text/javascript">
     function set_openid(openid, pr)
     {
@@ -104,15 +113,16 @@ p {
         <p>{{ form.remember_me }} Remember Me</p>
         <p><input type="submit" value="Sign In"></p>
     </form>
-    </div>
+</div>
             
 
 <!--This is the footer-->
     <footer id="footer">
         Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
-        <br><a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html"><img src="/static/gplv3-88x31.png" alt="(GPLv3)"></a> The Linguist's Kitchen is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>The Linguist's Kitchen code is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>Content is licensed under a <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">Creative Commons Attribution-ShareAlike 2.0 Generic License</a>, except where otherwise noted.
     </footer>
 	
-    </div>
+</div>
 </body>
 </html>

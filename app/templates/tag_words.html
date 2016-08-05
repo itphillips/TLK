@@ -1,3 +1,21 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -29,10 +47,10 @@
 
 	<form name="pos" action="{{url_for('pos_to_db')}}" method="GET">
    
-        <table class="center">
+        <table class="center" style="table-layout:fixed; width:100%;">
             <tr>
             	{% for word in sentence.split() %}
-            	   <th> {{word}} </th>
+            	   <th style="font-size:80%; word-wrap:break-word;"> {{word}} </th>
                 {% endfor %}
             </tr>
 
@@ -40,7 +58,7 @@
             <tr>
                 {% for word in sentence.split() %}
                     <th>
-                      <select name="{{count}}" style="width:130px; font-size:16px;height:26px;">
+                      <select name="{{count}}" style="width:100%; max-width:130px; font-size:16px; height:26px;">
                         <option value="adjective">adjective</option>
                         <option value="adverb">adverb</option>
                         <option value="conjunction">conjunction</option>
@@ -89,8 +107,11 @@
 
 {% block helpbox %}
 <h2 style="align:center;">Parts of speech</h2>
-<iframe name="resources" src="https://en.wikipedia.org/wiki/Part_of_speech" style="border:none;" width="100%" height="85%">
+<iframe name="resources" src="https://en.wikipedia.org/wiki/Part_of_speech" style="border:none;" width="100%" height="80%">
 </iframe>
+<div style="padding-top:10px;">
+Wikipedia content licensed under <a href="https://en.wikipedia.org/wiki/Wikipedia:Copyrights" target="_blank">CC-BY-SA</a>.
+</div>
 {% endblock %}
 
 </body>
