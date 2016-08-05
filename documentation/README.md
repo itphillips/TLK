@@ -32,7 +32,9 @@ The purpose of The Linguist's Kitchen is to support learning. The first aim is t
 # License
 Copyright (C) 2016 [Ian Phillips](http://ianphillips.commons.gc.cuny.edu/)
 
-The Linguist's Kitchen is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0-standalone.html).
+The Linguist's Kitchen code is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0-standalone.html).
+
+Content is licensed under a [Creative Commons Attribution-ShareAlike 2.0 Generic License](http://creativecommons.org/licenses/by-sa/2.0/), except where otherwise noted.
 
 
 # Credits
