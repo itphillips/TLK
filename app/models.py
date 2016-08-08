@@ -70,20 +70,17 @@ class User(db.Model):
 class Sentence(db.Model):
 	__tablename__ = 'sentences'
 	id = db.Column(db.Integer, primary_key = True)
-	sessionid = db.Column(db.String(40))
-	sessionnumber = db.Column(db.Integer)
 	sentence = db.Column(db.String)
 	sentence_type = db.Column(db.String(30))
 	sentence_language = db.Column(db.String(50))
 	english_gloss = db.Column(db.String)
-	collection_date = db.Column(db.DateTime)
-	collection_location = db.Column(db.String(70))
 	notes = db.Column(db.String)
-	timestamp = db.Column(db.DateTime)
+	date_added = db.Column(db.DateTime)
 	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
 
 	def __repr__(self):
 		return '<Sentence %r>' % (self.sentence)
+		self.timestamp = DateTime.utcnow()
 
 
 class Word(db.Model):

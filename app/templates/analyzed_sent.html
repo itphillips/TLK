@@ -29,8 +29,8 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 			font-family: arial;
 		}
 
-		#pos_tab  {display: block; }
-		#pos_tab  th {display: inline-block; }
+		#pos_tab {display:inline-block;}
+
 	</style>
 </head>
 <!-- extend base layout -->
@@ -45,28 +45,23 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 <!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
 
 {% if POSlist!=[] %}
-<table class="center" id="pos_tab">
-	<tr>
+<div style="width:100%; text-align:center;">
 	{% for i in POSlist %}
-	<th>
-		<table class="center">
-			<tr>
-			<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[0]}}</th>
-			</tr>
+	<table id="pos_tab">
+		<tr>
+		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[0]}}</th>
+		</tr>
 
-			<tr>
-			<th>|</th>
-			</tr>
+		<tr>
+		<th style="text-align:center;">|</th>
+		</tr>
 
-			<tr>
-			<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[1]}}</th>
-			</tr>
-
-		</table>
-	</th>
+		<tr>
+		<th style="padding-left: 10px;padding-right: 10px; font-size:100%;">{{i[1]}}</th>
+		</tr>
+	</table>
 	{% endfor %}
-	</tr>
-</table>
+</div>
 
 {% else %}
 <p style="color:red;"> You didn't identify any parts of speech for this sentence.
@@ -148,7 +143,7 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 {% if uniquepslist!=[] %}
 <table class="center">
 	<tr>
-		<td>S &#8594; NP VP</td>
+		<td>S &#8594; {{sent_ps_rule}}</td>
 	</tr>
 
 	{% for i in uniquepslist %}
@@ -175,7 +170,6 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
     <input type="hidden" name="userID" value="{{userID}}">
     <input type="hidden" name="sentence" value="{{sentence}}">
     <input type="hidden" name="language" value="{{language}}">
-    <input type="hidden" name="date" value="{{collection_date}}">
     <input type="hidden" name="sentenceID" value="{{sentenceID}}">
 
 </form> 
@@ -189,7 +183,6 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 	<p align="left"><b>Language:</b> {{language}}</p>
 	<p align="left"><b>Sentence type:</b> {{sent_type}}</p>
 	<p align="left"><b>Meaning:</b> {{gloss}}</p>
-	<p align="left"><b>Collection date:</b> {{collection_date}}</p>
 	<p align="left"><b>Notes:</b> {{notes}}</p>
 	<form name="analysis" action="{{url_for('user', userID=userID)}}" method="GET">
         <br>

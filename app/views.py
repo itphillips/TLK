@@ -20,6 +20,7 @@
 #imports the app variable from the app package
 from app import app, db, lm, oid 
 from flask import Flask, render_template, url_for, request, redirect, jsonify, flash, session, g
+from datetime import datetime
 import string
 import psycopg2
 import collections
@@ -161,11 +162,10 @@ def confirm_sentence():
 		userID=request.args.get("userID")
 		sentence=request.args.get("sentence").lower()
 		language=request.args.get("language")
-		date=request.args.get("date")
 		paraphrase=request.args.get("paraphrase")
 		sentence_type=request.args.get("sentence_type")
 		notes=request.args.get("notes")
-		sessionID=date+language
+		date_added = datetime.utcnow()
 	except Exception as e:
 		print e
 
@@ -175,19 +175,8 @@ def confirm_sentence():
 		sentence = sentence.replace(i, "")
 
 	try:
-		dict_cur.execute("SELECT sessionnumber FROM sentences INNER JOIN users ON users.id=sentences.id_user WHERE users.id = %s AND sessionid = %s;", (userID, sessionID))
-		sessionnumber = dict_cur.fetchall()	
-	except Exception as e:
-		print e
-
-	if dict_cur.fetchall() != []:
-		sessionnumber=sessionnumber+1
-	else:
-		sessionnumber=1	
-
-	try:
 		#make sure that this sentence isn't already in the database
-		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, collection_date, sessionnumber, sessionid, english_gloss, id_user, sentence_type, notes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(sentence, language, date, sessionnumber, sessionID, paraphrase, userID, sentence_type, notes))
+		dict_cur.execute("INSERT INTO sentences (sentence, sentence_language, english_gloss, id_user, sentence_type, notes, date_added) VALUES (%s, %s, %s, %s, %s, %s, %s)",(sentence, language, paraphrase, userID, sentence_type, notes, date_added))
 	except Exception as e:
 		print e
 
@@ -310,7 +299,7 @@ def group(userID, sentenceID):
 
 	dict_cur.execute("SELECT * FROM sentences s INNER JOIN users u ON s.id_user = u.id WHERE s.id = %s;", (sentenceID,))
 	s_record = dict_cur.fetchone()
-	sentence = str(s_record[3])
+	sentence = str(s_record[1])
 	print "group - sentence= ", sentence, type(sentence)	
 	userID = int(userID)
 	print "group - userID= ", userID, type(userID)
@@ -726,12 +715,6 @@ def analyzed_sent():
 		dict_cur.execute("SELECT notes FROM sentences WHERE id = %s;", (sentenceID,))
 		notes = dict_cur.fetchone()[0]
 
-		#get collection date for sentence
-		dict_cur.execute("SELECT collection_date FROM sentences WHERE id = %s;", (sentenceID,))
-		collection_date = dict_cur.fetchone()[0].date()
-		# print "collection date: ", collection_date, type(collection_date)
-
-
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND wpp.wp_linear_position = 0 ORDER BY p.phrase_type ASC;", (sentenceID,))
 		phrases = dict_cur.fetchall()
 		print "\nphrases: ", phrases, type(phrases)
@@ -942,6 +925,11 @@ def analyzed_sent():
 
 	uniquepslist = []
 	try:
+		#each phrase that is identified as a daughter of something will get added to this list; the point is that
+		#whatever phrases don't get added here will be the top level phrases that go into the sentence
+		#PS rule (e.g., S = NP VP)
+		listofalldaughters = []
+
 		#this will look at each mother (key), subtract the content of the daughters (value list), and append
 		#what remains in the correct position in the list
 		dict_cur.execute("SELECT * FROM word_phrase_positions wpp INNER JOIN words w ON wpp.id_word = w.id WHERE wpp.id_sentence = %s AND w.id_user = %s ORDER BY wpp.id_phrase, wpp.wp_linear_position;", (sentenceID, userID))
@@ -979,11 +967,14 @@ def analyzed_sent():
 								del dcontent[j]
 				print "dcontent (subsets removed): ", key, dcontent
 
-				#this updates psdict by removing phrases that are subsets of other phrases
+				#this updates psdict by removing phrases that are daughters of daughter phrases
 				dcontentlist = []
 				for k in dcontent:
 					dcontentlist.append(k)
 				print "dcontentlist: ", dcontentlist
+				for i in dcontentlist:
+					listofalldaughters.append(i)
+
 				psdict[key] = dcontentlist
 				print "psdict: ", psdict
 
@@ -1043,6 +1034,7 @@ def analyzed_sent():
 				print "pscontent: ", pscontent
 				psdict[key] = pscontent
 
+		print "\nlistofalldaughters: ", listofalldaughters
 		print "\npruledict: ", pruledict
 		print "\npsdict: ", psdict
 
@@ -1102,6 +1094,29 @@ def analyzed_sent():
 	except Exception as e:
 		print e
 
+	try:
+		#this will created the ps rule for the sentence
+		dict_cur.execute("SELECT * from phrase_sentence_positions psp INNER JOIN phrases p ON psp.id_phrase = p.id WHERE psp.id_sentence = %s ORDER BY ps_linear_position ASC;", (sentenceID,))
+		psp_records = dict_cur.fetchall()
+		sent_top_phrases = []
+		print "psp_records: ", psp_records
+		
+		for i in psp_records:
+			if i[2] not in listofalldaughters:
+				sent_top_phrases.append(i[6])
+		print "sent_top_phrases: ", sent_top_phrases
+
+		ps_rule = ""
+		for i in sent_top_phrases:
+			ps_rule = ps_rule + " " + i
+
+		sent_ps_rule = ps_rule.strip()
+		print "sent_ps_rule: ", sent_ps_rule
+
+	except Exception as e:
+		print e
+		
+
 	return render_template("analyzed_sent.html",
 							username=userID,
 							userID=userID,
@@ -1111,12 +1126,12 @@ def analyzed_sent():
 							sent_type=sent_type,
 							gloss=english_gloss,
 							notes=notes,
-							collection_date=collection_date,
 							POSlist=POSlist,
 							phrase_types=ptlist,
 							phrase_groups=phrase_groups,
 							phrases=phrases,
 							bwo=bwo,
-							uniquepslist=uniquepslist
+							uniquepslist=uniquepslist,
+							sent_ps_rule=sent_ps_rule
 							)
 
