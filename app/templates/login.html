@@ -99,9 +99,9 @@ p {
         CSRF prevention we implemented in config.py - this needs to be in all forms if CSRF is enabled -->
         {{ form.hidden_tag() }}
         <p>
-            Please enter your OpenID, or click on the link below to login through Yahoo:<br>
+            Click the link below to sign in through Yahoo:<br>
             <!--this field object renders the field 'openid' from loginform subclass-->
-            {{ form.openid(size=90) }}<br>
+            {{ form.openid(size=50) }}<br>
             <!--this for loop renders any messages that are added by the validators under the openid field-->
             {% for error in form.openid.errors %}
                 <span style="color: red;">[{{ error }}]</span>
