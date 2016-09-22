@@ -52,6 +52,11 @@ def home():
 def about():
 	return render_template("about.html")
 
+@app.route('/tutorial')
+@login_required
+def tutorial():
+	return render_template("tutorial.html")
+
 @app.route('/login', methods=['GET', 'POST'])
 @oid.loginhandler 
 def login():
@@ -161,7 +166,8 @@ def confirm_sentence():
 	try:
 		userID=request.args.get("userID")
 		sentence=request.args.get("sentence").lower()
-		language=request.args.get("language")
+		language=request.args.get("language").lower()
+		print "language input: ", language
 		paraphrase=request.args.get("paraphrase")
 		sentence_type=request.args.get("sentence_type")
 		notes=request.args.get("notes")
@@ -689,7 +695,7 @@ def analyzed_sent():
 	try:
 		#get sentence language
 		dict_cur.execute("SELECT sentence_language sl FROM sentences s WHERE s.id=%s;", (sentenceID,))
-		language = dict_cur.fetchone()[0].title()
+		language = dict_cur.fetchone()[0]
 		print "lang: ", language, type(language)
 
 		#get list of parts of speech in sentence
@@ -720,7 +726,7 @@ def analyzed_sent():
 		print "\nphrases: ", phrases, type(phrases)
 
 		# get distinct phrase types present in sentence
-		dict_cur.execute("SELECT DISTINCT phrase_type FROM phrases p INNER JOIN sentences s ON p.id_sentence = s.id WHERE s.id = %s;", (sentenceID,))
+		dict_cur.execute("SELECT DISTINCT phrase_type FROM phrases p INNER JOIN sentences s ON p.id_sentence = s.id WHERE s.id = %s AND p.phrase_type != %s;", (sentenceID,"S"))
 		phrase_types = dict_cur.fetchall()
 
 		ptlist = []
@@ -820,8 +826,14 @@ def analyzed_sent():
 
 	#determine basic word order based on above info
 	try:
-		if verb == "no verb" or subject == "no subject":
+		if verb == "no verb":
 			bwo = []
+
+		elif verblinpos > dobjlinpos and subject == "no subject":
+			bwo = [["Object", dobj], ["Verb", verb], ["(OV)"]]
+
+		elif verblinpos < dobjlinpos and subject == "no subject":
+			bwo = [["Verb", verb], ["Object", dobj], ["(VO)"]]
 
 		elif subjectlinpos < verblinpos and dobj == "no object":
 			bwo = [["Subject", subject], ["Verb", verb], ["(SV)"]]
@@ -884,8 +896,34 @@ def analyzed_sent():
 	except Exception as e:
 		print e
 
-
+	#***this is the new psdict creation method based on matching the linear position of the first
+	#***word in a phrase with the linear span of each other phrase in combination with 
+	#***matching the string conent of one phrase to chunks of the string content of of other phrases
+	#***the position matching is necessar to prevent things like the NP "you" becoming a daughter of the NP "your sentence"
+	#****because "you" is a part of the string "your sentence" 
 	try:
+		prange_dict = {}
+		dict_cur.execute("SELECT p.id, psp.ps_linear_position FROM phrases p INNER JOIN phrase_sentence_positions psp ON p.id=psp.id_phrase WHERE p.id_sentence = %s AND p.id_user = %s AND p.phrase_type != %s;", (sentenceID, userID, "S"))
+		sentp = dict_cur.fetchall()
+		print "sentp: ", sentp
+		
+		for p in sentp:
+			prange_dict[p[0]] = []
+		print "prange dict with keys only: ", prange_dict
+		
+		for key in prange_dict:
+			# linpos_span = []
+			dict_cur.execute("SELECT w.ws_linear_position FROM words w INNER JOIN word_phrase_positions wpp ON w.id=wpp.id_word INNER JOIN phrases p ON p.id=wpp.id_phrase WHERE p.id_sentence = %s AND p.id_user = %s AND p.id = %s ORDER BY w.ws_linear_position ASC;", (sentenceID, userID, key))
+			prange_recs = dict_cur.fetchall()
+			print "prange_recs: ", key, prange_recs
+			
+			for record in prange_recs:
+				linearpos = record[0]
+				# print "linearpos: ", linearpos
+				prange_dict[key].append(linearpos)
+
+		print "prange_dict finished: ", prange_dict
+
 		#create a phrase structure dictionary where the key:value pair is phrase ID: list of daughter phraseIDs 
 		psdict = {}
 		dict_cur.execute("SELECT * FROM phrases p INNER JOIN phrase_sentence_positions psp ON p.id=psp.id_phrase WHERE p.id_sentence = %s AND p.id_user = %s;", (sentenceID, userID))
@@ -898,6 +936,7 @@ def analyzed_sent():
 			phraseID = record[0]
 			print "phraseID: ", phraseID, type(phraseID)
 			psdict[phraseID] = const
+			print "prange_dict for: ", phraseID, prange_dict[phraseID]
 
 
 			for i in precords:
@@ -909,19 +948,20 @@ def analyzed_sent():
 				isentoffset = " " + i[1]
 
 				#the and statement excludes the phraseID itself from the list
-				if imidsent in record[1] and i[1] != record[1]:
+				if imidsent in record[1] and i[1] != record[1] and int(i[6]) in prange_dict[phraseID]:
 					psdict[phraseID].append(i[0])
 
-				elif isentonset in record[1] and i[1] != record[1]:
+				elif isentonset in record[1] and i[1] != record[1] and int(i[6]) in prange_dict[phraseID]:
 					psdict[phraseID].append(i[0])
 
-				elif isentoffset in record[1] and i[1] != record[1]:
+				elif isentoffset in record[1] and i[1] != record[1] and int(i[6]) in prange_dict[phraseID]:
 					psdict[phraseID].append(i[0])
 
 		print "\npsdict: ", psdict
 
 	except Exception as e:
 		print e
+	#***this is the end of the old psdict creation method
 
 	uniquepslist = []
 	try:
@@ -944,6 +984,7 @@ def analyzed_sent():
 				for record in wppwrecords:
 					if record[4] == key:
 						psdict[key].append(record[7])
+				print "psdict w/ non-phrase daughters: ", psdict
 
 			else:
 				#create dictionary made of a word list for each daughter in each mother
@@ -1034,8 +1075,8 @@ def analyzed_sent():
 				print "pscontent: ", pscontent
 				psdict[key] = pscontent
 
-		print "\nlistofalldaughters: ", listofalldaughters
-		print "\npruledict: ", pruledict
+				print "\nlistofalldaughters: ", listofalldaughters
+				print "\npruledict: ", pruledict
 		print "\npsdict: ", psdict
 
 		for item in psdict:
@@ -1063,17 +1104,23 @@ def analyzed_sent():
 				dict_cur.execute("INSERT INTO phrase_structure_rules (phrase_structure, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (psdict[item], item, userID, sentenceID))
 			except Exception as e:
 				print e
-			print "\ninserted into psr table: ", psdict[item]
+			print "inserted into psr table: ", psdict[item], "\n"
 
 		dict_cur.execute("SELECT * FROM phrase_structure_rules psr INNER JOIN phrases p ON psr.id_phrase = p.id WHERE psr.id_sentence = %s AND psr.id_user = %s ORDER BY p.phrase_type;", (sentenceID, userID))
 		psr_records = dict_cur.fetchall()
+		print "psr_records: ", psr_records
 		pslist = []
 		for record in psr_records:
 			mdlist = []
 			mother = record[7]
+			# print "mother: ", mother, type(mother)
 			mdlist.append(mother)
 			daughter = record[1]
+			# print "daughter: ", daughter, type(daughter)
+			pid = record[2]
+			# print "pid: ", pid, type(pid)
 			mdlist.append(daughter)
+			mdlist.append(pid)
 			pslist.append(mdlist)
 		for rule in pslist:
 			print rule
@@ -1082,7 +1129,28 @@ def analyzed_sent():
 		exists = set()
 		for item in pslist:
 			rule = item[0] + " = " + item[1]
-			print rule
+			pid = item[2]
+			print "full ps rule: ", rule
+			print "phraseID: ", pid
+
+
+			#this checks the phrase structure rule table for duplicate entries
+			try:
+				dict_cur.execute("SELECT * FROM full_ps_rules fpr WHERE fpr.id_phrase = %s AND fpr.id_sentence = %s;", (pid, sentenceID))
+				dup_fpr = list(dict_cur.fetchall())
+
+				if dup_fpr != []:
+					print "\nfound duplicate fpr: ", dup_fpr, type(dup_fpr)
+					for record in dup_fpr:
+						dict_cur.execute("DELETE FROM full_ps_rules fpr WHERE fpr.id = %s;", (record[0],))
+						print "deleted duplicate fpr entry: ", record
+
+
+				# add full rule to full_ps_rules table in db
+				dict_cur.execute("INSERT INTO full_ps_rules (ps_rule, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (rule, pid, userID, sentenceID))
+			except Exception as e:
+				print e
+
 			if rule not in exists:
 				uniquepslist.append(item)
 				exists.add(rule)
@@ -1094,8 +1162,9 @@ def analyzed_sent():
 	except Exception as e:
 		print e
 
+
 	try:
-		#this will created the ps rule for the sentence
+		#this will create the ps rule for the sentence
 		dict_cur.execute("SELECT * from phrase_sentence_positions psp INNER JOIN phrases p ON psp.id_phrase = p.id WHERE psp.id_sentence = %s ORDER BY ps_linear_position ASC;", (sentenceID,))
 		psp_records = dict_cur.fetchall()
 		sent_top_phrases = []
@@ -1112,6 +1181,52 @@ def analyzed_sent():
 
 		sent_ps_rule = ps_rule.strip()
 		print "sent_ps_rule: ", sent_ps_rule
+
+		if sent_ps_rule != "":
+			full_sent_psr = "S = " + sent_ps_rule
+			print "full_sent_psr: ", full_sent_psr
+
+			#insert sentence into phrases table
+			try:
+				dict_cur.execute("SELECT * FROM phrases p WHERE p.phrase = %s AND p.phrase_type = %s AND p.id_user = %s AND p.id_sentence = %s;", (sentence, "S", userID, sentenceID))
+				dup_sentphrase = list(dict_cur.fetchall())
+
+				if dup_sentphrase != []:
+					print "found duplicate sentence phrase: ", dup_sentphrase, type(dup_sentphrase)
+					for record in dup_sentphrase:
+						dict_cur.execute("DELETE FROM phrases p WHERE p.id = %s;", (record[0],))
+						print "deleted duplicate sentence phrase entry: ", record
+
+				dict_cur.execute("INSERT INTO phrases (phrase, phrase_type, id_sentence, id_user) VALUES (%s, %s, %s, %s);", (sentence, "S", sentenceID, userID))
+			except Exception as e:
+				print e
+
+			print "inserted '%s' into phrases table" % (sentence)
+
+			#get id of whole sentence phrase from phrases table
+			try:
+				dict_cur.execute("SELECT * FROM phrases p WHERE p.phrase = %s AND p.id_sentence = %s AND p.id_user = %s;", (sentence, sentenceID, userID))
+				sentphraseID = dict_cur.fetchone()[0]
+				print "sentphraseID: ", sentphraseID
+
+			except Exception as e:
+				print e
+
+			#check and see if sentence ps rule is in full_psr_table
+			try:
+				dict_cur.execute("SELECT * FROM full_ps_rules fpr WHERE fpr.ps_rule = %s AND fpr.id_sentence = %s;", (full_sent_psr, sentenceID))
+				dup_sent_fpr = list(dict_cur.fetchall())
+
+				if dup_sent_fpr != []:
+					print "\nfound duplicate sentence fpr: ", dup_sent_fpr, type(dup_sent_fpr)
+					for record in dup_sent_fpr:
+						dict_cur.execute("DELETE FROM full_ps_rules fpr WHERE fpr.id = %s;", (record[0],))
+						print "deleted duplicate sentence fpr entry: ", record		
+			
+			#add sentence ps rule to full_psr_table
+				dict_cur.execute("INSERT INTO full_ps_rules (ps_rule, id_phrase, id_user, id_sentence) VALUES (%s, %s, %s, %s);", (full_sent_psr, sentphraseID, userID, sentenceID))
+			except Exception as e:
+				print e
 
 	except Exception as e:
 		print e
@@ -1134,4 +1249,59 @@ def analyzed_sent():
 							uniquepslist=uniquepslist,
 							sent_ps_rule=sent_ps_rule
 							)
+
+
+@app.route('/languages/<userID>')
+@login_required 
+def languages(userID):
+	print "\nthis is languages function"
+
+	try:
+		dict_cur.execute("SELECT username FROM users u WHERE u.id = %s;", (userID,))
+		user = dict_cur.fetchone()[0]
+		print "user: ", user, type(user)
+	except Exception as e:
+		print e
+
+
+	try:
+		lang_psr_dict = {}
+		dict_cur.execute("SELECT DISTINCT s.sentence_language FROM sentences s WHERE s.id_user =%s;", (userID,))
+		user_langs = dict_cur.fetchall()
+		print "user_langs: ", user_langs, type(user_langs)
+
+		for i in user_langs:
+			lang = i[0]
+			print "******\nlang: ", lang, type(lang)
+			lang_psr_dict[lang] = []
+
+		# print "lang_psr_dict: ", lang_psr_dict
+
+			dict_cur.execute("SELECT DISTINCT fpr.ps_rule FROM sentences s INNER JOIN full_ps_rules fpr ON s.id = fpr.id_sentence WHERE s.id_user = %s AND s.sentence_language = %s ORDER BY fpr.ps_rule ASC;", (userID,lang))
+			sent_ps_recs = dict_cur.fetchall()
+			# for l in lang_psr_dict:
+			psrlist = []
+			for i in sent_ps_recs:
+				print "sent_ps_recs: ", i, type(i)
+				# lang = i[3]
+				# print "lang: ", lang
+				psrule = i[0]
+				print "psrule: ", psrule, type(psrule)
+
+				# if lang == l:
+				psrlist.append(psrule)
+			print "psrlist: ", psrlist, type(psrlist)
+			lang_psr_dict[lang] = psrlist
+		print "lang_psr_dict for: ", lang, lang_psr_dict
+
+	except Exception as e:
+		print e
+
+	print "end of languages function"
+
+	return render_template('languages.html',
+						user=user,
+						userID=userID,
+						lang_psr_dict=lang_psr_dict
+						)
 

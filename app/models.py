@@ -37,6 +37,7 @@ class User(db.Model):
 	phrases = db.relationship('Phrase', backref='users', cascade='delete')
 	gram_functions = db.relationship('Gram_function', backref='users', cascade='delete')
 	phrase_structure_rules = db.relationship('Phrase_structure_rule', backref='users', cascade='delete')
+	full_ps_rules = db.relationship('Full_ps_rule', backref='users', cascade='delete')
 
 	
 	#this should just return true unless the object represents a user that should not
@@ -159,3 +160,13 @@ class Phrase_structure_rule(db.Model):
 		return '<Phrase_structure_rule %r>' % (self.phrase_structure_rule)
 
 
+class Full_ps_rule(db.Model):
+	__tablename__ = 'full_ps_rules'
+	id = db.Column(db.Integer, primary_key = True)
+	ps_rule = db.Column(db.String(60))
+	id_phrase = db.Column(db.Integer, db.ForeignKey('phrases.id', ondelete="CASCADE"))
+	id_user = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+	id_sentence = db.Column(db.Integer, db.ForeignKey('sentences.id', ondelete="CASCADE"))
+
+	def __repr__(self):
+		return '<Full_ps_rule %r>' % (self.full_ps_rule)

@@ -1,0 +1,116 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>{{user}}'s languages</title>
+	<style>
+		table, td, tr {
+			/*border: 1px solid black; */
+			padding: 5px;
+			font-size: 18px;
+			font-weight: normal;
+			font-family: arial;
+			
+		}
+
+		th {
+			font-weight:bold;
+		}
+
+		#pos_tab {
+			display:inline-block;
+		}
+
+		#menlangs {
+	        background-color: #ffffff;
+	        border-top: 1px solid #000000;
+	        border-left: 1px solid #000000;
+	        border-right: 1px solid #000000;
+	        height:22px;
+    	}
+
+	</style>
+</head>
+<!-- extend base layout -->
+{% extends "base3.html" %}
+
+<body>
+{% block helpbox %}
+
+<h2>Phrase structure rules for your languages:</h2>
+<hr>
+
+{% if lang_psr_dict!={} %}
+<div style="width:100%; text-align:center;">
+	{% for language, psrlist in lang_psr_dict.iteritems() %}
+		<table id="pos_tab" style="vertical-align:top;padding-left:20px;padding-right:20px;padding-top:10px;">
+		<th>{{language}}<hr></th>
+
+		{% if psrlist != [] %}
+			{% for psr in psrlist %}
+			<tr>
+			<td style="width:100%; text-align:left;">{{psr}}</td>
+			</tr>
+			{% endfor %}
+
+		{% else %}
+			<tr>
+			<td style="width:150px; color:red;">
+			Looks like you haven't analyzed any {{language}} sentences yet! <br><br>Click below to see your sentences.
+			</td>
+			</tr>
+		{% endif %}
+
+		</table>
+
+	{% endfor %}
+</div>
+<hr>
+<br>
+<form name="NewSentence" action="{{url_for('user', userID=userID)}}">
+<button type="submitg" id="submitg">See my sentences</button>
+<input type="hidden" name="userID" value="{{userID}}">
+</form>
+</br>
+
+{% else %}
+
+<p style="color:red;">Looks like you haven't analyzed any sentences yet! <br>Click below to see your sentences.
+<br>
+<form name="NewSentence" action="{{url_for('user', userID=userID)}}">
+	<button type="submitg" id="submitg">See my sentences</button>
+	<input type="hidden" name="userID" value="{{userID}}">
+</form>
+</br>
+</p>
+<br>
+
+{% endif %}
+
+{% endblock %}
+
+{% block guide %}
+	<h2>PS grammars for your languages</h2>
+	<p> The box to the right shows the unique phrase structure (PS) rules that can describe all of the sentences that you have analyzed for each language.  <br><br>You can think of each list of PS rules as a mini descriptive grammar for each language. <br><br>These rules are generated based on all of the sentence analyses that you have completed so far. These rules may change each time you (re)analyze a sentence.</p>        
+{% endblock %}
+
+
+</body>
+</html>

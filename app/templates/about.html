@@ -28,7 +28,8 @@ ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
+    height:50px;
     background-color: #FFF;
     border-bottom:solid 1px black;
 }
@@ -45,6 +46,18 @@ li a {
     text-decoration: none;
     font-family: "arial", Times, sans-serif;
     font-size: 18px;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    height: 21px;
+}
+
+li a.active {
+    background-color: #ffffff;
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    height:22px;
 }
 
 p {
@@ -121,10 +134,12 @@ a {
 
 <!--this is the menu box-->
     <ul>
-        <li><a href="{{ url_for('about') }}">About TLK</a></li>
+        <li><a class="active" id="menabout" href="{{ url_for('about') }}">About TLK</a></li>
         {% if g.user.is_authenticated() %}
-        <li><a href="{{ url_for('user', userID=g.user.id) }}">Home</a></li>
-        <li style="float:right"><a href="{{ url_for('logout') }}">Log out</a></li>
+        <li><a id="menuser" href="{{ url_for('user', userID=g.user.id) }}">My sentences</a></li>
+        <li><a id="menlangs" href="{{ url_for('languages', userID=g.user.id) }}">My languages</a></li>
+        <li><a id="mentutorial" href="{{ url_for('tutorial') }}" target="_blank">Tutorial</a></li>
+        <li style="float:right"><a id="menlogout" href="{{ url_for('logout') }}">Log out</a></li>
         {% endif %}
 
         {% if not g.user.is_authenticated() %}
@@ -137,7 +152,7 @@ a {
 
 <!--This is the workspace box-->
     <div id="workspace">
-    <h1>About</h1>
+    <h1>About TLK</h1>
     	<p>
     	The Linguist's Kitchen is a teaching and learning tool designed for 
 		introductory linguistics and language courses. It is meant to support classroom 

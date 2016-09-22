@@ -1,0 +1,300 @@
+<!-- The Linguist's Kitchen: A web-based app for learning linguistics -->
+<!-- Copyright (C) 2016 Ian Phillips -->
+
+<!-- This file is part of The Linguist's Kitchen.
+
+The Linguist's Kitchen is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Linguist's Kitchen is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>How to use The Linguist's Kitchen</title>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    /*overflow: hidden;*/
+    height:50px;
+    background-color: #FFF;
+    border-bottom:solid 1px black;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    height: 21px;
+}
+
+li a.active {
+    background-color: #ffffff;
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    height:22px;
+}
+
+p {
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;
+
+}
+
+
+h1 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 24px;
+}
+
+h2 {
+    font-family: "arial", Times, sans-serif;
+    font-size: 18px;    
+}
+
+a {
+    text-decoration: none;
+}
+
+        #container	{
+        	width:1100px;
+        	margin-left:auto;
+        	margin-right:auto;
+        }
+        
+        #header {
+        	position:relative;
+        	background-color:#FFF;
+        	width:100%;
+        	height:120px;
+    	}
+        		
+        #menu	{
+        	display:inline;
+            list-style-type:none;
+            position:relative;
+        	background-color:#FFF;
+        	width:10%;
+        	float:left;
+        	text-align:left;
+        	padding:10px;
+            border-left:solid 1px black;
+        }
+	
+
+        #footer	{
+        	position:static;
+        	background-color:#FFF;
+        	text-align:center;
+        	width:100%;
+        	clear:both;
+        	padding-top:100px;
+        	padding-bottom:20px;
+        }
+
+         </style>
+</head>
+
+<body>
+
+<!--This is the container-->
+<div id="container">
+
+<!--This is the title image header-->
+    <div id="header">
+    		<a href="{{ url_for('about') }}">
+            <img src="/static/tlk.png" alt="The Linguist's Kitchen" height="100%"> 
+            </a>
+    </div>
+
+<!--this is the menu box-->
+    <ul>
+        <li><a id="menabout" href="{{ url_for('about') }}">About TLK</a></li>
+        {% if g.user.is_authenticated() %}
+        <li><a id="menuser" href="{{ url_for('user', userID=g.user.id) }}">My sentences</a></li>
+        <li><a id="menlangs" href="{{ url_for('languages', userID=g.user.id) }}">My languages</a></li>
+        <li><a class="active" id="mentutorial" href="{{ url_for('tutorial') }}" target="_blank">Tutorial</a></li>
+        <li style="float:right"><a id="menlogout" href="{{ url_for('logout') }}">Log out</a></li>
+        {% endif %}
+
+        {% if not g.user.is_authenticated() %}
+        <li style="float:right"><a href="{{ url_for('login') }}">Log in</a></li>
+        {% endif %}
+
+        <!-- <p><a href="/help">Help</a></p> -->
+    </ul> 
+
+
+<!--This is the workspace box-->
+    <div id="workspace">
+        <h1>Getting started</h1>
+            <p>
+            This tutorial illustrates how to use The Linguist's Kitchen.
+            <br><br>
+            If you are unsure what The Linguist's Kitchen is all about, please read the <a href="{{ url_for('about') }}" target="_blank">About TLK page</a>.
+            <br><br>
+            The Linguist's Kitchen works best with Firefox or Chrome. Some pages may not render correctly with other browsers.
+            <br><br>
+            The Linguist's Kitchen uses OpenID to handle user login. If you do not have a Yahoo account, you will need to create one.
+            </p>
+        
+        <br><h1>Sign in</h1>
+            <p>
+            <b>Step 1: </b>Click "Yahoo" and then "Sign in". 
+            <br><br><i>After you click "Sign in", you may be need to enter your Yahoo credentials if you are not already signed into your Yahoo account.</i> 
+            <br><br><img src="/static/0_login.png" alt="Log in screen" width="75%" style="border:1px solid #000000;"> 
+            </p>
+
+        <br><h1>Add a sentence</h1>
+            <p>
+            <i>After signing in, you will see the "My sentences" page.</i> 
+            <br><br><b>Step 1: </b>Click the "Add a new sentence" button to input a new sentence.
+            <br><br><img src="/static/1_nosent.png" alt="My sentences screen" width="75%" style="border:1px solid #000000;">
+            </p>   
+
+            <p>
+            <br><i>You should now see the page for inputting sentences (shown below).</i>
+            <br><br><img src="/static/2.2_entersentfilled.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            <br><br><b>Step 1: </b>Type in your sentence. 
+            <br><p style="font-style:italic;">Note: TLK will remove punctuation and capitalization for the analysis. Multi-word nouns, phrasal verbs, and non-finite verbs should be entered <u>without</u> spaces. For example, "New York" should be entered as "NewYork" or "New_York". 
+            <br><br>Click on the <b style="color:blue;">blue links</b> for help--useful information will appear in the guide windows below the workspace.</p>
+            <p><b>Step 2: </b>Type in the name of language that the sentence belongs to. 
+            <br><br><b>Step 3: </b>Indicate what type of sentence this is.
+            <br><br><b>Step 4: </b>Provide a paraphrase or translation of the sentence. 
+            <br><p style="font-style:italic;">This is required to clairfy the meaning of ambiguous sentences and/or provide a translation for the sentence if needed.</p>
+            <p><b>Step 5: </b>(Optional) Type in any other information that you would like to save with the sentence, such as "Assignment #1", "The sentence was spoken in reply to...", etc.
+            <br><br>Click "Next" to continue. 
+            </p>
+
+
+        <br><h1>Analyze your sentences</h1>
+            <p>
+            <i>After clicking "Next" on the sentence input page, you will see the "My sentences" page.</i> 
+            <br><br><b>Step 1: </b>Click "Start new analysis".
+            <br><br><img src="/static/3_usersentences.png" alt="User's sentences screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        
+        <br><h1 style="font-style:italic;">Identify the part of speech for each word</h1>
+            <p>
+            <i>After clicking "Start new analysis", you should see the page for tagging the part of speech for each word in the sentence (shown below).</i>
+            <br><br><b>Step 1: </b>Click the drop down menu to identify the part of speech for each word. 
+            <br><br><b>Step 2: </b>Click "Next" after you pick the part of speech for all the words in the sentence.
+            <br><br><i>Note: If you make a mistake, use the browser buttons to go back or click the "My sentences" tab to start a new analysis for the sentece.</i>
+            <br><br><img src="/static/4_tagwords.png" alt="Identify parts of speech screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        <br><h1 style="font-style:italic;">Identify the syntactic phrases in the sentence</h1>
+            <p>
+            <i>After clicking "Next" on the last screen, you should see the page for identifying syntactic phrases in the sentence (shown below).</i>
+            <br><br><b>Step 1: </b>Use the tests in the guide box to identify groups of words in the sentence that form syntactic constituents. 
+            <br><br><b>Step 2: </b>Click the words that form a syntactic constituent.
+            <br><br><b>Step 3: </b>Click to idetify the type of syntactic constituent formed by the words. 
+            <br><br><b>Step 4: </b>Click "Confirm this phrase and identify another".
+            <br><br><img src="/static/5_tagp1.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+            <p>
+            <br><i>After clicking "Confirm this phrase..." on the last screen, you should see a confirmation window (shown below).</i>
+            <br><br>Click "Next" to continue.
+            <br><br><img src="/static/6_confirmp1.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+            <p>
+            <br><i>After clicking "Next" in the confirmation window, you will see the page for identifying syntactic constituents again.</i>
+            <br><br><i>Note that the syntactic phrase you just identified now appears in the workspace (shown below).</i>
+            <br><br><b>Step 5: </b>Continue identifying all of the syntactic constituents in the sentence following Steps 1-4 above.
+            <br><br><i>Note: If you make a mistake, use the "Delete" button.</i>
+            <br><br><img src="/static/7_tagp2.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+            <p>
+            <br><b>Step 6: </b>After you identify all of the phrases in the sentence, click "I finished identifying all phrases - go to the next step".
+            <br><br><img src="/static/8_finalptag.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        <br><h1 style="font-style:italic;">Identify the grammatical subject for the sentence</h1>
+            <p>
+            <i>After clicking "I finished identifying all phrases...", you will see the page for identifying the grammatical subject (shown below).</i>
+            <br><br><b>Step 1: </b>Click "Yes" if the sentence has a grammatical subject or click "No" if the sentence doesn't have a grammatical subject.
+            <br><br><b>Step 2: </b>If you clicked "Yes", then click the sytactic phrase that functions as the grammatical subject in the sentence.
+            <br><br><b>Step 3: </b>Click "Next".
+            <br><br><img src="/static/9_idsubj.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        <br><h1 style="font-style:italic;">Identify the direct object for the sentence</h1>
+            <p>
+            <i>After clicking "Next" or "No" on the last screen, you will see the page for identifying the direct object (shown below).</i>
+            <br><br><b>Step 1: </b>Click "Yes" if the sentence has a direct object or click "No" if the sentence doesn't have a direct object.
+            <br><br><b>Step 2: </b>If you clicked "Yes", then click the sytactic phrase that functions as the direct object in the sentence.
+            <br><br><b>Step 3: </b>Click "Next".   
+            <br><br><img src="/static/10_idobj.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        <br><h1 style="font-style:italic;">View the finished analysis for the sentence</h1>
+            <p>
+            <i>After clicking "Next" or "No" on the last screen, you will see the page that shows the completed analysis for the sentence (shown below).</i>
+            <br><br>This screen shows four levels of analysis on the left and the meta data you entered for the sentence on the right:
+            <br><br><b>Parts of speech: </b>Taken directly from the part of speech label you picked for each word in the sentence.
+            <br><br><b>Basic word order: </b>Determined by TLK based on the phrases you picked for grammatical subject and direct object and the word(s) you tagged with "verb" when you identified the parts of speech for the sentence.
+            <br><br><b>Syntactic phrases: </b>Taken directly from how you grouped words into syntactic phrases and the label you gave each grouping.
+            <br><br><b>Phrase structure: </b>Determined by TLK based on how you grouped words into syntactic phrases and the part of speech label you picked for each word in the sentence. 
+            <br><br><img src="/static/11_analyzedsent.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+        <br><h1>Analyze your languages</h1>
+            <p>
+            <i>Click on the menu item "My languages" to see the total unique phrase structure rules for each language you've analyzed sentences for.</i>
+            <br><br><img src="/static/12_userlangeng.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+            <p>
+            <br><i>Try analyzing sentences in different languages.</i>
+            <br><br><img src="/static/13_userstwosent.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            <br>
+            <br><br><img src="/static/14_analyzedsentspa.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;">
+            </p>
+
+            <p>
+            <br><i>"My languages" shows you the phrase structure rules for the different languages you've analyzed side by side.</i>
+            <br><br><img src="/static/15_userlangeands.png" alt="Sentence input screen" width="75%" style="border:1px solid #000000;"> 
+            </p>
+
+    </div>
+            
+<!--This is the footer-->
+    <footer id="footer">
+        Copyright &copy; 2016 <a target="_blank" href="http://ianphillips.commons.gc.cuny.edu/">Ian Phillips</a>
+        <br>The Linguist's Kitchen code is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html" target="_blank">GNU General Public License version 3</a>.
+        <br>Content is licensed under a <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">Creative Commons Attribution-ShareAlike 2.0 Generic License</a>, except where otherwise noted.
+    </footer>
+
+</div>
+
+</body>
+</html>

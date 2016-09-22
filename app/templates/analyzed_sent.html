@@ -38,8 +38,6 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 
 <body>
 {% block content %}
-
-{% if sentences!=[] %}
 	
 <h2>Parts of speech:</h2>
 <!-- <p align="left" style="font-size:20px;color:blue">{{sentence}}</p> -->
@@ -96,7 +94,7 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 </table>
 
 {% else %}
-<p style="color:red;"> You didn't identify the verb or subject in this sentence. <br>Can't determine basic word order.
+<p style="color:red;"> You didn't identify a verb in this sentence. <br>Can't determine basic word order.
 </p>
 
 {% endif %}
@@ -165,7 +163,7 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 
 <hr><br>
 <form name="reanalyzePOS" action="{{url_for('tag_pos')}}" method="GET">
-    <button type="submitg" id="submitg">Reanalyze this sentence
+    <button type="submitg" id="submitg">(Re)analyze this sentence
     </button>
     <input type="hidden" name="userID" value="{{userID}}">
     <input type="hidden" name="sentence" value="{{sentence}}">
@@ -173,7 +171,6 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
     <input type="hidden" name="sentenceID" value="{{sentenceID}}">
 
 </form> 
-{% endif %}
 
 {% endblock %}
 

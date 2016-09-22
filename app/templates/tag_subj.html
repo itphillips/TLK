@@ -32,7 +32,21 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 {% block content %}
 
 <script type="text/javascript">
+window.onload = function () {
+var tag_DO=document.getElementById("tag_DO");
+// var tag_IO=document.getElementById("tag_IO");
+}
+
+	function showTagDO(){
+		tag_DO.style.display="block";
+	}
+	function hideTagObj(){
+		tag_DO.style.display="None";
+		// tag_IO.style.display="None";
+	}
+
 	var prev= null;
+
 	function changeColor(e){
 		var target = e.target;
 		console.log(target);
@@ -56,33 +70,59 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 		}
 	}
 
-	{% for element in phrase_structure_options %}
-	console.log("{{element}}")
-	console.log("{{element[0]}}")
-	console.log("{{element[1]}}")
-	{% if element[1] == "necessary" %}
-	var button=document.forms.getElementById("{{element[0]}}");
+	// {% for element in phrase_structure_options %}
+	// console.log("{{element}}")
+	// console.log("{{element[0]}}")
+	// console.log("{{element[1]}}")
+	// {% if element[1] == "necessary" %}
+	// var button=document.forms.getElementById("{{element[0]}}");
 	
-	console.log(button)
-	console.log("hi")
-	console.log("{{element[0]}}")
+	// console.log(button)
+	// console.log("hi")
+	// console.log("{{element[0]}}")
 
-	button.style.background='orange';
-	{% endif %}
-	{% endfor %}
-	</script>
+	// button.style.background='orange';
+	// {% endif %}
+	// {% endfor %}
+</script>
 
 
 <!--This is the workspace box-->
 <p style="font-size: 30px;">
-What is the grammatical subject of "{{sentence}}"? <br><br>(Pick one.)
+Does "{{sentence}}" have a grammatical subject?
 </p>
 <!-- <p>(Pick one phrase.)</p> -->
-{% if error != None %}
+<!-- {% if error != None %}
 <h4 style="color:red"> Please make sure you select the grammatical subject in your sentence! </h4>
-{% endif %}
+{% endif %} -->
+
+<table class="center">
+<tr>
+
+<td style="padding-left:5px">
+	<form name="no_obj" action="{{url_for('tag_obj', userID=userID, sentence=sentence, sentenceID=sentenceID)}}">
+		<!-- <button type="button" id="no" name="no_DO" onClick="hideTagObj()" style="font-size:16px;height:26px">No</button> -->
+		<button type="submitr" id="submitr">No</button>
+
+		<input type="hidden" name="sentence" value="{{sentence}}">
+		<input type="hidden" name="sentenceID" value="{{sentenceID}}">
+		<input type="hidden" name="userID" value="{{userID}}">
+	</form>
+
+
+
+</td>
+
+<td style="padding-right:5px">
+	<button type="submitg" id="submitg" name="yes_DO" onClick="showTagDO()">Yes</button>
+</td>
+</tr>
+</table>
 
 <form action="{{url_for('confirm_subj')}}">
+
+	<div id="tag_DO" style="display:none">
+	<p style="font-size: 30px;">Which phrase is the grammatical subject? (Click one.)</p>
 
 {% for i in range(phrases|count) %}
 <button type="button" required id="{{phrases[i]}}" onClick="changeColor(event)" style="font-size:16px;height:26px">{{phrases[i][1]}}</button></br></br>
@@ -94,8 +134,10 @@ What is the grammatical subject of "{{sentence}}"? <br><br>(Pick one.)
 
 <br>
 <button type="submitg" id="submitg" name="subject" onClick="submitClick(event)" value="">Next</button>
-
+</div>
 </form>
+
+
 {% endblock %}
 
 

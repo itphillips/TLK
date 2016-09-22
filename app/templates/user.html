@@ -19,13 +19,23 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<title>{{user}}'s TLK homepage</title>
+	<title>{{user}}'s sentences</title>
 	<style>
 	td {
-	font-family: "arial", Times, sans-serif;
-    font-size: 20px;
-    text-align: left;
-/*    border-style: solid;*/
+    	font-family: "arial", Times, sans-serif;
+        font-size: 20px;
+        text-align: left;
+    /*    border-style: solid;*/
+    }
+
+    #menuser {
+        background-color: #ffffff;
+        border-top: 1px solid #000000;
+        border-left: 1px solid #000000;
+        border-right: 1px solid #000000;
+        height:22px;
+    }
+
 	</style>
 </head>
 <!-- extend base layout -->
@@ -52,7 +62,7 @@ along with The Linguist's Kitchen.  If not, see <http://www.gnu.org/licenses/>. 
 
 <table style="width:100%;">
 <tr>
-<td colspan="3" style="width:100%;">{{sentence['sentence']}}</td>
+<td colspan="3" style="width:100%;">{{sentence['sentence']}} ({{sentence['sentence_language']}})</td>
 </tr>
 
 <tr>
